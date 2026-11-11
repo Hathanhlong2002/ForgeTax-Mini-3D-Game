@@ -3434,7 +3434,7 @@
     cursor: default !important;
   }
 
-  /* ================= TAMAHAGANE KINTSUGI FLOATING ANVIL HOLO BOARD ================= */
+  /* ================= TAMAHAGANE KINTSUGI COMPACT ANVIL HOLO BOARD ================= */
   .anvil-holo-board {
     position: fixed;
     z-index: 85;
@@ -3442,23 +3442,16 @@
     display: none;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    width: min(94vw, 760px);
-    max-width: 760px;
-    animation: ahbLevitate 3.2s ease-in-out infinite alternate;
-    transition: opacity 0.22s ease;
+    gap: 5px;
+    width: min(92vw, 540px);
+    max-width: 540px;
+    animation: ahbStationLevitate 3s ease-in-out infinite alternate;
+    transition: opacity 0.2s ease;
     contain: layout style;
-  }
-  @keyframes ahbLevitate {
-    0% { transform: translate(-50%, -100%) translateY(0); }
-    100% { transform: translate(-50%, -100%) translateY(-6px); }
-  }
-  body.station-engaged.st-anvil .anvil-holo-board {
-    animation: ahbStationLevitate 3.2s ease-in-out infinite alternate;
   }
   @keyframes ahbStationLevitate {
     0% { transform: translateX(-50%) translateY(0); }
-    100% { transform: translateX(-50%) translateY(-5px); }
+    100% { transform: translateX(-50%) translateY(-4px); }
   }
   
   .ahb-head {
@@ -3468,165 +3461,206 @@
   .ahb-pill-badge {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 6px 20px;
-    background: linear-gradient(180deg, rgba(38, 24, 16, 0.96) 0%, rgba(16, 10, 6, 0.98) 100%);
-    border: 1.5px solid #e5a93c;
+    gap: 7px;
+    padding: 3px 14px;
+    background: linear-gradient(180deg, rgba(34, 22, 14, 0.96) 0%, rgba(14, 8, 4, 0.98) 100%);
+    border: 1px solid rgba(229, 169, 60, 0.65);
     border-radius: 999px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.8), 0 0 14px rgba(229, 169, 60, 0.35);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.75), 0 0 10px rgba(229, 169, 60, 0.25);
   }
-  .ahb-icon { font-size: 16px; }
+  .ahb-icon { font-size: 13px; line-height: 1; }
   .ahb-title {
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 900;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.10em;
     text-transform: uppercase;
     color: #ffe082;
-    text-shadow: 0 0 10px rgba(229, 169, 60, 0.5);
   }
 
   .ahb-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
     width: 100%;
   }
 
   .ahb-card {
-    background: linear-gradient(180deg, rgba(28, 18, 12, 0.94) 0%, rgba(12, 8, 5, 0.98) 100%);
-    border: 1.5px solid rgba(229, 169, 60, 0.55);
-    border-radius: 14px;
-    padding: 12px 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), 0 0 14px rgba(229, 169, 60, 0.2);
-    position: relative;
+    background: linear-gradient(180deg, rgba(24, 16, 11, 0.94) 0%, rgba(12, 8, 5, 0.98) 100%);
+    border: 1px solid rgba(229, 169, 60, 0.50);
+    border-radius: 10px;
+    padding: 7px 10px 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.75), 0 0 10px rgba(229, 169, 60, 0.15);
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
     box-sizing: border-box;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
   .ahb-card.safe-mode {
     border-color: #5ae875;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), 0 0 16px rgba(90, 232, 117, 0.35);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.75), 0 0 12px rgba(90, 232, 117, 0.25);
   }
   .ahb-card.danger-mode {
     border-color: #ff5252;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 82, 82, 0.35);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.75), 0 0 12px rgba(255, 82, 82, 0.25);
   }
   .ahb-card.quota-ready {
     border-color: #4ade80;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), 0 0 16px rgba(74, 222, 128, 0.35);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.75), 0 0 12px rgba(74, 222, 128, 0.25);
   }
 
   .ahb-card-top {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    line-height: 1;
   }
   .ahb-card-badge {
     background: linear-gradient(180deg, #d48a20 0%, #874906 100%);
     border: 1px solid #ffd56a;
-    border-radius: 6px;
-    padding: 2px 7px;
-    font-size: 11px;
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 9px;
     font-weight: 900;
     color: #fff9ea;
     line-height: 1.2;
   }
   .ahb-card-label {
-    font-size: 12px;
+    font-size: 10.5px;
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: #e8cfad;
     flex: 1;
   }
   .ahb-corner-tag {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 700;
-    color: rgba(229, 169, 60, 0.65);
-    letter-spacing: 0.04em;
+    color: rgba(229, 169, 60, 0.75);
+    white-space: nowrap;
   }
 
+  .ahb-row-main {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px;
+    margin-top: 1px;
+  }
   .ahb-val {
-    font-size: 26px;
+    font-size: 17px;
     font-weight: 900;
     line-height: 1.15;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
-  .ahb-val-success {
-    color: #4ade80;
-    text-shadow: 0 0 12px rgba(74, 222, 128, 0.45);
+  .ahb-val.gold-val {
+    color: #ffcf5e;
+    text-shadow: 0 0 8px rgba(255, 207, 94, 0.4);
   }
-  .ahb-val-quota {
+  .ahb-val.quota-val {
     color: #ffd56a;
-    text-shadow: 0 0 12px rgba(255, 213, 106, 0.45);
   }
-  .ahb-danger-row {
-    font-size: 15px;
-    font-weight: 800;
-    line-height: 1.2;
+  .ahb-card.quota-ready .ahb-val.quota-val {
+    color: #4ade80;
+    text-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
   }
 
   .ahb-sub {
-    font-size: 13px;
-    font-weight: 700;
-    color: #fff4db;
-    line-height: 1.2;
-  }
-  .ahb-meta {
     font-size: 11px;
     font-weight: 600;
-    color: #d4a359;
-    line-height: 1.2;
-    margin-top: 2px;
+    color: #cbbba8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  /* Segmented Bar (10 slots) */
-  .ahb-seg-meter {
+  /* Dual Rate Row (% Thành công / % Thất bại) */
+  .ahb-rate-dual {
     display: flex;
-    gap: 3px;
-    width: 100%;
-    height: 9px;
-    margin: 4px 0 2px;
-    background: rgba(10, 8, 6, 0.9);
-    padding: 2px;
-    border-radius: 6px;
-    border: 1px solid rgba(229, 169, 60, 0.35);
-    box-sizing: border-box;
+    align-items: baseline;
+    gap: 5px;
+    margin-top: 1px;
+    font-variant-numeric: tabular-nums;
   }
-  .ahb-seg-meter i {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 2px;
-    transition: background 0.2s ease;
+  .rate-success {
+    font-size: 14px;
+    font-weight: 900;
+    color: #4ade80;
+    text-shadow: 0 0 8px rgba(74, 222, 128, 0.35);
+    white-space: nowrap;
   }
-  .ahb-seg-meter i.active {
-    background: linear-gradient(180deg, #ffd56a 0%, #d48a20 100%);
-    box-shadow: 0 0 6px rgba(255, 213, 106, 0.5);
+  .rate-sep {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.3);
   }
-  .ahb-seg-meter i.active.safe {
-    background: linear-gradient(180deg, #5ae875 0%, #2e9f45 100%);
-    box-shadow: 0 0 6px rgba(90, 232, 117, 0.6);
+  .rate-fail {
+    font-size: 13px;
+    font-weight: 800;
+    color: #ff5252;
+    text-shadow: 0 0 8px rgba(255, 82, 82, 0.35);
+    white-space: nowrap;
   }
 
-  @media (max-width: 680px) {
+  /* Mini Dual Progress Bar (Success vs Fail) */
+  .ahb-dual-bar {
+    display: flex;
+    width: 100%;
+    height: 6px;
+    margin-top: 3px;
+    background: rgba(10, 8, 6, 0.95);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(229, 169, 60, 0.3);
+  }
+  .bar-succ {
+    height: 100%;
+    background: linear-gradient(90deg, #2e9f45, #4ade80);
+    transition: width 0.2s ease;
+  }
+  .bar-fail {
+    height: 100%;
+    background: linear-gradient(90deg, #ff7a1a, #ff5252);
+    transition: width 0.2s ease;
+  }
+
+  /* Mini Single Bar for Quota */
+  .ahb-single-bar {
+    width: 100%;
+    height: 6px;
+    margin-top: 3px;
+    background: rgba(10, 8, 6, 0.95);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(229, 169, 60, 0.3);
+  }
+  .ahb-single-bar .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #d48a20, #ffd56a);
+    transition: width 0.2s ease;
+  }
+  .ahb-card.quota-ready .ahb-single-bar .bar-fill {
+    background: linear-gradient(90deg, #2e9f45, #4ade80);
+  }
+
+  @media (max-width: 580px) {
     .anvil-holo-board {
       width: 95vw;
-      gap: 6px;
-    }
-    .ahb-grid {
-      grid-template-columns: 1fr;
-      gap: 6px;
-    }
-    .ahb-card {
-      padding: 8px 12px;
+      gap: 4px;
     }
     .ahb-val {
-      font-size: 20px;
+      font-size: 15px;
     }
-    .ahb-title {
-      font-size: 11px;
+    .rate-success {
+      font-size: 12.5px;
+    }
+    .rate-fail {
+      font-size: 11.5px;
+    }
+    .ahb-sub {
+      font-size: 10px;
     }
   }
 </style>
@@ -3713,12 +3747,12 @@
       <button type="button" data-st="wide" class="st-tab" title="Tự do đi bộ / Toàn cảnh (Phím 5)"><span class="st-num">[5]</span><span class="st-ic">👁</span> <span class="st-name">Tự Do</span></button>
     </div>
     
-    <!-- Floating Crystal-Crisp Anvil Holo Board (Tamahagane Kintsugi DOM Component) -->
+    <!-- Compact Floating Anvil Holo Board (Tamahagane Kintsugi DOM Component) -->
     <div id="anvilHoloBoard" class="anvil-holo-board" style="display:none;" aria-live="polite">
       <div class="ahb-head">
         <div class="ahb-pill-badge">
           <span class="ahb-icon">⚔️</span>
-          <span class="ahb-title" id="ahbHeaderTitle">FORGETAX · BẢNG THÔNG SỐ RÈN KIẾM</span>
+          <span class="ahb-title" id="ahbHeaderTitle">FORGETAX · THÔNG SỐ RÈN KIẾM</span>
         </div>
       </div>
       <div class="ahb-grid">
@@ -3727,11 +3761,12 @@
           <div class="ahb-card-top">
             <span class="ahb-card-badge">LV</span>
             <span class="ahb-card-label" id="ahbLblLv">CẤP ĐỘ KIẾM</span>
-            <span class="ahb-corner-tag">+ ANVIL.01</span>
+            <span class="ahb-corner-tag" id="ahbShapeNext">Lv.2 ➔</span>
           </div>
-          <div class="ahb-val" id="ahbValLv">Lv.1</div>
-          <div class="ahb-sub" id="ahbSubLvName">Kiếm Sắt Tập Luyện · Thép Thô</div>
-          <div class="ahb-meta" id="ahbMetaLvNext">Mục tiêu: Lv.2 → Kiếm Ngắn Lính Mới</div>
+          <div class="ahb-row-main">
+            <span class="ahb-val" id="ahbValLv">Lv.1</span>
+            <span class="ahb-sub" id="ahbSubLvName">Kiếm Sắt · Thép Thô</span>
+          </div>
         </div>
 
         <!-- CARD 2: GIÁ TRỊ KIẾM (VÀNG) -->
@@ -3739,45 +3774,50 @@
           <div class="ahb-card-top">
             <span class="ahb-card-badge">🪙</span>
             <span class="ahb-card-label" id="ahbLblGold">GIÁ TRỊ KIẾM</span>
-            <span class="ahb-corner-tag">TRIB.GATE +</span>
+            <span class="ahb-corner-tag">[B] CHỐT</span>
           </div>
-          <div class="ahb-val" id="ahbValGold">25 VÀNG</div>
-          <div class="ahb-sub" id="ahbSubGoldPrompt">Bấm phím [B] để chốt vàng vào kho</div>
-          <div class="ahb-meta" id="ahbMetaGoldVault">Vàng kho đang có: 0 vàng</div>
+          <div class="ahb-row-main">
+            <span class="ahb-val gold-val" id="ahbValGold">25 VÀNG</span>
+            <span class="ahb-sub" id="ahbMetaGoldVault">Kho: 0 Vàng</span>
+          </div>
         </div>
 
-        <!-- CARD 3: TỈ LỆ THÀNH CÔNG / NGUY CƠ VỠ -->
+        <!-- CARD 3: % THÀNH CÔNG & THẤT BẠI -->
         <div class="ahb-card ahb-card-rate" id="ahbCardRate">
           <div class="ahb-card-top">
             <span class="ahb-card-badge" id="ahbBadgeRate">🛡️</span>
-            <span class="ahb-card-label" id="ahbLblRate">TỈ LỆ THÀNH CÔNG & NGUY CƠ VỠ</span>
-            <span class="ahb-corner-tag">+ MATRIX.64</span>
+            <span class="ahb-card-label" id="ahbLblRate">TỈ LỆ RÈN KIẾM</span>
+            <span class="ahb-corner-tag" id="ahbHeatTag">🔥 20%</span>
           </div>
-          <div class="ahb-val ahb-val-success" id="ahbValSuccess">✔ 99.9% THÀNH CÔNG</div>
-          <div class="ahb-danger-row" id="ahbValBreak">⚠️ 0.1% NGUY CƠ VỠ</div>
-          <div class="ahb-seg-meter" id="ahbMeterSuccess">
-            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          <div class="ahb-rate-dual">
+            <span class="rate-success" id="ahbValSuccess">✔ 99.9% Thành công</span>
+            <span class="rate-sep">·</span>
+            <span class="rate-fail" id="ahbValFail">💥 0.1% Thất bại</span>
           </div>
-          <div class="ahb-meta" id="ahbMetaHeatNote">Nhiệt kiếm: 20% (Nhiệt ≥60% giảm 50% vỡ) · Đã gõ: 0/99 nhát</div>
+          <div class="ahb-dual-bar">
+            <div class="bar-succ" id="ahbBarSucc" style="width: 99.9%;"></div>
+            <div class="bar-fail" id="ahbBarFail" style="width: 0.1%;"></div>
+          </div>
         </div>
 
         <!-- CARD 4: TIẾN ĐỘ NỘP CỐNG QUA VÒNG -->
         <div class="ahb-card ahb-card-quota" id="ahbCardQuota">
           <div class="ahb-card-top">
             <span class="ahb-card-badge" id="ahbBadgeQuota">🎯</span>
-            <span class="ahb-card-label" id="ahbLblQuota">TIẾN ĐỘ NỘP CỐNG QUA VÒNG</span>
-            <span class="ahb-corner-tag">MOLTEN.FORGE +</span>
+            <span class="ahb-card-label" id="ahbLblQuota">TIẾN ĐỘ CỐNG</span>
+            <span class="ahb-corner-tag" id="ahbTurnsLeft">Lượt: 30</span>
           </div>
-          <div class="ahb-val ahb-val-quota" id="ahbValQuota">0% ĐẠT CHỈ TIÊU CỐNG</div>
-          <div class="ahb-sub" id="ahbSubQuota">Hiện có 0 / 120 Vàng · Cần thêm 120 Vàng</div>
-          <div class="ahb-seg-meter" id="ahbMeterQuota">
-            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          <div class="ahb-row-main">
+            <span class="ahb-val quota-val" id="ahbValQuota">0% ĐẠT CỐNG</span>
+            <span class="ahb-sub" id="ahbSubQuota">0 / 120 Vàng</span>
           </div>
-          <div class="ahb-meta" id="ahbMetaRoundNote">Vòng 1 · Lượt còn lại: 30 lượt rèn</div>
+          <div class="ahb-single-bar">
+            <div class="bar-fill" id="ahbBarQuota" style="width: 0%;"></div>
+          </div>
         </div>
       </div>
     </div>
-<div id="interactPromptWrap" class="interact-prompt-wrap" style="display:none;">
+    <div id="interactPromptWrap" class="interact-prompt-wrap" style="display:none;">
       <div id="interactPrompt" class="interact-prompt" role="button" tabindex="0">
         <span class="prompt-key">E</span>
         <span class="prompt-label" id="interactLabel">SỬ DỤNG ĐE RÈN</span>
@@ -4259,6 +4299,22 @@ var hornL = mesh(new THREE.ConeGeometry(.09,.5,8), matDragon, -.48,.5,-.2, drago
 var hornR = mesh(new THREE.ConeGeometry(.09,.5,8), matDragon,  .48,.5,-.2, dragonHead, false); hornR.rotation.z=-.35; hornR.rotation.x=-.3;
 mesh(new THREE.SphereGeometry(.05,10,8), eyeMat, -.16,-.08,.8, dragonHead, false);
 mesh(new THREE.SphereGeometry(.05,10,8), eyeMat,  .16,-.08,.8, dragonHead, false);
+function setProceduralDragonVisible(v){
+  if(typeof dragonHead==='undefined'||!dragonHead) return;
+  for(var i=0;i<dragonHead.children.length;i++){
+    var c=dragonHead.children[i];
+    if(c!==smokeDragonRoot) c.visible=!!v;
+  }
+}
+function setDragonCaveEyesVisible(v){
+  var on=!!v;
+  if(typeof eyeL!=='undefined'&&eyeL) eyeL.visible=on;
+  if(typeof eyeR!=='undefined'&&eyeR) eyeR.visible=on;
+  if(typeof pupL!=='undefined'&&pupL) pupL.visible=on;
+  if(typeof pupR!=='undefined'&&pupR) pupR.visible=on;
+  if(typeof brow!=='undefined'&&brow) brow.visible=on;
+}
+setProceduralDragonVisible(false); /* GLB or alcove eyes only — hide blocky placeholder snout */
 
 /* Front Wall (z = +4.9) + Blacksmith Castle Doors + Banners */
 mesh(RB(13.6,4.2,.4,.06), matStone, 0,2.1,5.0);
@@ -5664,8 +5720,7 @@ function engageStation(st, force){
     toast(isEn ? '🔥 Furnace — [Space/E] Heat blade, [Q/WASD] Leave station' : '🔥 Lò Nung — [Space/E] Nung kiếm, [Q/WASD] Rời trạm', 'info');
   } else if(st === 'bell'){
     if(typeof bellSound === 'function') bellSound();
-    if(typeof showSmokeDragonHead === 'function') showSmokeDragonHead();
-    toast(isEn ? '🔔 Dragon Bell — look at the cave behind you (Smoke Dragon). [Space/E] Pay tribute' : '🔔 Chuông Cống — quay lại hang phía sau (Rồng Khói). [Space/E] Nộp cống', 'info');
+    toast(isEn ? '🔔 Dragon Bell — [Space/E] Pay tribute, [Q/WASD] Leave station' : '🔔 Chuông Cống — [Space/E] Nộp cống, [Q/WASD] Rời trạm', 'info');
   } else if(st === 'rack'){
     if(typeof clang === 'function') clang(0.25, 1.4);
     toast(isEn ? '🗡 Sword Rack — [T] Hang/Retrieve blade, [Q/WASD] Leave station' : '🗡 Giá Treo — [T] Treo/Lấy kiếm, [Q/WASD] Rời trạm', 'info');
@@ -7146,9 +7201,9 @@ function updateAnvilHoloBoard(){
 
   function formatBoardGold(n){
     n = Math.round(Number(n) || 0);
-    if(n >= 1e12) return (n/1e12).toFixed(n % 1e12 === 0 ? 0 : 2).replace(/\.0$/,"") + (isEn ? "T" : " nghìn tỷ");
+    if(n >= 1e12) return (n/1e12).toFixed(n % 1e12 === 0 ? 0 : 2).replace(/\.0$/,"") + (isEn ? "T" : "T");
     if(n >= 1e9) return (n/1e9).toFixed(n % 1e9 === 0 ? 0 : 2).replace(/\.0$/,"") + (isEn ? "B" : " tỷ");
-    if(n >= 1e6) return (n/1e6).toFixed(n % 1e6 === 0 ? 0 : 1).replace(/\.0$/,"") + (isEn ? "M" : " triệu");
+    if(n >= 1e6) return (n/1e6).toFixed(n % 1e6 === 0 ? 0 : 1).replace(/\.0$/,"") + (isEn ? "M" : " tr");
     if(n >= 1e4) return n.toLocaleString();
     return String(n);
   }
@@ -7156,11 +7211,11 @@ function updateAnvilHoloBoard(){
   var sShapeName = (typeof modelNameForLevel === 'function') ? modelNameForLevel(sLv) : 'Kiếm Sắt';
 
   // 1. Header
-  var headTitle = isEn ? "FORGETAX · ANVIL SWORD INSPECTION CONSOLE" : "FORGETAX · BẢNG THÔNG SỐ RÈN KIẾM";
+  var headTitle = isEn ? "FORGETAX · ANVIL SWORD STATS" : "FORGETAX · THÔNG SỐ RÈN KIẾM";
   var elHead = $('ahbHeaderTitle'); if(elHead) elHead.textContent = headTitle;
 
   // 2. Card 1: Level
-  var elLblLv = $('ahbLblLv'); if(elLblLv) elLblLv.textContent = isEn ? "BLADE LEVEL" : "CẤP ĐỘ KIẾM";
+  var elLblLv = $('ahbLblLv'); if(elLblLv) elLblLv.textContent = isEn ? "BLADE LEVEL" : "CẤP ĐỘ";
   var elValLv = $('ahbValLv');
   if(elValLv){
     elValLv.textContent = "Lv." + sLv;
@@ -7169,24 +7224,22 @@ function updateAnvilHoloBoard(){
   }
   var elSubLv = $('ahbSubLvName');
   if(elSubLv) elSubLv.textContent = sShapeName + " · " + (sSkin.name || "");
-  var elMetaLv = $('ahbMetaLvNext');
-  if(elMetaLv){
-    var nextDesc = (sLv >= 100) ? (isEn ? "★ MAX LEVEL (FINAL FORM)" : "★ CỰC HẠN VŨ KHÍ TỐI THƯỢNG")
-                                : (isEn ? ("Next: Lv." + (sLv+1) + " → " + modelNameForLevel(sLv + 1)) : ("Mục tiêu: Lv." + (sLv+1) + " → " + modelNameForLevel(sLv + 1)));
-    elMetaLv.textContent = nextDesc;
+  var elShapeNext = $('ahbShapeNext');
+  if(elShapeNext){
+    var nextDesc = (sLv >= 100) ? (isEn ? "★ MAX" : "★ CỰC HẠN") : ("Lv." + (sLv+1) + " ➔");
+    elShapeNext.textContent = nextDesc;
   }
 
   // 3. Card 2: Giá trị (Vàng)
-  var elLblGold = $('ahbLblGold'); if(elLblGold) elLblGold.textContent = isEn ? "SWORD VALUE" : "GIÁ TRỊ KIẾM";
+  var elLblGold = $('ahbLblGold'); if(elLblGold) elLblGold.textContent = isEn ? "SWORD VALUE" : "GIÁ TRỊ";
   var elValGold = $('ahbValGold'); if(elValGold) elValGold.textContent = formatBoardGold(sVal) + " " + (isEn ? "GOLD" : "VÀNG");
-  var elSubGold = $('ahbSubGoldPrompt'); if(elSubGold) elSubGold.textContent = isEn ? "Press [B] to bank gold into vault" : "Bấm phím [B] để chốt vàng vào kho";
   var elMetaGold = $('ahbMetaGoldVault');
   if(elMetaGold){
-    var vaultInfo = (isEn ? "Vault reserve: " : "Vàng kho đang có: ") + formatBoardGold(G ? G.gold : 0) + (isEn ? " gold" : " vàng");
+    var vaultInfo = (isEn ? "Kho: " : "Kho: ") + formatBoardGold(G ? G.gold : 0) + (isEn ? " G" : " Vàng");
     elMetaGold.textContent = vaultInfo;
   }
 
-  // 4. Card 3: % Thành công / Rủi ro vỡ
+  // 4. Card 3: % THÀNH CÔNG & % THẤT BẠI
   var isSafeMode = (G && (G.rainbow || G.frenzy));
   var elCardRate = $('ahbCardRate');
   if(elCardRate){
@@ -7194,60 +7247,41 @@ function updateAnvilHoloBoard(){
     elCardRate.classList.toggle('danger-mode', !isSafeMode && rk >= 0.15);
   }
   var elLblRate = $('ahbLblRate');
-  if(elLblRate) elLblRate.textContent = isEn ? "FORGE SUCCESS & BREAK RISK" : "TỈ LỆ THÀNH CÔNG & NGUY CƠ VỠ";
+  if(elLblRate) elLblRate.textContent = isEn ? "FORGE RATES" : "TỈ LỆ RÈN KIẾM";
+  var elHeatTag = $('ahbHeatTag');
+  if(elHeatTag) elHeatTag.textContent = "🔥 " + sHeat + "%";
 
   var elValSuccess = $('ahbValSuccess');
-  var elValBreak = $('ahbValBreak');
-  var elMetaHeat = $('ahbMetaHeatNote');
-  var meterRate = $('ahbMeterSuccess');
+  var elValFail = $('ahbValFail');
+  var barSucc = $('ahbBarSucc');
+  var barFail = $('ahbBarFail');
 
   if(isSafeMode){
-    if(elValSuccess){
-      elValSuccess.textContent = isEn ? "100% SUCCESS" : "100% THÀNH CÔNG";
-      elValSuccess.style.color = "#5ae875";
+    if(elValSuccess) elValSuccess.textContent = isEn ? "✔ 100% Success" : "✔ 100% Thành công";
+    if(elValFail) {
+      elValFail.textContent = G.rainbow ? (isEn ? "🌈 0% Break (x3.5)" : "🌈 0% Vỡ (x3.5)")
+                                        : (isEn ? "★ 0% Break (x2.2)" : "★ 0% Vỡ (x2.2)");
+      elValFail.style.color = "#7df094";
     }
-    if(elValBreak){
-      var safeTag = G.rainbow ? (isEn ? "🌈 RAINBOW IMMUNITY · 0% BREAK (×3.5)" : "🌈 CẦU VỒNG BẤT TỬ · 0% VỠ (×3.5)")
-                              : (isEn ? "★ FRENZY ARMED · 0% BREAK (×2.2)" : "★ CUỒNG NỘ BẢO HỘ · 0% VỠ (×2.2)");
-      elValBreak.textContent = safeTag;
-      elValBreak.style.color = "#7df094";
-    }
-    if(meterRate){
-      var segs = meterRate.querySelectorAll('i');
-      for(var i = 0; i < segs.length; i++){
-        segs[i].className = 'active safe';
-      }
-    }
-    if(elMetaHeat){
-      elMetaHeat.textContent = isEn ? "Indestructible under divine protection!" : "Thần kiếm đang được bảo hộ tuyệt đối không thể vỡ!";
-    }
+    if(barSucc) barSucc.style.width = "100%";
+    if(barFail) barFail.style.width = "0%";
   } else {
     var successRate = Math.max(0, Math.min(100, (1 - rk) * 100));
-    var successText = "✔ " + (successRate >= 99.9 ? "99.9" : successRate.toFixed(1)) + "% " + (isEn ? "SUCCESS" : "THÀNH CÔNG");
+    var successStr = (successRate >= 99.9 ? "99.9" : successRate.toFixed(1)) + "%";
     if(elValSuccess){
-      elValSuccess.textContent = successText;
+      elValSuccess.textContent = "✔ " + successStr + (isEn ? " Success" : " Thành công");
       elValSuccess.style.color = "#4ade80";
     }
-    var rkPct = (rk * 100).toFixed(1);
-    var breakText = "⚠️ " + rkPct + "% " + (isEn ? "BREAK RISK" : "NGUY CƠ VỠ");
-    if(elValBreak){
-      elValBreak.textContent = breakText;
-      elValBreak.style.color = rk >= 0.15 ? "#ff5252" : (rk >= 0.08 ? "#ff9800" : "#ffcc80");
+    var failPct = (rk * 100).toFixed(1);
+    if(elValFail){
+      elValFail.textContent = "💥 " + failPct + "% " + (isEn ? "Fail" : "Thất bại");
+      elValFail.style.color = rk >= 0.15 ? "#ff5252" : (rk >= 0.08 ? "#ff9800" : "#ffbe3b");
     }
-    if(meterRate){
-      var activeCount = Math.round((1 - rk) * 10);
-      var segs = meterRate.querySelectorAll('i');
-      for(var i = 0; i < segs.length; i++){
-        segs[i].className = (i < activeCount) ? 'active' : '';
-      }
-    }
-    if(elMetaHeat){
-      elMetaHeat.textContent = isEn ? ("Heat: " + sHeat + "% (Heat ≥60% cuts risk by 50%) · " + (G ? G.hits : 0) + "/99 hits")
-                                    : ("Nhiệt kiếm: " + sHeat + "% (Nhiệt ≥60% giảm 50% nguy cơ vỡ) · " + (G ? G.hits : 0) + "/99 nhát");
-    }
+    if(barSucc) barSucc.style.width = (100 - (rk * 100)).toFixed(1) + "%";
+    if(barFail) barFail.style.width = (rk * 100).toFixed(1) + "%";
   }
 
-  // 5. Card 4: % Đạt chỉ tiêu cống
+  // 5. Card 4: % ĐẠT CHỈ TIÊU CỐNG
   var totalGoldAvailable = (G ? (G.gold || 0) : 0) + (G && G.hits > 0 ? (G.swordVal || 0) : 0);
   var tgt = (G && G.target) ? G.target : 120;
   var quotaPct = Math.round((totalGoldAvailable / tgt) * 100);
@@ -7256,44 +7290,31 @@ function updateAnvilHoloBoard(){
   var elCardQuota = $('ahbCardQuota');
   if(elCardQuota) elCardQuota.classList.toggle('quota-ready', isEnough);
   var elLblQuota = $('ahbLblQuota');
-  if(elLblQuota) elLblQuota.textContent = isEn ? "TRIBUTE QUOTA PROGRESS" : "TIẾN ĐỘ NỘP CỐNG QUA VÒNG";
-  var elBadgeQuota = $('ahbBadgeQuota');
-  if(elBadgeQuota) elBadgeQuota.textContent = isEnough ? "🔔" : "🎯";
+  if(elLblQuota) elLblQuota.textContent = isEn ? "TRIBUTE QUOTA" : "TIẾN ĐỘ CỐNG";
+  var elTurnsLeft = $('ahbTurnsLeft');
+  if(elTurnsLeft) elTurnsLeft.textContent = (isEn ? "Turns: " : "Lượt: ") + (G ? G.turns : 30);
 
   var elValQuota = $('ahbValQuota');
   if(elValQuota){
     if(isEnough){
-      elValQuota.textContent = quotaPct + (isEn ? "% TRIBUTE READY 🔔" : "% ĐỦ CỐNG QUA VÒNG 🔔");
-      elValQuota.style.color = "#4ade80";
+      elValQuota.textContent = quotaPct + (isEn ? "% READY 🔔" : "% ĐỦ CỐNG 🔔");
     } else {
-      elValQuota.textContent = quotaPct + (isEn ? "% TRIBUTE REACHED" : "% ĐẠT CHỈ TIÊU CỐNG");
-      elValQuota.style.color = "#ffbe3b";
+      elValQuota.textContent = quotaPct + (isEn ? "% REACHED" : "% ĐẠT CỐNG");
     }
   }
   var elSubQuota = $('ahbSubQuota');
   if(elSubQuota){
-    if(isEnough){
-      elSubQuota.textContent = (isEn ? "Have " : "Hiện có ") + formatBoardGold(totalGoldAvailable) + " / " + formatBoardGold(tgt) + (isEn ? " gold · Ring bell to advance!" : " Vàng · Rung chuông để qua vòng!");
-    } else {
-      elSubQuota.textContent = (isEn ? "Have " : "Hiện có ") + formatBoardGold(totalGoldAvailable) + " / " + formatBoardGold(tgt) + (isEn ? " gold · Need " : " Vàng · Cần thêm ") + formatBoardGold(Math.max(0, tgt - totalGoldAvailable)) + (isEn ? " gold" : " Vàng");
-    }
+    elSubQuota.textContent = formatBoardGold(totalGoldAvailable) + " / " + formatBoardGold(tgt) + (isEn ? " G" : " Vàng");
   }
-  var meterQuota = $('ahbMeterQuota');
-  if(meterQuota){
-    var activeCountQ = Math.min(10, Math.round((totalGoldAvailable / tgt) * 10));
-    var segsQ = meterQuota.querySelectorAll('i');
-    for(var i = 0; i < segsQ.length; i++){
-      segsQ[i].className = (i < activeCountQ) ? (isEnough ? 'active safe' : 'active') : '';
-    }
-  }
-  var elMetaRound = $('ahbMetaRoundNote');
-  if(elMetaRound){
-    elMetaRound.textContent = (isEn ? "Round " : "Vòng ") + (G ? G.round : 1) + (isEn ? " · Turns left: " : " · Lượt còn lại: ") + (G ? G.turns : 30) + (isEn ? " turns" : " lượt rèn");
+  var barQuota = $('ahbBarQuota');
+  if(barQuota){
+    var fillPct = Math.min(100, Math.round((totalGoldAvailable / tgt) * 100));
+    barQuota.style.width = fillPct + "%";
   }
 
-  // 6. Positioning: Docked right in optical height when engaged at anvil, or 3D projected in roam
+  // 6. Optimal Height Positioning
   if(!isAnvilStation && isNearAnvil && typeof camera !== "undefined" && camera){
-    var anvilWorldPos = new THREE.Vector3(0, 1.45, -0.3);
+    var anvilWorldPos = new THREE.Vector3(0, 1.40, -0.3);
     var p = anvilWorldPos.project(camera);
     if(p.z > 1){
       board.style.display = 'none';
@@ -7305,7 +7326,8 @@ function updateAnvilHoloBoard(){
     board.style.left = Math.round(sx) + 'px';
     board.style.transform = 'translate(-50%, -100%)';
   } else {
-    board.style.top = '12%';
+    // Engaged at anvil: Docked at top 13% of screen, comfortably above anvil sword
+    board.style.top = '13%';
     board.style.left = '50%';
     board.style.transform = 'translateX(-50%)';
   }
@@ -7759,10 +7781,7 @@ function prefetchEndgameMedia(lv){
     CINEMATIC_PREFETCH.tribute = true;
     prefetchUrl(assetsBase() + LV100_TRIBUTE_MP4);
   }
-  if(lv >= 40 && !CINEMATIC_PREFETCH.dragon){
-    CINEMATIC_PREFETCH.dragon = true;
-    setTimeout(function(){ if(typeof showSmokeDragonHead==='function') showSmokeDragonHead(); }, 400);
-  }
+
 }
 function hideProceduralDragonMesh(){
   if(typeof dragonHead==='undefined' || !dragonHead) return;
@@ -7771,23 +7790,68 @@ function hideProceduralDragonMesh(){
     if(c!==smokeDragonRoot) c.visible=false;
   }
 }
-function showSmokeDragonHead(){
-  if(smokeDragonRoot || smokeDragonLoading) return;
+function orientSmokeDragonInCave(root){
+  if(!root) return;
+  /* GLB authored neck along +Y (rearing); cave needs neck along +Z into the forge */
+  root.rotation.order = 'YXZ';
+  root.rotation.set(-Math.PI / 2, Math.PI, 0);
+  root.scale.setScalar(0.46);
+  root.position.set(0, 0.02, -0.12);
+  root.updateMatrixWorld(true);
+  var box = new THREE.Box3().setFromObject(root);
+  var center = box.getCenter(new THREE.Vector3());
+  root.position.x -= center.x;
+  root.position.y -= center.y;
+  root.position.z -= center.z;
+  root.position.z += 0.08;
+  root.position.y -= 0.05;
+}
+function loadSmokeDragonHead(opts){
+  opts=opts||{};
+  var silent=!!opts.silent, onDone=opts.onDone, onFail=opts.onFail;
+  if(smokeDragonRoot){ if(onDone) onDone(); return true; }
+  if(smokeDragonLoading) return false;
   smokeDragonLoading=true;
-  if(typeof THREE==='undefined' || !THREE.GLTFLoader){ smokeDragonLoading=false; return; }
-  if(!glbLoader2){ try{ glbLoader2=new THREE.GLTFLoader(); }catch(e){ smokeDragonLoading=false; return; } }
+  if(typeof THREE==='undefined' || !THREE.GLTFLoader){
+    smokeDragonLoading=false;
+    if(onFail) onFail();
+    return false;
+  }
+  if(!glbLoader2){ try{ glbLoader2=new THREE.GLTFLoader(); }catch(e){ smokeDragonLoading=false; if(onFail) onFail(); return false; } }
   glbLoader2.load(assetsBase()+'models/smoke-dragon-head.glb', function(gltf){
     smokeDragonLoading=false;
-    if(!gltf || !gltf.scene || typeof dragonHead==='undefined') return;
+    if(!gltf || !gltf.scene || typeof dragonHead==='undefined'){ if(onFail) onFail(); return; }
     smokeDragonRoot=gltf.scene;
     smokeDragonRoot.name='SmokeDragonHeadGLB';
-    smokeDragonRoot.scale.setScalar(0.38);
-    smokeDragonRoot.position.set(0, -0.35, 0.55);
-    smokeDragonRoot.rotation.set(-0.12, Math.PI, 0);
+    if(typeof orientSmokeDragonInCave==='function') orientSmokeDragonInCave(smokeDragonRoot);
     hideProceduralDragonMesh();
+    if(typeof setDragonCaveEyesVisible==='function') setDragonCaveEyesVisible(false);
     dragonHead.add(smokeDragonRoot);
+    smokeDragonRoot.visible=true;
     shadowDirty=true;
-  }, undefined, function(){ smokeDragonLoading=false; });
+    if(onDone) onDone();
+    if(typeof updateMenuLoadUI==='function') updateMenuLoadUI();
+  }, undefined, function(){
+    smokeDragonLoading=false;
+    if(typeof setProceduralDragonVisible==='function') setProceduralDragonVisible(true);
+    if(onFail) onFail();
+    if(typeof updateMenuLoadUI==='function') updateMenuLoadUI();
+  });
+  return true;
+}
+function showSmokeDragonHead(){
+  return loadSmokeDragonHead({ silent: true });
+}
+function bootPreloadDragon(){
+  if(smokeDragonRoot){ bootDragonState='done'; return; }
+  if(bootDragonState==='done' || bootDragonState==='failed') return;
+  bootDragonState='loading';
+  if(typeof updateMenuLoadUI==='function') updateMenuLoadUI();
+  loadSmokeDragonHead({
+    silent: true,
+    onDone: function(){ bootDragonState='done'; },
+    onFail: function(){ bootDragonState='failed'; }
+  });
 }
 function preloadLv100Tribute(){
   var v=document.getElementById('lv100TributeVideo');
@@ -8816,7 +8880,7 @@ function animate(){
     /* idle: dragon head peeks from the back alcove */
     if(!dragonAnim && typeof dragonPose==='function'){
       var _dPeek = 0.12;
-      if(G && G.started) _dPeek = (isStationEngaged && activeStation==='bell') ? 0.42 : 0.22;
+      if(G && G.started) _dPeek = (isStationEngaged && activeStation==='bell') ? 0.52 : 0.28;
       dragonPose(_dPeek);
     }
     /* dragon eyes: blink + menace */
@@ -10138,7 +10202,7 @@ function initBootGate(){
   updateBootGateEnter();
 }
 var BOOT_PRELOAD_LV_MAX=25;
-var bootPreloadIds=[], bootPreloadActive=true, bootPreloadReady=false, bootPreloadForceTimer=0;
+var bootPreloadIds=[], bootPreloadActive=true, bootPreloadReady=false, bootPreloadForceTimer=0, bootDragonState='pending';
 function collectBootPreloadIds(){
   var seen={}, ids=[];
   for(var lv=1; lv<=BOOT_PRELOAD_LV_MAX; lv++){
@@ -10162,15 +10226,20 @@ function setStartModesLocked(locked){
     el.setAttribute('aria-disabled', locked?'true':'false');
   });
 }
+function bootDragonDoneForGate(){
+  return bootDragonState==='done' || bootDragonState==='failed';
+}
 function updateMenuLoadUI(){
-  var total=bootPreloadIds.length, done=bootMeshesDoneCount();
+  var meshTotal=bootPreloadIds.length, meshDone=bootMeshesDoneCount();
+  var dragonSlot=1, dragonDone=bootDragonDoneForGate()?1:0;
+  var total=meshTotal+dragonSlot, done=meshDone+dragonDone;
   var pct=total? Math.min(100, Math.round(100*done/total)) : 100;
   var blk=$('menuLoadBlock'), txt=$('menuLoadTxt'), fill=$('menuLoadFill'), sub=$('menuLoadSub');
   if(fill) fill.style.width=pct+'%';
   if(sub){ sub.style.display='none'; sub.textContent=''; }
   var lv1=meshIdForLevel(1), lv1ok=!lv1 || meshState[lv1]==='done' || meshState[lv1]==='failed';
   var batchOk= total===0 || done>=total;
-  var ready= bootPreloadReady || (lv1ok && batchOk);
+  var ready= bootPreloadReady || (lv1ok && batchOk && bootDragonDoneForGate());
   if(txt){
     if(ready) txt.textContent=L('Tài nguyên đã sẵn sàng — bấm Vào menu bên dưới','Forge assets ready — tap Enter menu below');
     else txt.textContent=L('Đang tải tài nguyên… ','Loading resources… ')+pct+'%';
@@ -10193,6 +10262,7 @@ function startBootPreload(){
   updateMenuLoadUI();
   for(var i=0;i<bootPreloadIds.length;i++)
     requestMesh(bootPreloadIds[i], i<4);
+  if(typeof bootPreloadDragon==='function') bootPreloadDragon();
   syncMainModelVisual();
   if(!bootPreloadForceTimer){
     bootPreloadForceTimer=setTimeout(function(){
@@ -10200,7 +10270,7 @@ function startBootPreload(){
       bootPreloadReady=true;
       setStartModesLocked(false);
       updateMenuLoadUI();
-    }, 22000);
+    }, 120000);
   }
 }
 function loadLevelModels(){ startBootPreload(); if(typeof initGameTeaserUI==='function') initGameTeaserUI(); if(typeof initLv100TributeUI==='function') initLv100TributeUI(); }
