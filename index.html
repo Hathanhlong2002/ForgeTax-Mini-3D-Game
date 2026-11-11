@@ -1252,6 +1252,15 @@
     line-height: 1.3;
   }
 
+  .menu-load{margin:10px 0 14px;padding:12px 14px;background:rgba(12,8,5,.72);border:1px solid rgba(232,179,60,.28);border-radius:10px;}
+  .menu-load-txt{font-size:12px;font-weight:800;letter-spacing:.6px;color:#ffe8b8;margin-bottom:8px;}
+  .menu-load-bar{height:7px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;}
+  .menu-load-fill{height:100%;width:0%;border-radius:6px;background:linear-gradient(90deg,#c87820,#ffd56a);transition:width .25s ease-out;}
+  .menu-load-sub{margin-top:6px;font-size:11px;color:#a89478;}
+  .menu-load.ready .menu-load-txt{color:#9dffb0;}
+  .mode-card.menu-locked{opacity:.48;pointer-events:none;filter:saturate(.7);}
+  .mode-card.menu-locked .mode-action-btn{opacity:.65;}
+
   /* Mode selection cards */
   .menu-modes {
     display: flex;
@@ -2043,6 +2052,227 @@
       font-size: 16px;
     }
   }
+
+  /* ============================================================
+     IMPERIAL TAMAHAGANE HIGH-CRAFT TEXTURED UI ASSETS
+     ============================================================ */
+  /* Dragon Altar Living Medallion */
+  #tributePlate {
+    position: relative !important;
+    padding-left: 54px !important;
+  }
+  #tributePlate::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: url('assets/ui/dragon_crest.jpg') center/cover no-repeat;
+    border: 1.5px solid #ffd56a;
+    box-shadow: 0 0 10px rgba(255, 140, 30, 0.5), inset 0 0 6px rgba(255, 200, 80, 0.4);
+    animation: dragonAltarPulse 2.8s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes dragonAltarPulse {
+    0% { transform: translateY(-50%) scale(0.96); filter: drop-shadow(0 0 3px rgba(255, 90, 20, 0.4)); }
+    100% { transform: translateY(-50%) scale(1.06); filter: drop-shadow(0 0 12px rgba(255, 180, 40, 0.85)); }
+  }
+
+  /* Master Sword Plaque Background Texture */
+  #swordPlate {
+    background: linear-gradient(135deg, rgba(14, 10, 7, 0.94) 0%, rgba(24, 17, 11, 0.92) 50%, rgba(12, 8, 5, 0.96) 100%),
+                url('assets/ui/sword_plate_bg.jpg') center/cover no-repeat !important;
+    border: 1.5px solid rgba(232, 179, 60, 0.45) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 230, 160, 0.25), 0 12px 32px rgba(0, 0, 0, 0.8), 0 0 24px rgba(232, 179, 60, 0.15) !important;
+    position: relative;
+    overflow: hidden;
+  }
+  #swordPlate::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at 85% 20%, rgba(255, 160, 40, 0.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Tactile Action Button Badges */
+  .btnrow.actions-main button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: left;
+    position: relative;
+    padding: 8px 14px !important;
+  }
+  #btnHit::before {
+    content: "";
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    background: url('assets/ui/btn_hammer.jpg') center/cover no-repeat;
+    border-radius: 8px;
+    border: 1.5px solid rgba(255, 213, 106, 0.6);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6), inset 0 0 6px rgba(255, 180, 50, 0.3);
+    flex-shrink: 0;
+    margin-right: 8px;
+    transition: transform 0.2s ease;
+  }
+  #btnHeat::before {
+    content: "";
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    background: url('assets/ui/btn_furnace.jpg') center/cover no-repeat;
+    border-radius: 8px;
+    border: 1.5px solid rgba(255, 140, 30, 0.6);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6), inset 0 0 6px rgba(255, 100, 20, 0.3);
+    flex-shrink: 0;
+    margin-right: 8px;
+    transition: transform 0.2s ease;
+  }
+  #btnBank::before {
+    content: "";
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    background: url('assets/ui/btn_vault.jpg') center/cover no-repeat;
+    border-radius: 8px;
+    border: 1.5px solid rgba(232, 179, 60, 0.6);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6), inset 0 0 6px rgba(232, 179, 60, 0.3);
+    flex-shrink: 0;
+    margin-right: 8px;
+    transition: transform 0.2s ease;
+  }
+  #btnTribute::before {
+    content: "";
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    background: url('assets/ui/dragon_crest.jpg') center/cover no-repeat;
+    border-radius: 8px;
+    border: 1.5px solid rgba(255, 213, 106, 0.6);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6), inset 0 0 6px rgba(255, 180, 50, 0.3);
+    flex-shrink: 0;
+    margin-right: 8px;
+    transition: transform 0.2s ease;
+  }
+  #btnHit:hover::before, #btnHeat:hover::before, #btnBank:hover::before, #btnTribute:hover::before {
+    transform: scale(1.1);
+  }
+
+  /* Station Navigation Thumbnails */
+  .st-tab {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+  .st-tab .st-ic {
+    display: none !important;
+  }
+  .st-tab[data-st="anvil"]::before {
+    content: "";
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    background: url('assets/ui/btn_hammer.jpg') center/cover no-repeat;
+    border-radius: 5px;
+    border: 1px solid rgba(232, 179, 60, 0.35);
+    flex-shrink: 0;
+  }
+  .st-tab[data-st="furnace"]::before {
+    content: "";
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    background: url('assets/ui/btn_furnace.jpg') center/cover no-repeat;
+    border-radius: 5px;
+    border: 1px solid rgba(232, 179, 60, 0.35);
+    flex-shrink: 0;
+  }
+  .st-tab[data-st="bell"]::before {
+    content: "";
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    background: url('assets/ui/dragon_crest.jpg') center/cover no-repeat;
+    border-radius: 5px;
+    border: 1px solid rgba(232, 179, 60, 0.35);
+    flex-shrink: 0;
+  }
+  .st-tab[data-st="rack"]::before {
+    content: "";
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    background: url('assets/ui/btn_vault.jpg') center/cover no-repeat;
+    border-radius: 5px;
+    border: 1px solid rgba(232, 179, 60, 0.35);
+    flex-shrink: 0;
+  }
+  .st-tab[data-st="wide"]::before {
+    content: "👁";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    font-size: 13px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(232, 179, 60, 0.35);
+    flex-shrink: 0;
+  }
+  .st-tab.active::before {
+    border-color: #ffd56a !important;
+    box-shadow: 0 0 8px rgba(255, 180, 50, 0.6) !important;
+  }
+
+  /* Royal Armory Hero Pedestal Textured Backdrop */
+  .gal-hero-pedestal {
+    background: radial-gradient(circle at 50% 25%, rgba(255, 160, 50, 0.16) 0%, rgba(12, 8, 5, 0.95) 75%),
+                url('assets/ui/kintsugi_pattern.jpg') center/cover no-repeat !important;
+    border: 1.5px solid rgba(232, 179, 60, 0.45) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 230, 160, 0.25), 0 16px 48px rgba(0, 0, 0, 0.9) !important;
+  }
+  .gal-crest-img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid #ffd56a;
+    box-shadow: 0 0 14px rgba(255, 150, 40, 0.6);
+    object-fit: cover;
+    margin-right: 12px;
+    vertical-align: middle;
+  }
+
+  /* Modals and Sheets Luxury Styling */
+  .sheet-panel {
+    background: linear-gradient(180deg, #18110b 0%, #100b07 100%),
+                url('assets/ui/sword_plate_bg.jpg') center/cover no-repeat !important;
+    border: 1.5px solid rgba(232, 179, 60, 0.4) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 230, 160, 0.2), 0 20px 60px rgba(0, 0, 0, 0.9) !important;
+    border-radius: 18px !important;
+  }
+
+  @media (max-width: 820px) {
+    #tributePlate {
+      padding-left: 44px !important;
+    }
+    #tributePlate::before {
+      width: 28px;
+      height: 28px;
+      left: 6px;
+    }
+    .btnrow.actions-main button::before {
+      width: 26px;
+      height: 26px;
+      margin-right: 5px;
+    }
+  }
+
 </style>
 </head>
 <body>
@@ -2068,7 +2298,7 @@
         <button class="tool-btn lang-btn" id="btnLangTop" type="button" title="Chuyển ngôn ngữ / Switch Language">🌐 <span id="topLangTxt">EN</span></button>
       </div>
     </div>
-    <div id="missionBar"><span class="mb-title" id="lblMissionBar">🎯 <span id="lblMissionTxt">Vòng</span> <span id="uiMissionRound">1</span></span><span id="btnGhostHint" class="mb-ghost" title="Thương nhân ma mỗi vòng 3,6,9…"></span><span id="missionList"></span><button type="button" id="btnHudToggle" class="hud-toggle" title="Thu gọn thanh trên">▴</button><button type="button" id="btnUiMode" class="hud-toggle" title="Chế độ hiển thị">◎</button></div>
+    <div id="missionBar"><span class="mb-title" id="lblMissionBar">🎯 <span id="lblMissionTxt">Vòng</span> <span id="uiMissionRound">1</span></span><span id="btnGhostHint" class="mb-ghost" title="Thương nhân ma mỗi vòng 3,6,9…"></span><span id="missionList"></span><button type="button" id="btnHudToggle" class="hud-toggle" title="Thu gọn thanh trên">▴</button><button type="button" id="btnUiMode" class="hud-toggle" title="Chế độ hiển thị">◎</button><button type="button" id="btnSfx" class="hud-toggle" title="Âm thanh">🔊</button></div>
     <div id="workflowRibbon" class="workflow-ribbon" role="status" aria-live="polite"></div>
   </div>
 
@@ -2218,6 +2448,12 @@
       </div>
     </div>
 
+    <div class="menu-load" id="menuLoadBlock">
+      <div class="menu-load-txt" id="menuLoadTxt">Đang chuẩn bị kiếm 3D…</div>
+      <div class="menu-load-bar"><div class="menu-load-fill" id="menuLoadFill"></div></div>
+      <div class="menu-load-sub" id="menuLoadSub">0 / 0 model</div>
+    </div>
+
     <!-- Mode Selector Cards -->
     <div class="menu-modes">
       <div class="mode-card mode-contract" id="btnStart" role="button" tabindex="0" data-mode="contract">
@@ -2291,7 +2527,7 @@
     <div class="gal-top">
       <div class="gal-top-row">
         <div class="gal-title-group">
-          <div class="gal-crest-badge">⚔️ TÀNG KIẾM CÁC · ROYAL ARMORY ⚔️</div>
+          <div class="gal-crest-badge"><img src="assets/ui/dragon_crest.jpg" class="gal-crest-img" alt="Royal Armory Crest">⚔️ TÀNG KIẾM CÁC · ROYAL ARMORY ⚔️</div>
           <h2 id="galModalTitle">BỘ SƯU TẬP 100 THẦN KIẾM</h2>
           <p class="gal-subtitle" id="galModalSub">100 tuyệt phẩm vũ khí 3D độc bản · Khám phá sức mạnh nguyên tố & linh thú hộ mệnh</p>
         </div>
@@ -4104,44 +4340,100 @@ regTier(hammerTierMeshes,3, mesh(new THREE.SphereGeometry(.046,12,10), matRuby, 
 regTier(hammerTierMeshes,4, mesh(new THREE.OctahedronGeometry(.05), matCrystal, 0,-.135,0, hamHead, false));
 
 /* ============================== AUDIO ============================== */
-var AC=null;
-function audio(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(AC&&AC.state==='suspended') AC.resume(); return AC; }
+var AC=null, masterGain=null, _noiseBuf=null, _sfxVoices=0, SFX_VOICE_MAX=16;
+function initAudioBus(ac){
+  if(!ac||masterGain) return;
+  masterGain=ac.createGain();
+  masterGain.connect(ac.destination);
+  applySfxGain();
+}
+function applySfxGain(){
+  if(!masterGain) return;
+  var ac=audio(); if(!ac) return;
+  var mute=(typeof META!=='undefined'&&META.sfxMute);
+  var v=mute?0:((typeof META!=='undefined'&&META.sfxVol!=null)?META.sfxVol:.72);
+  masterGain.gain.setTargetAtTime(v, ac.currentTime, .035);
+}
+function sfxOut(ac){ initAudioBus(ac); return masterGain||ac.destination; }
+function sfxStarted(){ _sfxVoices=Math.min(SFX_VOICE_MAX+2,_sfxVoices+1); }
+function sfxEnded(){ _sfxVoices=Math.max(0,_sfxVoices-1); }
+function sfxBusy(){ return _sfxVoices>=SFX_VOICE_MAX || (typeof META!=='undefined'&&META.sfxMute); }
+function getNoiseBuffer(ac, dur){
+  var len=Math.max(1,Math.floor(ac.sampleRate*Math.min(dur,.4)));
+  if(!_noiseBuf || _noiseBuf.sampleRate!==ac.sampleRate || _noiseBuf.length<len){
+    var cap=Math.floor(ac.sampleRate*.4);
+    _noiseBuf=ac.createBuffer(1,cap,ac.sampleRate);
+    var d=_noiseBuf.getChannelData(0);
+    for(var i=0;i<cap;i++) d[i]=(Math.random()*2-1)*(1-i/cap);
+  }
+  return _noiseBuf;
+}
+function audio(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); initAudioBus(AC); }catch(e){} } if(AC&&AC.state==='suspended') AC.resume(); return AC; }
+function cycleSfxMode(){
+  audio();
+  if(typeof META==='undefined') return;
+  if(!META.sfxMute && (META.sfxVol==null||META.sfxVol>=0.62)){ META.sfxVol=0.35; toast('🔉 Âm nhẹ','info'); }
+  else if(!META.sfxMute){ META.sfxMute=true; toast('🔇 Tắt âm thanh','info'); }
+  else { META.sfxMute=false; META.sfxVol=0.72; toast('🔊 Bật âm thanh','info'); }
+  if(typeof metaSave==='function') metaSave();
+  applySfxGain(); if(typeof updateSfxBtn==='function') updateSfxBtn();
+}
+function updateSfxBtn(){
+  var b=$('btnSfx'); if(!b||typeof META==='undefined') return;
+  if(META.sfxMute){ b.textContent='🔇'; b.title='Âm thanh: tắt — bấm để bật'; }
+  else if(META.sfxVol<0.5){ b.textContent='🔉'; b.title='Âm thanh: nhẹ — bấm để tắt'; }
+  else { b.textContent='🔊'; b.title='Âm thanh: đầy đủ — bấm để giảm'; }
+}
+function levelUpChime(){
+  if(sfxBusy()) return;
+  var ac=audio(); if(!ac) return; var t=ac.currentTime, out=sfxOut(ac);
+  [880,1175,1568].forEach(function(fr,i){
+    var o=ac.createOscillator(),g=ac.createGain(); o.type='sine'; o.frequency.value=fr;
+    env(g,t+i*.04,.003,.09-i*.02,.22); o.connect(g); g.connect(out); o.start(t+i*.04); o.stop(t+i*.04+.26);
+  });
+}
 function env(g,t0,a,peak,dur){ g.gain.setValueAtTime(0,t0); g.gain.linearRampToValueAtTime(peak,t0+a); g.gain.exponentialRampToValueAtTime(.0001,t0+dur); }
 function clang(vol, pitch){
-  var ac=audio(); if(!ac) return; var t=ac.currentTime;
+  if(sfxBusy()) return;
+  var ac=audio(); if(!ac) return; var t=ac.currentTime, out=sfxOut(ac);
+  sfxStarted();
   [2093, 2960, 4180, 1244].forEach(function(f,i){
     var o=ac.createOscillator(), g=ac.createGain(); o.type='triangle'; o.frequency.value=f*pitch*rnd(.98,1.02);
-    env(g,t,.002, vol/(i+1.6), .28-i*.04); o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t+.32);
+    env(g,t,.002, vol/(i+1.6), .28-i*.04); o.connect(g); g.connect(out); o.start(t); o.stop(t+.32);
   });
   noiseBurst(.12, vol*.7, 3800);
+  setTimeout(sfxEnded, 340);
 }
 function noiseBurst(dur, vol, freq){
-  var ac=audio(); if(!ac) return; var t=ac.currentTime;
-  var len=Math.floor(ac.sampleRate*dur), buf=ac.createBuffer(1,len,ac.sampleRate), d=buf.getChannelData(0);
-  for(var i=0;i<len;i++) d[i]=(Math.random()*2-1)*(1-i/len);
+  if(sfxBusy() && vol>.25) return;
+  var ac=audio(); if(!ac) return; var t=ac.currentTime, out=sfxOut(ac);
+  var buf=getNoiseBuffer(ac, dur);
   var src=ac.createBufferSource(); src.buffer=buf;
   var f=ac.createBiquadFilter(); f.type='highpass'; f.frequency.value=freq||1000;
   var g=ac.createGain(); g.gain.value=vol;
-  src.connect(f); f.connect(g); g.connect(ac.destination); src.start(t);
+  src.connect(f); f.connect(g); g.connect(out); src.start(t, 0, Math.min(dur,.38));
 }
-function crackSound(){ noiseBurst(.3,.9,300); var ac=audio(); if(!ac)return; var t=ac.currentTime; var o=ac.createOscillator(),g=ac.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(220,t); o.frequency.exponentialRampToValueAtTime(38,t+.28); env(g,t,.004,.5,.3); o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t+.32); }
+function crackSound(){ noiseBurst(.3,.9,300); var ac=audio(); if(!ac)return; var t=ac.currentTime, out=sfxOut(ac); var o=ac.createOscillator(),g=ac.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(220,t); o.frequency.exponentialRampToValueAtTime(38,t+.28); env(g,t,.004,.5,.3); o.connect(g); g.connect(out); o.start(t); o.stop(t+.32); }
 function shatterSound(){ crackSound(); clang(.5,.6); setTimeout(function(){clang(.35,.8);},70); setTimeout(function(){noiseBurst(.2,.5,2000);},120); }
-function whoosh(){ var ac=audio(); if(!ac)return; var t=ac.currentTime; var len=Math.floor(ac.sampleRate*.5), buf=ac.createBuffer(1,len,ac.sampleRate), d=buf.getChannelData(0); for(var i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.sin(i/len*Math.PI); var s=ac.createBufferSource(); s.buffer=buf; var f=ac.createBiquadFilter(); f.type='bandpass'; f.frequency.setValueAtTime(400,t); f.frequency.exponentialRampToValueAtTime(1600,t+.4); f.Q.value=1.2; var g=ac.createGain(); g.gain.value=.5; s.connect(f); f.connect(g); g.connect(ac.destination); s.start(t); }
-function bellSound(){ var ac=audio(); if(!ac)return; var t=ac.currentTime; [523,784,1046,1318].forEach(function(fr,i){ var o=ac.createOscillator(),g=ac.createGain(); o.type='sine'; o.frequency.value=fr; env(g,t,.003,.4/(i+1),1.6-i*.25); o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t+1.7); }); }
-function coinSound(){ var ac=audio(); if(!ac)return; var t=ac.currentTime; [1568,2093].forEach(function(fr,i){ var o=ac.createOscillator(),g=ac.createGain(); o.type='square'; o.frequency.value=fr; env(g,t+i*.07,.002,.12,.18); o.connect(g); g.connect(ac.destination); o.start(t+i*.07); o.stop(t+i*.07+.2); }); }
+function whoosh(){ if(sfxBusy()) return; var ac=audio(); if(!ac)return; var t=ac.currentTime, out=sfxOut(ac);
+  var len=Math.floor(ac.sampleRate*.5), buf=ac.createBuffer(1,len,ac.sampleRate), d=buf.getChannelData(0); for(var i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.sin(i/len*Math.PI); var s=ac.createBufferSource(); s.buffer=buf; var f=ac.createBiquadFilter(); f.type='bandpass'; f.frequency.setValueAtTime(400,t); f.frequency.exponentialRampToValueAtTime(1600,t+.4); f.Q.value=1.2; var g=ac.createGain(); g.gain.value=.5; s.connect(f); f.connect(g); g.connect(out); s.start(t); }
+function bellSound(){ if(sfxBusy()) return; var ac=audio(); if(!ac)return; var t=ac.currentTime, out=sfxOut(ac);
+  [523,784,1046,1318].forEach(function(fr,i){ var o=ac.createOscillator(),g=ac.createGain(); o.type='sine'; o.frequency.value=fr; env(g,t,.003,.4/(i+1),1.6-i*.25); o.connect(g); g.connect(out); o.start(t); o.stop(t+1.7); }); }
+function coinSound(){ if(sfxBusy()) return; var ac=audio(); if(!ac)return; var t=ac.currentTime, out=sfxOut(ac);
+  [1568,2093].forEach(function(fr,i){ var o=ac.createOscillator(),g=ac.createGain(); o.type='square'; o.frequency.value=fr; env(g,t+i*.07,.002,.12,.18); o.connect(g); g.connect(out); o.start(t+i*.07); o.stop(t+i*.07+.2); }); }
 
 function dragonRoar(){
   noiseBurst(2.3,.85,420);
-  var ac=audio(); if(!ac) return; var t=ac.currentTime;
+  var ac=audio(); if(!ac) return; var t=ac.currentTime, out=sfxOut(ac);
   [[96,36,.5,'sawtooth',0],[58,29,.28,'square',.12]].forEach(function(cfg){
     var o=ac.createOscillator(), g=ac.createGain(); o.type=cfg[3];
     var t0=t+cfg[4];
     o.frequency.setValueAtTime(cfg[0],t0); o.frequency.exponentialRampToValueAtTime(cfg[1],t0+2.1);
     g.gain.setValueAtTime(.0001,t0); g.gain.exponentialRampToValueAtTime(cfg[2],t0+.2); g.gain.exponentialRampToValueAtTime(.0001,t0+2.3);
-    o.connect(g); g.connect(ac.destination); o.start(t0); o.stop(t0+2.35);
+    o.connect(g); g.connect(out); o.start(t0); o.stop(t0+2.35);
   });
 }
-function weldSound(){ noiseBurst(1,.5,2400); var ac=audio(); if(!ac) return; var t=ac.currentTime; var o=ac.createOscillator(),g=ac.createGain(); o.type='square'; o.frequency.setValueAtTime(2200,t); o.frequency.exponentialRampToValueAtTime(900,t+.8); env(g,t,.004,.07,.85); o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t+.9); }
+function weldSound(){ noiseBurst(1,.5,2400); var ac=audio(); if(!ac) return; var t=ac.currentTime, out=sfxOut(ac); var o=ac.createOscillator(),g=ac.createGain(); o.type='square'; o.frequency.setValueAtTime(2200,t); o.frequency.exponentialRampToValueAtTime(900,t+.8); env(g,t,.004,.07,.85); o.connect(g); g.connect(out); o.start(t); o.stop(t+.9); }
 
 /* ============================== GAME STATE ============================== */
 var RELICS=[
@@ -4262,8 +4554,8 @@ function feedBladeToRelicMachine(r){
    nothing here touches BREAK_A / BREAK_B / heatRiskMult / anvil
    maths — the Monte-Carlo break curve is exactly as balanced. */
 var META_KEY='forgetax_meta_v1';
-var META={ unlocked:{}, ach:{}, records:{bestLevel:0,bestSword:0,tributes:0,frenzyTotal:0,rainbowTotal:0,repairs:0,hitsTotal:0,greatTotal:0,missionsDone:0}, onboarded:false, hudCollapsed:false, uiCompact:false };
-try{ var _ms=localStorage.getItem(META_KEY); if(_ms){ var _mp=JSON.parse(_ms); if(_mp){ if(_mp.unlocked) META.unlocked=_mp.unlocked; if(_mp.ach) META.ach=_mp.ach; if(_mp.records){ for(var _rk in META.records) if(typeof _mp.records[_rk]==='number') META.records[_rk]=_mp.records[_rk]; } META.onboarded=!!_mp.onboarded; META.hudCollapsed=!!_mp.hudCollapsed; META.uiCompact=!!_mp.uiCompact; } } }catch(e){}
+var META={ unlocked:{}, ach:{}, records:{bestLevel:0,bestSword:0,tributes:0,frenzyTotal:0,rainbowTotal:0,repairs:0,hitsTotal:0,greatTotal:0,missionsDone:0}, onboarded:false, hudCollapsed:false, uiCompact:false, sfxVol:0.72, sfxMute:false };
+try{ var _ms=localStorage.getItem(META_KEY); if(_ms){ var _mp=JSON.parse(_ms); if(_mp){ if(_mp.unlocked) META.unlocked=_mp.unlocked; if(_mp.ach) META.ach=_mp.ach; if(_mp.records){ for(var _rk in META.records) if(typeof _mp.records[_rk]==='number') META.records[_rk]=_mp.records[_rk]; } META.onboarded=!!_mp.onboarded; META.hudCollapsed=!!_mp.hudCollapsed; META.uiCompact=!!_mp.uiCompact; if(typeof _mp.sfxVol==='number') META.sfxVol=_mp.sfxVol; META.sfxMute=!!_mp.sfxMute; } } }catch(e){}
 function metaSave(){ try{ localStorage.setItem(META_KEY, JSON.stringify(META)); }catch(e){} }
 var ACHS=[
   {id:'a_lv30',   ic:'⚔️', name:'Thợ Rèn Tập Sự',   cond:'Đưa 1 kiếm lên Lv.30',        relic:'r_value2'},
@@ -4572,6 +4864,8 @@ function renderWorkflowRibbon(){
   });
 }
 function applyHudChrome(){
+  if(typeof updateSfxBtn==='function') updateSfxBtn();
+  if(typeof applySfxGain==='function') applySfxGain();
   var ht=document.querySelector('.hud-top');
   if(ht) ht.classList.toggle('collapsed', !!META.hudCollapsed);
   document.body.classList.toggle('ui-compact', !!META.uiCompact);
@@ -4617,7 +4911,7 @@ function metaOnGameStart(){
   else renderWorkflowRibbon();
   renderMissions();
 }
-function greatSound(){ var ac=audio(); if(!ac) return; var t=ac.currentTime; [1318,1760,2637].forEach(function(fr,i){ var o=ac.createOscillator(),g=ac.createGain(); o.type='square'; o.frequency.value=fr; env(g,t+i*.05,.002,.1,.22); o.connect(g); g.connect(ac.destination); o.start(t+i*.05); o.stop(t+i*.05+.24); }); noiseBurst(.15,.5,5200); }
+function greatSound(){ if(sfxBusy()) return; var ac=audio(); if(!ac) return; var t=ac.currentTime, out=sfxOut(ac); [1318,1760,2637].forEach(function(fr,i){ var o=ac.createOscillator(),g=ac.createGain(); o.type='square'; o.frequency.value=fr; env(g,t+i*.05,.002,.1,.22); o.connect(g); g.connect(out); o.start(t+i*.05); o.stop(t+i*.05+.24); }); noiseBurst(.15,.5,5200); }
 function crackleSound(){ noiseBurst(.06,.35,900); setTimeout(function(){ noiseBurst(.05,.25,700); }, 60); }
 
 
@@ -5059,6 +5353,7 @@ function doHit(){
         floatNum('\u2b06 Lv.'+G.swordLevel+' \u2014 '+modelNameForLevel(G.swordLevel), 'info');
         fxOnLevelUp(G.swordLevel, famChanged); /* element shockwave ring + burst in the NEW level's element */
         burstSparks(-.05,1.3,.2, famChanged?55:34, famChanged?1.5:1.2, 1.1);
+        if(!famChanged && G.swordLevel<SWORD_LEVEL_MAX && typeof levelUpChime==='function') levelUpChime();
         if(famChanged || G.swordLevel>=SWORD_LEVEL_MAX){
           setTimeout(function(){ toast('\u2728 MODEL M\u1edaI! Lv.'+G.swordLevel+' \u2014 '+modelNameForLevel(G.swordLevel)+' \u2014 m\u1ed7i level m\u1ed9t model ri\u00eang, ng\u00f3 tr\u00ean \u0111e \u0111i!', 'good'); }, wasRainbow? 350 : 60);
           bellSound(); flashTo(.55); burstCoins(-.05,1.35,.2,20);
@@ -5222,6 +5517,11 @@ function setInspect(on){
 
 /* ============================== INPUT ============================== */
 function beginRun(mode){
+  if(typeof bootPreloadReady!=='undefined' && !bootPreloadReady){
+    if(typeof updateMenuLoadUI==='function') updateMenuLoadUI();
+    toast('Đang tải model kiếm — chờ thanh loading xong nhé!','info');
+    return;
+  }
   audio(); if(!G) newGame();
   G.runMode=mode||'contract';
   G.contractGoal=(mode==='contract')?12:9999;
@@ -5283,6 +5583,7 @@ var _bv=$('btnView'); if(_bv) _bv.addEventListener('click', function(){ audio();
 var _bht=$('btnHudToggle'); if(_bht) _bht.addEventListener('click', function(e){ e.stopPropagation(); audio(); toggleHudCollapsed(); });
 var _bhe=$('btnHudExpand'); if(_bhe) _bhe.addEventListener('click', function(){ audio(); META.hudCollapsed=false; metaSave(); applyHudChrome(); refreshUI(); });
 var _bum=$('btnUiMode'); if(_bum) _bum.addEventListener('click', function(e){ e.stopPropagation(); audio(); toggleUiCompact(); });
+var _bsfx=$('btnSfx'); if(_bsfx) _bsfx.addEventListener('click', function(e){ e.stopPropagation(); cycleSfxMode(); });
 var _bcr=$('btnCoachReplay'); if(_bcr) _bcr.addEventListener('click', function(){ audio(); coachReplay(); });
 bindClick('btnHeat', function(){ engageStation('furnace', true); runStationAction('furnace'); });
 bindClick('btnRepair', doRepair);
@@ -6311,6 +6612,15 @@ function b64ToArrayBuffer(b64){
   for(var i=0;i<len;i++) bytes[i]=bin.charCodeAt(i)&0xff;
   return bytes.buffer;
 }
+function dropEmbeddedMeshB64(meshId){
+  if(!meshId||!MODEL_B64) return;
+  var k='meshes/'+meshId+'.glb';
+  if(MODEL_B64[k]){ delete MODEL_B64[k]; }
+}
+function dropOrphanTextureB64(texPath){
+  if(!texPath||!MODEL_B64||texCache[texPath]) return;
+  if(MODEL_B64[texPath]) delete MODEL_B64[texPath];
+}
 function modelEntryForLevel(lv){ lv=clampLv(lv); return (typeof LEVEL_MODELS!=='undefined' && LEVEL_MODELS && LEVEL_MODELS[lv-1])? LEVEL_MODELS[lv-1] : null; }
 function modelNameForLevel(lv){ var e=modelEntryForLevel(lv); return e? e.name : ('Level '+clampLv(lv)); }
 function meshIdForLevel(lv){ var e=modelEntryForLevel(lv); return e? e.mesh : ''; }
@@ -6335,7 +6645,7 @@ function getLevelTexture(path, srgb){
   tx.flipY=false; /* glTF UV convention — the same flipY=false GLTFLoader uses */
   tx.colorSpace = srgb? THREE.SRGBColorSpace : (typeof THREE.NoColorSpace!=='undefined'? THREE.NoColorSpace : '');
   tx.anisotropy = IS_MOBILE? 1 : 2;
-  img.onload=function(){ tx.needsUpdate=true; };
+  img.onload=function(){ tx.needsUpdate=true; if(typeof dropOrphanTextureB64==='function') dropOrphanTextureB64(path); };
   img.onerror=function(){ if(window.console) console.warn('ForgeTax: level texture failed to load — '+path); };
   var b64=MODEL_B64? MODEL_B64[path] : null; /* path is "tex/<file>" in the embedded payload */
   if(b64) img.src='data:'+(/\.png$/i.test(path)? 'image/png' : 'image/jpeg')+';base64,'+b64;
@@ -6392,6 +6702,7 @@ function scheduleEvictUnusedModels(){
   if(evictModelsTimer) return;
   evictModelsTimer=setTimeout(function(){
     evictModelsTimer=0;
+    pruneLevelProtoMatsFar();
     evictUnusedModels(MODEL_CACHE_CAP);
   }, 900);
 }
@@ -6417,10 +6728,25 @@ function touchMesh(meshId){ if(meshId) meshLastUsed[meshId]=++meshUseClock; }
 function protectedMeshIds(){
   var set={};
   if(typeof G!=='undefined' && G){
-    set[meshIdForLevel(swordLevelNow())]=1;
+    var cur=swordLevelNow();
+    for(var d=0; d<=4; d++){ var mid=meshIdForLevel(clampLv(cur+d)); if(mid) set[mid]=1; }
     if(G.rack) for(var i=0;i<3;i++){ if(G.rack[i]) set[meshIdForLevel(clampLv(G.rack[i].level))]=1; }
   }
+  if(typeof bootPreloadIds!=='undefined' && bootPreloadActive){
+    for(var bi=0; bi<bootPreloadIds.length; bi++) set[bootPreloadIds[bi]]=1;
+  }
   return set;
+}
+function pruneLevelProtoMatsFar(){
+  if(typeof G==='undefined'||!G) return;
+  var cur=swordLevelNow(), keep={};
+  for(var d=-3; d<=6; d++) keep[clampLv(cur+d)]=1;
+  if(G.rack) for(var ri=0; ri<3; ri++){ if(G.rack[ri]) keep[clampLv(G.rack[ri].level)]=1; }
+  for(var lv=1; lv<=100; lv++){
+    if(keep[lv]||!levelProtoMats[lv]) continue;
+    try{ levelProtoMats[lv].dispose(); }catch(e){}
+    delete levelProtoMats[lv];
+  }
 }
 function evictMeshTemplate(meshId){
   var tpl=meshTemplates[meshId]; if(!tpl) return;
@@ -6475,6 +6801,10 @@ function requestMesh(meshId, front){
   if(front) meshQueue.unshift(meshId); else meshQueue.push(meshId);
   pumpMeshQueue();
 }
+function schedulePumpMesh(){
+  var ms=(typeof G!=='undefined'&&G&&G.started&&typeof qStep!=='undefined'&&qStep>=1)?44:22;
+  setTimeout(pumpMeshQueue, ms);
+}
 function pumpMeshQueue(){
   if(meshPumpBusy) return;
   if(!bigDataReady) return; /* model loading is gated on window load (loadLevelModels) */
@@ -6503,23 +6833,23 @@ function pumpMeshQueue(){
         meshPumpBusy=false;
         if(gltf && gltf.scene){ meshTemplates[meshId]=prepareSwordTemplate(gltf.scene, meshId); meshState[meshId]='done'; onMeshReady(meshId); }
         else meshState[meshId]='failed';
-        setTimeout(pumpMeshQueue, 20);
+        schedulePumpMesh();
       }, undefined, function(err){
         meshPumpBusy=false; meshState[meshId]='failed';
         if(window.console) console.warn('ForgeTax: endgame model failed to load — '+meshId, err);
-        setTimeout(pumpMeshQueue, 20);
+        schedulePumpMesh();
       });
     }catch(e){
       meshPumpBusy=false; meshState[meshId]='failed';
       if(window.console) console.warn('ForgeTax: endgame model load could not start — '+meshId, e);
-      setTimeout(pumpMeshQueue, 20);
+      schedulePumpMesh();
     }
     return;
   }
   if(!meshB64){
     meshPumpBusy=false; meshState[meshId]='failed';
     if(window.console) console.warn('ForgeTax: embedded level mesh missing — '+meshId);
-    setTimeout(pumpMeshQueue, 20);
+    schedulePumpMesh();
     return;
   }
   var bufPromise = Promise.resolve().then(function(){ return b64ToArrayBuffer(meshB64); });
@@ -6528,23 +6858,27 @@ function pumpMeshQueue(){
       meshPumpBusy=false;
       if(gltf && gltf.scene){ meshTemplates[meshId]=prepareSwordTemplate(gltf.scene, meshId); meshState[meshId]='done'; onMeshReady(meshId); }
       else meshState[meshId]='failed';
-      setTimeout(pumpMeshQueue, 20);
+      schedulePumpMesh();
     }, function(err){
       meshPumpBusy=false; meshState[meshId]='failed';
       if(window.console) console.warn('ForgeTax: level mesh failed to parse — '+meshId, err);
-      setTimeout(pumpMeshQueue, 20);
+      schedulePumpMesh();
     });
   }).catch(function(err){
     meshPumpBusy=false; meshState[meshId]='failed';
     if(window.console) console.warn('ForgeTax: level mesh failed to load — '+meshId, err);
-    setTimeout(pumpMeshQueue, 20);
+    schedulePumpMesh();
   });
 }
 function onMeshReady(meshId){
   touchMesh(meshId);
+  if(typeof dropEmbeddedMeshB64==='function') dropEmbeddedMeshB64(meshId);
   syncMainModelVisual();
   syncRackModels();
-  for(var lv=1; lv<=100; lv++){ if(meshIdForLevel(lv)===meshId) queueGallerySnapshot(lv); }
+  if(typeof bootOnMeshProgress==='function') bootOnMeshProgress(meshId);
+  if(typeof bootPreloadActive==='undefined' || !bootPreloadActive){
+    for(var lv=1; lv<=100; lv++){ if(meshIdForLevel(lv)===meshId) queueGallerySnapshot(lv); }
+  }
 }
 /* ---------- template preparation: ONE display convention for every model ----------
    The forge displays every sword lying flat on the anvil like the
@@ -6700,8 +7034,8 @@ function syncMainModelVisual(){
   if(ready && mainModelLv!==lv) buildMainModel(lv);
   var shown = ready && !!mainModelGroup && mainModelLv===lv;
   if(!ready) requestMesh(meshId, true);
-  if(lv<SWORD_LEVEL_MAX) requestMesh(meshIdForLevel(lv+1), false); /* preload next level GLB before the level-up frame */
-  if(lv<SWORD_LEVEL_MAX-1) requestMesh(meshIdForLevel(lv+2), false);
+  for(var _pd=1; _pd<=6 && lv+_pd<=SWORD_LEVEL_MAX; _pd++)
+    requestMesh(meshIdForLevel(lv+_pd), _pd<=2); /* ahead preload — fewer parse hitches while climbing */
   if(lv>=89 && typeof fxPreloadSpirit==='function') fxPreloadSpirit(Math.min(SWORD_LEVEL_MAX, lv+1));
   if(lv>=90 && typeof fxPreloadSpirit==='function') fxPreloadSpirit(lv);
   if(mainModelGroup) mainModelGroup.visible=shown;
@@ -6758,6 +7092,17 @@ function syncRackModels(){
       var cl=getRackClone(i, lvR);
       if(cl){
         shown=true;
+        for(var fk in rackClones[i]){
+          if(Number(fk)!==lvR){
+            var ocl=rackClones[i][fk];
+            if(ocl){
+              rackModelHolders[i].remove(ocl);
+              if(ocl.userData.mat) try{ ocl.userData.mat.dispose(); }catch(e){}
+              if(ocl.userData.selfMats) disposeSelfMats(ocl.userData.selfMats);
+              delete rackClones[i][fk];
+            }
+          }
+        }
         for(var fk in rackClones[i]) rackClones[i][fk].visible = (Number(fk)===lvR);
         if(cl.userData.selfMats){
           /* hung endgame sword: heat glow rides its own blade materials */
@@ -6953,12 +7298,71 @@ function refreshGalleryCard(lv){
    the background during gameplay anymore: the old preload-all pass kept
    the main thread busy decoding 57 GLBs + queueing 100 gallery snapshots
    for minutes after load, which was the main source of in-game jank. */
-function loadLevelModels(){
-  parseBigData();
-  var cur=(typeof G!=='undefined'&&G)? swordLevelNow():1;
-  requestMesh(meshIdForLevel(cur), true);
-  syncMainModelVisual();
+var BOOT_PRELOAD_LV_MAX=25;
+var bootPreloadIds=[], bootPreloadActive=true, bootPreloadReady=false, bootPreloadForceTimer=0;
+function collectBootPreloadIds(){
+  var seen={}, ids=[];
+  for(var lv=1; lv<=BOOT_PRELOAD_LV_MAX; lv++){
+    var mid=meshIdForLevel(lv);
+    if(mid && !seen[mid]){ seen[mid]=1; ids.push(mid); }
+  }
+  bootPreloadIds=ids;
 }
+function bootMeshesDoneCount(){
+  var n=0;
+  for(var i=0;i<bootPreloadIds.length;i++){
+    if(meshState[bootPreloadIds[i]]==='done') n++;
+  }
+  return n;
+}
+function setStartModesLocked(locked){
+  ['btnStart','btnStartEndless'].forEach(function(id){
+    var el=$(id);
+    if(!el) return;
+    el.classList.toggle('menu-locked', !!locked);
+    el.setAttribute('aria-disabled', locked?'true':'false');
+  });
+}
+function updateMenuLoadUI(){
+  var total=bootPreloadIds.length, done=bootMeshesDoneCount();
+  var pct=total? Math.min(100, Math.round(100*done/total)) : 100;
+  var blk=$('menuLoadBlock'), txt=$('menuLoadTxt'), fill=$('menuLoadFill'), sub=$('menuLoadSub');
+  if(fill) fill.style.width=pct+'%';
+  if(sub) sub.textContent=done+' / '+total+' model · '+pct+'%';
+  var lv1=meshIdForLevel(1), lv1ok=!lv1 || meshState[lv1]==='done' || meshState[lv1]==='failed';
+  var batchOk= total===0 || done>=total;
+  var ready= bootPreloadReady || (lv1ok && batchOk);
+  if(txt){
+    if(ready) txt.textContent='Sẵn sàng vào lò rèn!';
+    else txt.textContent='Đang tải kiếm 3D… '+pct+'%';
+  }
+  if(blk) blk.classList.toggle('ready', !!ready);
+  if(ready && !bootPreloadReady){
+    bootPreloadReady=true;
+    bootPreloadActive=false;
+    setStartModesLocked(false);
+    if(typeof syncMainModelVisual==='function') syncMainModelVisual();
+  } else if(!ready) setStartModesLocked(true);
+}
+function bootOnMeshProgress(meshId){ updateMenuLoadUI(); }
+function startBootPreload(){
+  parseBigData();
+  collectBootPreloadIds();
+  setStartModesLocked(true);
+  updateMenuLoadUI();
+  for(var i=0;i<bootPreloadIds.length;i++)
+    requestMesh(bootPreloadIds[i], i<4);
+  syncMainModelVisual();
+  if(!bootPreloadForceTimer){
+    bootPreloadForceTimer=setTimeout(function(){
+      bootPreloadActive=false;
+      bootPreloadReady=true;
+      setStartModesLocked(false);
+      updateMenuLoadUI();
+    }, 22000);
+  }
+}
+function loadLevelModels(){ startBootPreload(); }
 if(document.readyState==='complete') setTimeout(loadLevelModels, 60);
 else window.addEventListener('load', function(){ setTimeout(loadLevelModels, 60); });
 
