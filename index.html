@@ -3433,6 +3433,202 @@
     color: #ffd56a !important;
     cursor: default !important;
   }
+
+  /* ================= TAMAHAGANE KINTSUGI FLOATING ANVIL HOLO BOARD ================= */
+  .anvil-holo-board {
+    position: fixed;
+    z-index: 85;
+    pointer-events: none;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: min(94vw, 760px);
+    max-width: 760px;
+    animation: ahbLevitate 3.2s ease-in-out infinite alternate;
+    transition: opacity 0.22s ease;
+    contain: layout style;
+  }
+  @keyframes ahbLevitate {
+    0% { transform: translate(-50%, -100%) translateY(0); }
+    100% { transform: translate(-50%, -100%) translateY(-6px); }
+  }
+  body.station-engaged.st-anvil .anvil-holo-board {
+    animation: ahbStationLevitate 3.2s ease-in-out infinite alternate;
+  }
+  @keyframes ahbStationLevitate {
+    0% { transform: translateX(-50%) translateY(0); }
+    100% { transform: translateX(-50%) translateY(-5px); }
+  }
+  
+  .ahb-head {
+    display: inline-flex;
+    justify-content: center;
+  }
+  .ahb-pill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 20px;
+    background: linear-gradient(180deg, rgba(38, 24, 16, 0.96) 0%, rgba(16, 10, 6, 0.98) 100%);
+    border: 1.5px solid #e5a93c;
+    border-radius: 999px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.8), 0 0 14px rgba(229, 169, 60, 0.35);
+  }
+  .ahb-icon { font-size: 16px; }
+  .ahb-title {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #ffe082;
+    text-shadow: 0 0 10px rgba(229, 169, 60, 0.5);
+  }
+
+  .ahb-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    width: 100%;
+  }
+
+  .ahb-card {
+    background: linear-gradient(180deg, rgba(28, 18, 12, 0.94) 0%, rgba(12, 8, 5, 0.98) 100%);
+    border: 1.5px solid rgba(229, 169, 60, 0.55);
+    border-radius: 14px;
+    padding: 12px 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), 0 0 14px rgba(229, 169, 60, 0.2);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-sizing: border-box;
+  }
+  .ahb-card.safe-mode {
+    border-color: #5ae875;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), 0 0 16px rgba(90, 232, 117, 0.35);
+  }
+  .ahb-card.danger-mode {
+    border-color: #ff5252;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), 0 0 16px rgba(255, 82, 82, 0.35);
+  }
+  .ahb-card.quota-ready {
+    border-color: #4ade80;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), 0 0 16px rgba(74, 222, 128, 0.35);
+  }
+
+  .ahb-card-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ahb-card-badge {
+    background: linear-gradient(180deg, #d48a20 0%, #874906 100%);
+    border: 1px solid #ffd56a;
+    border-radius: 6px;
+    padding: 2px 7px;
+    font-size: 11px;
+    font-weight: 900;
+    color: #fff9ea;
+    line-height: 1.2;
+  }
+  .ahb-card-label {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #e8cfad;
+    flex: 1;
+  }
+  .ahb-corner-tag {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(229, 169, 60, 0.65);
+    letter-spacing: 0.04em;
+  }
+
+  .ahb-val {
+    font-size: 26px;
+    font-weight: 900;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+  }
+  .ahb-val-success {
+    color: #4ade80;
+    text-shadow: 0 0 12px rgba(74, 222, 128, 0.45);
+  }
+  .ahb-val-quota {
+    color: #ffd56a;
+    text-shadow: 0 0 12px rgba(255, 213, 106, 0.45);
+  }
+  .ahb-danger-row {
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .ahb-sub {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff4db;
+    line-height: 1.2;
+  }
+  .ahb-meta {
+    font-size: 11px;
+    font-weight: 600;
+    color: #d4a359;
+    line-height: 1.2;
+    margin-top: 2px;
+  }
+
+  /* Segmented Bar (10 slots) */
+  .ahb-seg-meter {
+    display: flex;
+    gap: 3px;
+    width: 100%;
+    height: 9px;
+    margin: 4px 0 2px;
+    background: rgba(10, 8, 6, 0.9);
+    padding: 2px;
+    border-radius: 6px;
+    border: 1px solid rgba(229, 169, 60, 0.35);
+    box-sizing: border-box;
+  }
+  .ahb-seg-meter i {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    transition: background 0.2s ease;
+  }
+  .ahb-seg-meter i.active {
+    background: linear-gradient(180deg, #ffd56a 0%, #d48a20 100%);
+    box-shadow: 0 0 6px rgba(255, 213, 106, 0.5);
+  }
+  .ahb-seg-meter i.active.safe {
+    background: linear-gradient(180deg, #5ae875 0%, #2e9f45 100%);
+    box-shadow: 0 0 6px rgba(90, 232, 117, 0.6);
+  }
+
+  @media (max-width: 680px) {
+    .anvil-holo-board {
+      width: 95vw;
+      gap: 6px;
+    }
+    .ahb-grid {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+    .ahb-card {
+      padding: 8px 12px;
+    }
+    .ahb-val {
+      font-size: 20px;
+    }
+    .ahb-title {
+      font-size: 11px;
+    }
+  }
 </style>
 </head>
 <body class="boot-pending">
@@ -3516,7 +3712,72 @@
       <button type="button" data-st="rack" class="st-tab" title="Giá treo kiếm trên tường (Phím 4)"><span class="st-num">[4]</span><span class="st-ic">🗡</span> <span class="st-name">Giá Treo</span></button>
       <button type="button" data-st="wide" class="st-tab" title="Tự do đi bộ / Toàn cảnh (Phím 5)"><span class="st-num">[5]</span><span class="st-ic">👁</span> <span class="st-name">Tự Do</span></button>
     </div>
-    <div id="interactPromptWrap" class="interact-prompt-wrap" style="display:none;">
+    
+    <!-- Floating Crystal-Crisp Anvil Holo Board (Tamahagane Kintsugi DOM Component) -->
+    <div id="anvilHoloBoard" class="anvil-holo-board" style="display:none;" aria-live="polite">
+      <div class="ahb-head">
+        <div class="ahb-pill-badge">
+          <span class="ahb-icon">⚔️</span>
+          <span class="ahb-title" id="ahbHeaderTitle">FORGETAX · BẢNG THÔNG SỐ RÈN KIẾM</span>
+        </div>
+      </div>
+      <div class="ahb-grid">
+        <!-- CARD 1: CẤP ĐỘ KIẾM -->
+        <div class="ahb-card ahb-card-lv">
+          <div class="ahb-card-top">
+            <span class="ahb-card-badge">LV</span>
+            <span class="ahb-card-label" id="ahbLblLv">CẤP ĐỘ KIẾM</span>
+            <span class="ahb-corner-tag">+ ANVIL.01</span>
+          </div>
+          <div class="ahb-val" id="ahbValLv">Lv.1</div>
+          <div class="ahb-sub" id="ahbSubLvName">Kiếm Sắt Tập Luyện · Thép Thô</div>
+          <div class="ahb-meta" id="ahbMetaLvNext">Mục tiêu: Lv.2 → Kiếm Ngắn Lính Mới</div>
+        </div>
+
+        <!-- CARD 2: GIÁ TRỊ KIẾM (VÀNG) -->
+        <div class="ahb-card ahb-card-gold">
+          <div class="ahb-card-top">
+            <span class="ahb-card-badge">🪙</span>
+            <span class="ahb-card-label" id="ahbLblGold">GIÁ TRỊ KIẾM</span>
+            <span class="ahb-corner-tag">TRIB.GATE +</span>
+          </div>
+          <div class="ahb-val" id="ahbValGold">25 VÀNG</div>
+          <div class="ahb-sub" id="ahbSubGoldPrompt">Bấm phím [B] để chốt vàng vào kho</div>
+          <div class="ahb-meta" id="ahbMetaGoldVault">Vàng kho đang có: 0 vàng</div>
+        </div>
+
+        <!-- CARD 3: TỈ LỆ THÀNH CÔNG / NGUY CƠ VỠ -->
+        <div class="ahb-card ahb-card-rate" id="ahbCardRate">
+          <div class="ahb-card-top">
+            <span class="ahb-card-badge" id="ahbBadgeRate">🛡️</span>
+            <span class="ahb-card-label" id="ahbLblRate">TỈ LỆ THÀNH CÔNG & NGUY CƠ VỠ</span>
+            <span class="ahb-corner-tag">+ MATRIX.64</span>
+          </div>
+          <div class="ahb-val ahb-val-success" id="ahbValSuccess">✔ 99.9% THÀNH CÔNG</div>
+          <div class="ahb-danger-row" id="ahbValBreak">⚠️ 0.1% NGUY CƠ VỠ</div>
+          <div class="ahb-seg-meter" id="ahbMeterSuccess">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+          <div class="ahb-meta" id="ahbMetaHeatNote">Nhiệt kiếm: 20% (Nhiệt ≥60% giảm 50% vỡ) · Đã gõ: 0/99 nhát</div>
+        </div>
+
+        <!-- CARD 4: TIẾN ĐỘ NỘP CỐNG QUA VÒNG -->
+        <div class="ahb-card ahb-card-quota" id="ahbCardQuota">
+          <div class="ahb-card-top">
+            <span class="ahb-card-badge" id="ahbBadgeQuota">🎯</span>
+            <span class="ahb-card-label" id="ahbLblQuota">TIẾN ĐỘ NỘP CỐNG QUA VÒNG</span>
+            <span class="ahb-corner-tag">MOLTEN.FORGE +</span>
+          </div>
+          <div class="ahb-val ahb-val-quota" id="ahbValQuota">0% ĐẠT CHỈ TIÊU CỐNG</div>
+          <div class="ahb-sub" id="ahbSubQuota">Hiện có 0 / 120 Vàng · Cần thêm 120 Vàng</div>
+          <div class="ahb-seg-meter" id="ahbMeterQuota">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+          <div class="ahb-meta" id="ahbMetaRoundNote">Vòng 1 · Lượt còn lại: 30 lượt rèn</div>
+        </div>
+      </div>
+    </div>
+<div id="interactPromptWrap" class="interact-prompt-wrap" style="display:none;">
       <div id="interactPrompt" class="interact-prompt" role="button" tabindex="0">
         <span class="prompt-key">E</span>
         <span class="prompt-label" id="interactLabel">SỬ DỤNG ĐE RÈN</span>
@@ -3955,7 +4216,7 @@ keyLight.shadow.mapSize.set(IS_LOW?256:(IS_MOBILE?512:1024), IS_LOW?256:(IS_MOBI
 scene.add(keyLight); keyLight.target.position.set(0,.95,0.1); scene.add(keyLight.target);
 var rimLight = new THREE.DirectionalLight(0x6a88b8, (IS_LOW||IS_MOBILE)? .45 : .62); rimLight.position.set(0,3.4,-5); scene.add(rimLight);
 var swordKey = new THREE.DirectionalLight(0xffddb0, (IS_LOW||IS_MOBILE)? 0 : .38); swordKey.position.set(2.2, 2.8, 1.4); scene.add(swordKey);
-var caveGlow = new THREE.PointLight(0xff9500, 0, 7, 2); caveGlow.position.set(0,1.8,-4.6); scene.add(caveGlow);
+var caveGlow = new THREE.PointLight(0xff9500, 4.5, 9, 2); caveGlow.position.set(0,1.8,-4.6); scene.add(caveGlow);
 var shrineLight = new THREE.PointLight(0xffb535, 20, 10, 2); shrineLight.position.set(3.8, 1.8, -2.6); scene.add(shrineLight);
 
 /* ============================== ENCLOSED 3D ROOM ============================== */
@@ -3990,7 +4251,7 @@ var pupL = mesh(new THREE.SphereGeometry(.045,10,10), pupilMat, -.52,1.86,-4.80,
 var pupR = mesh(new THREE.SphereGeometry(.045,10,10), pupilMat,  .52,1.86,-4.80, scene, false); pupR.scale.set(.45,1.5,.3);
 var brow = mesh(RB(1.7,.2,.3,.06), matBlack, 0,2.14,-4.82, scene, false);
 var dragonHead = new THREE.Group(); dragonHead.position.set(0,1.8,-5.35); scene.add(dragonHead);
-var matDragon = new THREE.MeshStandardMaterial({color:0x181008, roughness:.92, metalness:.05});
+var matDragon = new THREE.MeshStandardMaterial({color:0x281408, roughness:.88, metalness:.12, emissive:0x2a0800, emissiveIntensity:.35});
 mesh(RB(1.3,.68,.9,.08), matDragon, 0,.05,-.15, dragonHead, false);
 mesh(RB(.62,.32,.72,.05), matDragon, 0,-.14,.42, dragonHead, false);
 mesh(RB(.54,.15,.6,.04), matDragon, 0,-.38,.38, dragonHead, false);
@@ -4112,6 +4373,8 @@ mesh(RB(2.36, .10, .08, .015), matIron, 0, 2.45, 0, smithTable);
 // Grand Upright Slate Display Board (Standing vertically behind anvil)
 var displayStand = new THREE.Group();
 displayStand.position.set(0, 1.82, .02);
+ displayStand.visible = false; // Blurry 3D texture replaced by crystal-crisp floating DOM Holo Board
+
 displayStand.rotation.x = 0; // Standing perfectly upright vertical
 smithTable.add(displayStand);
 
@@ -5401,7 +5664,8 @@ function engageStation(st, force){
     toast(isEn ? '🔥 Furnace — [Space/E] Heat blade, [Q/WASD] Leave station' : '🔥 Lò Nung — [Space/E] Nung kiếm, [Q/WASD] Rời trạm', 'info');
   } else if(st === 'bell'){
     if(typeof bellSound === 'function') bellSound();
-    toast(isEn ? '🔔 Dragon Bell — [Space/E] Pay tribute, [Q/WASD] Leave station' : '🔔 Chuông Cống — [Space/E] Nộp cống, [Q/WASD] Rời trạm', 'info');
+    if(typeof showSmokeDragonHead === 'function') showSmokeDragonHead();
+    toast(isEn ? '🔔 Dragon Bell — look at the cave behind you (Smoke Dragon). [Space/E] Pay tribute' : '🔔 Chuông Cống — quay lại hang phía sau (Rồng Khói). [Space/E] Nộp cống', 'info');
   } else if(st === 'rack'){
     if(typeof clang === 'function') clang(0.25, 1.4);
     toast(isEn ? '🗡 Sword Rack — [T] Hang/Retrieve blade, [Q/WASD] Leave station' : '🗡 Giá Treo — [T] Treo/Lấy kiếm, [Q/WASD] Rời trạm', 'info');
@@ -6226,30 +6490,35 @@ function newGame(){
   if(typeof resetSmith==='function') resetSmith();
   buildShop(); buildUpgrades(); buildRackUI(); applyUpgradeVisuals(); updateRackVisuals(); applyFurnaceState(); startRoundMeta(); refreshUI();
 }
-/* ---- BREAK RISK (rebalanced) ----
-   Per-hit break chance is driven by the sword's LEVEL, not by raw hit
-   count:  p(L) = BREAK_A + BREAK_B*(L-1)  — a gentle linear ramp
-   (Lv.1 0.08% · Lv.2 0.31% · Lv.10 2.15% · Lv.50 11.35% · Lv.100 22.85%
-   BEFORE modifiers; no double-digit risk anywhere near low levels).
-   Heat is the decisive modifier: a hot blade (≥60%) halves the risk,
-   mid heat (30–59%) cuts a quarter, a cold blade (<30%) raises it 15%.
-   Then the luck relic (−30%) and the anvil (−11% per level, compounding
-   multiplicatively as before) apply. Frenzy / Rainbow hits never roll
-   this at all (see doHit). Monte Carlo of the real game logic (heat
-   decay, reheat under 40%, Lv.1 forge gear, Frenzy + Rainbow, 60k runs):
-   P(Lv.10) 95.4% · P(Lv.30) 75.9% · P(Lv.60) 32.7% · P(Lv.70) 22.0% ·
-   P(Lv.100) 4.2% — and ≈15% to Lv.100 with a maxed anvil + furnace. */
-var BREAK_A=.0008, BREAK_B=.0023;
+/* ---- BREAK RISK (level curve v8) ----
+   Base shatter chance by LEVEL only (nhiệt độ trung bình 50%, no relic/đe):
+     p_base(L) = BREAK_R_MIN + (BREAK_R_MAX - BREAK_R_MIN) * (L-1)/(LvMax-1)
+   Anchors: Lv.1 2% · Lv.10 10% · Lv.20 17% · Lv.100 85% (piecewise linear).
+   Then × heatRiskMult, luck (−30%), anvil (−11%/tier compounded), cap BREAK_R_CAP.
+   Lv.100 lạnh có thể chạm ~90%. Frenzy / Rainbow = 0% roll. */
+var BREAK_R_MIN=.02, BREAK_P10=.10, BREAK_P20=.17, BREAK_R_MAX=.85, BREAK_R_CAP=.92;
+function baseBreakRiskLv(lv){
+  lv = clampLv(lv);
+  /* Piecewise: Lv.1→2% · 10→10% · 20→17% · 100→85% (nhiệt trung bình, trước relic/đe) */
+  if(lv <= 1) return BREAK_R_MIN;
+  if(lv <= 10) return BREAK_R_MIN + (BREAK_P10 - BREAK_R_MIN) * ((lv - 1) / 9);
+  if(lv <= 20) return BREAK_P10 + (BREAK_P20 - BREAK_P10) * ((lv - 10) / 10);
+  var lmx = (typeof SWORD_LEVEL_MAX !== 'undefined' ? SWORD_LEVEL_MAX : 100);
+  return BREAK_P20 + (BREAK_R_MAX - BREAK_P20) * ((lv - 20) / (lmx - 20));
+}
 function heatRiskMult(){
   if(G.heat>=60) return .5;
   if(G.heat>=30) return .75;
   return 1.15;
 }
+function rawBreakRiskLv(lv, heatMult){
+  var r = baseBreakRiskLv(lv) * (heatMult != null ? heatMult : 1);
+  if(typeof relic === 'function' && relic('luck')) r *= .7;
+  if(typeof upLv === 'function') r *= (1 - .11 * upLv('anvil'));
+  return Math.max(0, Math.min(BREAK_R_CAP, r));
+}
 function riskNow(){
-  var r = (BREAK_A + BREAK_B*(swordLevelNow()-1)) * heatRiskMult();
-  if(relic('luck')) r*=.7;
-  r *= (1 - .11*upLv('anvil'));
-  return Math.max(0, Math.min(.85, r));
+  return rawBreakRiskLv(swordLevelNow(), heatRiskMult());
 }
 function relic(id){ for(var i=0;i<RELICS.length;i++) if(RELICS[i].id===id) return RELICS[i].owned; return false; }
 
@@ -6313,7 +6582,7 @@ function feedBladeToRelicMachine(r){
    Achievements -> permanent relic unlocks (localStorage), session
    missions, per-round random events, round summaries + records,
    first-run onboarding, critical hits and extra juice. HARD RULE:
-   nothing here touches BREAK_A / BREAK_B / heatRiskMult / anvil
+   nothing here touches baseBreakRiskLv / heatRiskMult / anvil break maths
    maths — the Monte-Carlo break curve is exactly as balanced. */
 var META_KEY='forgetax_meta_v1';
 var META={ unlocked:{}, ach:{}, records:{bestLevel:0,bestSword:0,tributes:0,frenzyTotal:0,rainbowTotal:0,repairs:0,hitsTotal:0,greatTotal:0,missionsDone:0}, onboarded:false, hudCollapsed:false, uiCompact:false, sfxVol:0.72, sfxMute:false };
@@ -6852,7 +7121,198 @@ function refreshHeatHudQuick(){
   if(typeof maybeUpdateSwordTableDisplay==='function') maybeUpdateSwordTableDisplay(false);
 }
 
+
+function updateAnvilHoloBoard(){
+  var board = $('anvilHoloBoard');
+  if(!board) return;
+
+  var isAnvilStation = (typeof isStationEngaged !== 'undefined' && isStationEngaged && activeStation === 'anvil');
+  var isNearAnvil = (!isStationEngaged && (typeof currentNearStation !== 'undefined' && currentNearStation === 'anvil'));
+  var show = (isAnvilStation || isNearAnvil) && (typeof inspectOn === 'undefined' || !inspectOn) && (typeof G !== 'undefined' && G && G.started && !G.over);
+
+  if(!show){
+    board.style.display = 'none';
+    return;
+  }
+  board.style.display = 'flex';
+
+  var isEn = (typeof CURRENT_LANG !== 'undefined' && CURRENT_LANG === 'en');
+  var sLv = (typeof swordLevelNow === 'function') ? swordLevelNow() : (G ? (G.swordLevel || 1) : 1);
+  var sSkin = (typeof skinForLevel === 'function') ? skinForLevel(sLv) : { name: "Thép Thô", hue: 0.1 };
+  var sVal = (G && typeof G.swordVal === 'number' && isFinite(G.swordVal)) ? Math.round(G.swordVal) : 25;
+  var sHeat = (G && typeof G.heat === 'number') ? Math.max(0, Math.min(100, Math.round(G.heat))) : 0;
+  var rk = 0.02;
+  if(G && typeof riskNow === 'function'){ try{ rk = riskNow(); }catch(e){ rk = 0.02; } }
+
+  function formatBoardGold(n){
+    n = Math.round(Number(n) || 0);
+    if(n >= 1e12) return (n/1e12).toFixed(n % 1e12 === 0 ? 0 : 2).replace(/\.0$/,"") + (isEn ? "T" : " nghìn tỷ");
+    if(n >= 1e9) return (n/1e9).toFixed(n % 1e9 === 0 ? 0 : 2).replace(/\.0$/,"") + (isEn ? "B" : " tỷ");
+    if(n >= 1e6) return (n/1e6).toFixed(n % 1e6 === 0 ? 0 : 1).replace(/\.0$/,"") + (isEn ? "M" : " triệu");
+    if(n >= 1e4) return n.toLocaleString();
+    return String(n);
+  }
+
+  var sShapeName = (typeof modelNameForLevel === 'function') ? modelNameForLevel(sLv) : 'Kiếm Sắt';
+
+  // 1. Header
+  var headTitle = isEn ? "FORGETAX · ANVIL SWORD INSPECTION CONSOLE" : "FORGETAX · BẢNG THÔNG SỐ RÈN KIẾM";
+  var elHead = $('ahbHeaderTitle'); if(elHead) elHead.textContent = headTitle;
+
+  // 2. Card 1: Level
+  var elLblLv = $('ahbLblLv'); if(elLblLv) elLblLv.textContent = isEn ? "BLADE LEVEL" : "CẤP ĐỘ KIẾM";
+  var elValLv = $('ahbValLv');
+  if(elValLv){
+    elValLv.textContent = "Lv." + sLv;
+    var hue = Math.round((sSkin.hue || 0.1) * 360);
+    elValLv.style.color = "hsl(" + hue + ", 95%, 80%)";
+  }
+  var elSubLv = $('ahbSubLvName');
+  if(elSubLv) elSubLv.textContent = sShapeName + " · " + (sSkin.name || "");
+  var elMetaLv = $('ahbMetaLvNext');
+  if(elMetaLv){
+    var nextDesc = (sLv >= 100) ? (isEn ? "★ MAX LEVEL (FINAL FORM)" : "★ CỰC HẠN VŨ KHÍ TỐI THƯỢNG")
+                                : (isEn ? ("Next: Lv." + (sLv+1) + " → " + modelNameForLevel(sLv + 1)) : ("Mục tiêu: Lv." + (sLv+1) + " → " + modelNameForLevel(sLv + 1)));
+    elMetaLv.textContent = nextDesc;
+  }
+
+  // 3. Card 2: Giá trị (Vàng)
+  var elLblGold = $('ahbLblGold'); if(elLblGold) elLblGold.textContent = isEn ? "SWORD VALUE" : "GIÁ TRỊ KIẾM";
+  var elValGold = $('ahbValGold'); if(elValGold) elValGold.textContent = formatBoardGold(sVal) + " " + (isEn ? "GOLD" : "VÀNG");
+  var elSubGold = $('ahbSubGoldPrompt'); if(elSubGold) elSubGold.textContent = isEn ? "Press [B] to bank gold into vault" : "Bấm phím [B] để chốt vàng vào kho";
+  var elMetaGold = $('ahbMetaGoldVault');
+  if(elMetaGold){
+    var vaultInfo = (isEn ? "Vault reserve: " : "Vàng kho đang có: ") + formatBoardGold(G ? G.gold : 0) + (isEn ? " gold" : " vàng");
+    elMetaGold.textContent = vaultInfo;
+  }
+
+  // 4. Card 3: % Thành công / Rủi ro vỡ
+  var isSafeMode = (G && (G.rainbow || G.frenzy));
+  var elCardRate = $('ahbCardRate');
+  if(elCardRate){
+    elCardRate.classList.toggle('safe-mode', !!isSafeMode);
+    elCardRate.classList.toggle('danger-mode', !isSafeMode && rk >= 0.15);
+  }
+  var elLblRate = $('ahbLblRate');
+  if(elLblRate) elLblRate.textContent = isEn ? "FORGE SUCCESS & BREAK RISK" : "TỈ LỆ THÀNH CÔNG & NGUY CƠ VỠ";
+
+  var elValSuccess = $('ahbValSuccess');
+  var elValBreak = $('ahbValBreak');
+  var elMetaHeat = $('ahbMetaHeatNote');
+  var meterRate = $('ahbMeterSuccess');
+
+  if(isSafeMode){
+    if(elValSuccess){
+      elValSuccess.textContent = isEn ? "100% SUCCESS" : "100% THÀNH CÔNG";
+      elValSuccess.style.color = "#5ae875";
+    }
+    if(elValBreak){
+      var safeTag = G.rainbow ? (isEn ? "🌈 RAINBOW IMMUNITY · 0% BREAK (×3.5)" : "🌈 CẦU VỒNG BẤT TỬ · 0% VỠ (×3.5)")
+                              : (isEn ? "★ FRENZY ARMED · 0% BREAK (×2.2)" : "★ CUỒNG NỘ BẢO HỘ · 0% VỠ (×2.2)");
+      elValBreak.textContent = safeTag;
+      elValBreak.style.color = "#7df094";
+    }
+    if(meterRate){
+      var segs = meterRate.querySelectorAll('i');
+      for(var i = 0; i < segs.length; i++){
+        segs[i].className = 'active safe';
+      }
+    }
+    if(elMetaHeat){
+      elMetaHeat.textContent = isEn ? "Indestructible under divine protection!" : "Thần kiếm đang được bảo hộ tuyệt đối không thể vỡ!";
+    }
+  } else {
+    var successRate = Math.max(0, Math.min(100, (1 - rk) * 100));
+    var successText = "✔ " + (successRate >= 99.9 ? "99.9" : successRate.toFixed(1)) + "% " + (isEn ? "SUCCESS" : "THÀNH CÔNG");
+    if(elValSuccess){
+      elValSuccess.textContent = successText;
+      elValSuccess.style.color = "#4ade80";
+    }
+    var rkPct = (rk * 100).toFixed(1);
+    var breakText = "⚠️ " + rkPct + "% " + (isEn ? "BREAK RISK" : "NGUY CƠ VỠ");
+    if(elValBreak){
+      elValBreak.textContent = breakText;
+      elValBreak.style.color = rk >= 0.15 ? "#ff5252" : (rk >= 0.08 ? "#ff9800" : "#ffcc80");
+    }
+    if(meterRate){
+      var activeCount = Math.round((1 - rk) * 10);
+      var segs = meterRate.querySelectorAll('i');
+      for(var i = 0; i < segs.length; i++){
+        segs[i].className = (i < activeCount) ? 'active' : '';
+      }
+    }
+    if(elMetaHeat){
+      elMetaHeat.textContent = isEn ? ("Heat: " + sHeat + "% (Heat ≥60% cuts risk by 50%) · " + (G ? G.hits : 0) + "/99 hits")
+                                    : ("Nhiệt kiếm: " + sHeat + "% (Nhiệt ≥60% giảm 50% nguy cơ vỡ) · " + (G ? G.hits : 0) + "/99 nhát");
+    }
+  }
+
+  // 5. Card 4: % Đạt chỉ tiêu cống
+  var totalGoldAvailable = (G ? (G.gold || 0) : 0) + (G && G.hits > 0 ? (G.swordVal || 0) : 0);
+  var tgt = (G && G.target) ? G.target : 120;
+  var quotaPct = Math.round((totalGoldAvailable / tgt) * 100);
+  var isEnough = totalGoldAvailable >= tgt;
+
+  var elCardQuota = $('ahbCardQuota');
+  if(elCardQuota) elCardQuota.classList.toggle('quota-ready', isEnough);
+  var elLblQuota = $('ahbLblQuota');
+  if(elLblQuota) elLblQuota.textContent = isEn ? "TRIBUTE QUOTA PROGRESS" : "TIẾN ĐỘ NỘP CỐNG QUA VÒNG";
+  var elBadgeQuota = $('ahbBadgeQuota');
+  if(elBadgeQuota) elBadgeQuota.textContent = isEnough ? "🔔" : "🎯";
+
+  var elValQuota = $('ahbValQuota');
+  if(elValQuota){
+    if(isEnough){
+      elValQuota.textContent = quotaPct + (isEn ? "% TRIBUTE READY 🔔" : "% ĐỦ CỐNG QUA VÒNG 🔔");
+      elValQuota.style.color = "#4ade80";
+    } else {
+      elValQuota.textContent = quotaPct + (isEn ? "% TRIBUTE REACHED" : "% ĐẠT CHỈ TIÊU CỐNG");
+      elValQuota.style.color = "#ffbe3b";
+    }
+  }
+  var elSubQuota = $('ahbSubQuota');
+  if(elSubQuota){
+    if(isEnough){
+      elSubQuota.textContent = (isEn ? "Have " : "Hiện có ") + formatBoardGold(totalGoldAvailable) + " / " + formatBoardGold(tgt) + (isEn ? " gold · Ring bell to advance!" : " Vàng · Rung chuông để qua vòng!");
+    } else {
+      elSubQuota.textContent = (isEn ? "Have " : "Hiện có ") + formatBoardGold(totalGoldAvailable) + " / " + formatBoardGold(tgt) + (isEn ? " gold · Need " : " Vàng · Cần thêm ") + formatBoardGold(Math.max(0, tgt - totalGoldAvailable)) + (isEn ? " gold" : " Vàng");
+    }
+  }
+  var meterQuota = $('ahbMeterQuota');
+  if(meterQuota){
+    var activeCountQ = Math.min(10, Math.round((totalGoldAvailable / tgt) * 10));
+    var segsQ = meterQuota.querySelectorAll('i');
+    for(var i = 0; i < segsQ.length; i++){
+      segsQ[i].className = (i < activeCountQ) ? (isEnough ? 'active safe' : 'active') : '';
+    }
+  }
+  var elMetaRound = $('ahbMetaRoundNote');
+  if(elMetaRound){
+    elMetaRound.textContent = (isEn ? "Round " : "Vòng ") + (G ? G.round : 1) + (isEn ? " · Turns left: " : " · Lượt còn lại: ") + (G ? G.turns : 30) + (isEn ? " turns" : " lượt rèn");
+  }
+
+  // 6. Positioning: Docked right in optical height when engaged at anvil, or 3D projected in roam
+  if(!isAnvilStation && isNearAnvil && typeof camera !== "undefined" && camera){
+    var anvilWorldPos = new THREE.Vector3(0, 1.45, -0.3);
+    var p = anvilWorldPos.project(camera);
+    if(p.z > 1){
+      board.style.display = 'none';
+      return;
+    }
+    var sx = (p.x * 0.5 + 0.5) * window.innerWidth;
+    var sy = (-(p.y * 0.5) + 0.5) * window.innerHeight;
+    board.style.top = Math.round(sy) + 'px';
+    board.style.left = Math.round(sx) + 'px';
+    board.style.transform = 'translate(-50%, -100%)';
+  } else {
+    board.style.top = '12%';
+    board.style.left = '50%';
+    board.style.transform = 'translateX(-50%)';
+  }
+}
+
 function refreshUI(){
+  if(typeof updateAnvilHoloBoard === "function") updateAnvilHoloBoard();
   _setText('uiRound', String(G.round));
   _setText('uiGold', String(G.gold));
   _setText('uiTurns', String(G.turns));
@@ -7299,7 +7759,7 @@ function prefetchEndgameMedia(lv){
     CINEMATIC_PREFETCH.tribute = true;
     prefetchUrl(assetsBase() + LV100_TRIBUTE_MP4);
   }
-  if(lv >= 96 && !CINEMATIC_PREFETCH.dragon){
+  if(lv >= 40 && !CINEMATIC_PREFETCH.dragon){
     CINEMATIC_PREFETCH.dragon = true;
     setTimeout(function(){ if(typeof showSmokeDragonHead==='function') showSmokeDragonHead(); }, 400);
   }
@@ -8105,6 +8565,7 @@ var frameNo=0;
 var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 function animate(){
   requestAnimationFrame(animate);
+  if(typeof updateAnvilHoloBoard === "function") updateAnvilHoloBoard();
   try{
     var dt=Math.min(clock.getDelta(), .05);
     if(performance.now()<hitstopEnd) dt*=.07; /* HITSTOP: freeze-frame 40-60ms on hammer impact */
@@ -8352,11 +8813,17 @@ function animate(){
     bellPivot.rotation.x=sw;
     var ready=G&&G.gold>=G.target&&!G.over;
     matGold.emissiveIntensity=ready? .35+Math.sin(t*4)*.25 : .04; /* emissive colour set once at startup — no per-frame Color allocation */
+    /* idle: dragon head peeks from the back alcove */
+    if(!dragonAnim && typeof dragonPose==='function'){
+      var _dPeek = 0.12;
+      if(G && G.started) _dPeek = (isStationEngaged && activeStation==='bell') ? 0.42 : 0.22;
+      dragonPose(_dPeek);
+    }
     /* dragon eyes: blink + menace */
     var blink=(Math.sin(t*.7)>.985)? .12 : 1;
     eyeL.scale.y=.62*blink; eyeR.scale.y=.62*blink; pupL.visible=pupR.visible=blink===1;
     eyeMat.emissiveIntensity=ready? 4.2+Math.sin(t*5)*1.2 : 2.4+Math.sin(t*1.3)*.4;
-    caveGlow.intensity=ready? 14+Math.sin(t*5)*5 : 3;
+    caveGlow.intensity=ready? 14+Math.sin(t*5)*5 : ((G&&G.started)? 6+Math.sin(t*1.8)*1.2 : 4.5);
     eyeL.position.x=-.52+lookX*.05; eyeR.position.x=.52+lookX*.05;
     /* ---- DRAGON EVENT: the head lunges out of the cave and its breath
        stream torches the furnace, then washes straight over the camera.
@@ -8653,8 +9120,7 @@ function galOrnaments(lv){
 }
 function galleryBreakRiskPct(lv){
   lv=clampLv(lv);
-  var r=(typeof BREAK_A!=='undefined'?BREAK_A:.0008)+(typeof BREAK_B!=='undefined'?BREAK_B:.0023)*(lv-1);
-  r*=100;
+  var r = (typeof baseBreakRiskLv === 'function' ? baseBreakRiskLv(lv) : 0.02) * 100;
   return r<0.095? r.toFixed(2)+'%' : (Math.round(r*10)/10)+'%';
 }
 function openGalFullView(lv){
