@@ -939,22 +939,105 @@
   .st-tab.active{background:linear-gradient(180deg,#8a4d0d,#5e2f04);border-color:#ffb84d;color:#fff2d4;box-shadow:0 0 12px rgba(255,184,77,.35);transform:scale(1.04);}
   .st-tab .st-ic{margin-right:3px;}
 
-  /* Contextual Station display */
-  body.st-anvil #btnHeat, body.st-anvil #btnTribute, body.st-anvil #rackBar{display:none !important;}
-  body.st-anvil #btnHit, body.st-anvil #btnBank, body.st-anvil #btnHang{display:inline-flex;}
+  /* Contextual Station display & [E] interaction */
+  .interact-prompt-wrap {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 10px;
+    z-index: 100;
+  }
+  .interact-prompt {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 22px;
+    background: linear-gradient(180deg, rgba(38,26,16,0.96) 0%, rgba(20,13,8,0.98) 100%);
+    border: 2px solid #e8b33c;
+    border-radius: 999px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.85), 0 0 16px rgba(232,179,60,0.45);
+    cursor: pointer;
+    color: #fff4db;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    animation: promptPulse 1.6s infinite ease-in-out;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+    pointer-events: auto;
+    user-select: none;
+  }
+  @keyframes promptPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 4px 20px rgba(0,0,0,0.8), 0 0 12px rgba(232,179,60,0.35); }
+    50% { transform: scale(1.05); box-shadow: 0 8px 28px rgba(0,0,0,0.95), 0 0 24px rgba(232,179,60,0.7); }
+  }
+  .interact-prompt:hover {
+    background: linear-gradient(180deg, #d48a20 0%, #9e5b0c 100%);
+    color: #fff;
+    transform: translateY(-2px) scale(1.06);
+  }
+  .interact-prompt:active {
+    transform: translateY(1px) scale(0.98);
+  }
+  .prompt-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    background: linear-gradient(180deg, #ffdc82 0%, #d48a20 100%);
+    border: 1px solid #fff;
+    border-radius: 6px;
+    color: #1a1006;
+    font-weight: 900;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+  }
+  .leave-station-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: linear-gradient(180deg, rgba(46,28,18,0.9) 0%, rgba(24,14,9,0.95) 100%);
+    border: 1.5px solid rgba(232,179,60,0.4);
+    border-radius: 8px;
+    color: #eedcc6;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .leave-station-btn:hover {
+    background: linear-gradient(180deg, #7c2617 0%, #4a1208 100%);
+    border-color: #ff7250;
+    color: #fff;
+  }
 
-  body.st-furnace #btnHit, body.st-furnace #btnBank, body.st-furnace #btnTribute, body.st-furnace #btnHang, body.st-furnace #rackBar{display:none !important;}
-  body.st-furnace #btnHeat{display:inline-flex;min-width:240px;}
+  body:not(.station-engaged) .actions-main button,
+  body:not(.station-engaged) #rackBar {
+    display: none !important;
+  }
 
-  body.st-bell #btnHit, body.st-bell #btnBank, body.st-bell #btnHeat, body.st-bell #btnHang, body.st-bell #rackBar{display:none !important;}
-  body.st-bell #btnTribute{display:inline-flex;min-width:240px;}
+  body.station-engaged #btnLeaveStation {
+    display: inline-flex !important;
+  }
 
-  body.st-rack #btnHit, body.st-rack #btnHeat, body.st-rack #btnTribute{display:none !important;}
-  body.st-rack #btnBank{display:none !important;}
-  body.st-rack #rackBar{display:flex !important;}
-  body.st-rack #btnHang{display:inline-flex;min-width:200px;}
+  body.station-engaged.st-anvil #btnHeat, body.station-engaged.st-anvil #btnTribute, body.station-engaged.st-anvil #rackBar{display:none !important;}
+  body.station-engaged.st-anvil #btnHit, body.station-engaged.st-anvil #btnBank, body.station-engaged.st-anvil #btnHang{display:inline-flex;}
 
-  body.st-wide #btnHeat, body.st-wide #btnRepair, body.st-wide #btnHit, body.st-wide #btnBank, body.st-wide #btnTribute, body.st-wide #btnHang, body.st-wide #rackBar{display:none !important;}
+  body.station-engaged.st-furnace #btnHit, body.station-engaged.st-furnace #btnBank, body.station-engaged.st-furnace #btnTribute, body.station-engaged.st-furnace #btnHang, body.station-engaged.st-furnace #rackBar{display:none !important;}
+  body.station-engaged.st-furnace #btnHeat{display:inline-flex;min-width:240px;}
+
+  body.station-engaged.st-bell #btnHit, body.station-engaged.st-bell #btnBank, body.station-engaged.st-bell #btnHeat, body.station-engaged.st-bell #btnHang, body.station-engaged.st-bell #rackBar{display:none !important;}
+  body.station-engaged.st-bell #btnTribute{display:inline-flex;min-width:240px;}
+
+  body.station-engaged.st-rack #btnHit, body.station-engaged.st-rack #btnHeat, body.station-engaged.st-rack #btnTribute{display:none !important;}
+  body.station-engaged.st-rack #btnBank{display:none !important;}
+  body.station-engaged.st-rack #rackBar{display:flex !important;}
+  body.station-engaged.st-rack #btnHang{display:inline-flex;min-width:200px;}
+
   body.st-wide .actions-main::after{content:'👁 Chạm trạm 3D hoặc bấm phím 1-4 để tới trạm đó';font-size:13px;font-weight:700;color:var(--gold-2);padding:10px 18px;background:rgba(16,11,7,.85);border-radius:20px;border:1px solid rgba(232,179,60,.4);text-shadow:0 1px 4px #000;}
 
   canvas#scene{cursor:grab;}
@@ -1260,16 +1343,23 @@
       <button type="button" data-st="rack" class="st-tab" title="Giá treo kiếm trên tường (Phím 4)"><span class="st-ic">🗡</span> Giá Treo</button>
       <button type="button" data-st="wide" class="st-tab" title="Toàn cảnh xưởng rèn (Phím 5)"><span class="st-ic">👁</span> Toàn Cảnh</button>
     </div>
+    <div id="interactPromptWrap" class="interact-prompt-wrap" style="display:none;">
+      <div id="interactPrompt" class="interact-prompt" role="button" tabindex="0">
+        <span class="prompt-key">E</span>
+        <span class="prompt-label" id="interactLabel">SỬ DỤNG ĐE RÈN</span>
+      </div>
+    </div>
     <div id="rackBar"><span class="racklbl">🗡 Giá treo</span><div id="rackSlots"></div></div>
     <div class="btnrow actions-main">
-      <button id="btnHeat">🔥 NUNG KIẾM<span class="sub">H · nóng = lời hơn, khó vỡ</span></button>
+      <button id="btnHeat">🔥 NUNG KIẾM<span class="sub">H / E · nóng = lời hơn, khó vỡ</span></button>
       <button id="btnRepair" class="goldbtn" style="display:none">🔧 SỬA LÒ<span class="sub">sửa lò nung bị rồng phá</span></button>
-      <button id="btnHit" class="primary">🔨 GÕ BÚA<span class="sub">Space · tăng giá, tăng nguy cơ vỡ</span></button>
+      <button id="btnHit" class="primary">🔨 GÕ BÚA<span class="sub">Space / E · tăng giá, nguy cơ vỡ</span></button>
       <button id="btnBank">📥 CHỐT KIẾM<span class="sub">B · cất vàng vào kho, lấy kiếm mới</span></button>
       <button id="btnHang">🗡 TREO KIẾM<span class="sub">T · lên giá treo (0/3)</span></button>
       <button id="btnTribute" class="goldbtn" disabled>🔔 NỘP CỐNG<span class="sub">đủ vàng mới rung chuông được</span></button>
+      <button id="btnLeaveStation" type="button" class="leave-station-btn" title="Rời trạm quay lại đi bộ tự do (Phím Q / WASD)"><span class="prompt-key" style="background:#5a3520;color:#fff;border-color:rgba(232,179,60,.5);">Q</span> RỜI TRẠM</button>
     </div>
-    <p id="keyHints" class="key-hints" aria-hidden="true">Phím: <kbd>WASD</kbd> đi bộ · <kbd>Kéo chuột</kbd> xoay nhìn 360° · <kbd>1-5</kbd> đổi trạm · <kbd>Space</kbd> hành động · <kbd>V</kbd> ngắm</p>
+    <p id="keyHints" class="key-hints" aria-hidden="true">Phím: <kbd>WASD</kbd> đi bộ · <kbd>E</kbd> tương tác trạm · <kbd>Q</kbd> rời trạm · <kbd>Space</kbd> hành động · <kbd>1-5</kbd> trạm</p>
   </div>
 </div>
 
@@ -2133,7 +2223,7 @@ function resetSmith(){
   playerPos.set(0, 1.85, 2.2);
   targetPlayerPos.copy(playerPos);
   camYaw = 0; camPitch = -0.38; targetYaw = 0; targetPitch = -0.38;
-  setStation('anvil', true);
+  engageStation('anvil');
   shadowDirty=true;
 }
 function updateSmith(dt){
@@ -3646,6 +3736,8 @@ $('btnHit').addEventListener('click', doHit);
 $('btnBank').addEventListener('click', doBank);
 $('btnTribute').addEventListener('click', doTribute);
 $('btnHang').addEventListener('click', function(){ hangSword(); });
+var _bip = $('interactPrompt'); if(_bip) _bip.addEventListener('click', function(){ engageStation(currentNearStation); });
+var _bls = $('btnLeaveStation'); if(_bls) _bls.addEventListener('click', function(){ disengageStation(); });
 /* ---------- sheets (UX v4): Relic / Upgrades / Help open one at a time
    as modal sheets over a clean play screen; Close / backdrop / Esc all
    return to the forge with nothing left open ---------- */
@@ -3678,32 +3770,48 @@ $('btnSummaryOk').addEventListener('click', closeSheets);
 $('btnEventSkip').addEventListener('click', closeSheets);
 window.addEventListener('keydown', function(e){
   if(e.target&&(/^(INPUT|TEXTAREA|SELECT)$/).test(e.target.tagName)) return;
-  if(e.code==='Digit1'||e.code==='Numpad1'){ setStation('anvil'); return; }
-  if(e.code==='Digit2'||e.code==='Numpad2'){ setStation('furnace'); return; }
-  if(e.code==='Digit3'||e.code==='Numpad3'){ setStation('bell'); return; }
-  if(e.code==='Digit4'||e.code==='Numpad4'){ setStation('rack'); return; }
-  if(e.code==='Digit5'||e.code==='Numpad5'){ setStation('wide'); return; }
+  if(e.code==='Digit1'||e.code==='Numpad1'){ engageStation('anvil'); return; }
+  if(e.code==='Digit2'||e.code==='Numpad2'){ engageStation('furnace'); return; }
+  if(e.code==='Digit3'||e.code==='Numpad3'){ engageStation('bell'); return; }
+  if(e.code==='Digit4'||e.code==='Numpad4'){ engageStation('rack'); return; }
+  if(e.code==='Digit5'||e.code==='Numpad5'){ disengageStation(); return; }
   if(e.code==='KeyW'||e.code==='KeyA'||e.code==='KeyS'||e.code==='KeyD'||e.code==='ArrowUp'||e.code==='ArrowDown'||e.code==='ArrowLeft'||e.code==='ArrowRight'){ setMoveKey(e.code,1); e.preventDefault(); return; }
   if(e.repeat) return;
+  if(e.code==='KeyE'){
+    e.preventDefault();
+    if(!isStationEngaged){
+      if(currentNearStation) engageStation(currentNearStation);
+    } else {
+      if(activeStation==='anvil') doHit();
+      else if(activeStation==='furnace') doHeat();
+      else if(activeStation==='bell') doTribute();
+      else if(activeStation==='rack') hangSword();
+    }
+    return;
+  }
+  if(e.code==='KeyQ'){
+    e.preventDefault();
+    if(isStationEngaged) disengageStation();
+    return;
+  }
   if(e.code==='Space'){
     e.preventDefault();
     if(!G.started){ $('btnStart').click(); }
     else {
-      var _sn=(typeof smithStationNear==='function'&&smith)?smithStationNear():'';
-      if(_sn==='furnace') doHeat();
-      else if(_sn==='bell') doTribute();
-      else if(_sn==='rack') hangSword();
-      else if(_sn==='anvil') doHit();
-      else if(activeStation==='furnace') doHeat();
-      else if(activeStation==='bell') doTribute();
-      else if(activeStation==='rack') hangSword();
-      else doHit();
+      if(!isStationEngaged){
+        if(currentNearStation) engageStation(currentNearStation);
+      } else {
+        if(activeStation==='furnace') doHeat();
+        else if(activeStation==='bell') doTribute();
+        else if(activeStation==='rack') hangSword();
+        else doHit();
+      }
     }
   }
   else if(e.code==='KeyV') setInspect(!inspectOn);
-  else if(e.code==='KeyH'){ if(activeStation!=='furnace') setStation('furnace'); doHeat(); }
-  else if(e.code==='KeyB'){ if(activeStation!=='anvil') setStation('anvil'); doBank(); }
-  else if(e.code==='KeyT'){ if(activeStation!=='rack') setStation('rack'); hangSword(); }
+  else if(e.code==='KeyH'){ engageStation('furnace'); doHeat(); }
+  else if(e.code==='KeyB'){ engageStation('anvil'); doBank(); }
+  else if(e.code==='KeyT'){ engageStation('rack'); hangSword(); }
 });
 window.addEventListener('keyup', function(e){
   if(e.code==='KeyW'||e.code==='KeyA'||e.code==='KeyS'||e.code==='KeyD'||e.code==='ArrowUp'||e.code==='ArrowDown'||e.code==='ArrowLeft'||e.code==='ArrowRight') setMoveKey(e.code,0);
