@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bellBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2a0815"/>
+      <stop offset="65%" stop-color="#140309"/>
+      <stop offset="100%" stop-color="#050103"/>
+    </radialGradient>
+    <linearGradient id="bellGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff6b3"/>
+      <stop offset="25%" stop-color="#f5c242"/>
+      <stop offset="60%" stop-color="#d48806"/>
+      <stop offset="90%" stop-color="#804a00"/>
+      <stop offset="100%" stop-color="#3d2100"/>
+    </linearGradient>
+    <filter id="bellGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <circle cx="256" cy="256" r="240" fill="url(#bellBg)" stroke="url(#bellGold)" stroke-width="14"/>
+  <circle cx="256" cy="256" r="226" fill="none" stroke="#ff4d4f" stroke-width="2" stroke-dasharray="10 8" opacity="0.6"/>
+  <!-- Resonance waves -->
+  <path d="M100 240 Q70 270 100 300" fill="none" stroke="#ffd700" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+  <path d="M412 240 Q442 270 412 300" fill="none" stroke="#ffd700" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+  <!-- Bell Loop Crown -->
+  <path d="M228 135 C228 105 284 105 284 135" fill="none" stroke="url(#bellGold)" stroke-width="18" stroke-linecap="round"/>
+  <!-- Main Bell Body -->
+  <path d="M220 145 C220 145 200 240 150 310 C140 325 155 350 185 350 L327 350 C357 350 372 325 362 310 C312 240 292 145 292 145 Z" 
+        fill="url(#bellGold)" stroke="#613600" stroke-width="6" filter="url(#bellGlow)"/>
+  <!-- Bottom Lip Rim -->
+  <ellipse cx="256" cy="350" rx="92" ry="22" fill="#522f02" stroke="url(#bellGold)" stroke-width="6"/>
+  <!-- Bell Clapper -->
+  <circle cx="256" cy="365" r="22" fill="url(#bellGold)" stroke="#3a1e00" stroke-width="4"/>
+  <!-- Bell Engraving Line -->
+  <path d="M175 290 Q256 315 337 290" fill="none" stroke="#ffe79a" stroke-width="5" opacity="0.8"/>
+</svg>

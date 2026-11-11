@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 120" width="800" height="120">
+  <defs>
+    <linearGradient id="frameGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1a130e"/>
+      <stop offset="15%" stop-color="#2c1e14"/>
+      <stop offset="50%" stop-color="#3d2a1d"/>
+      <stop offset="85%" stop-color="#2c1e14"/>
+      <stop offset="100%" stop-color="#1a130e"/>
+    </linearGradient>
+    <linearGradient id="metalRim" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#5c4028"/>
+      <stop offset="20%" stop-color="#dfaa48"/>
+      <stop offset="50%" stop-color="#fff1b8"/>
+      <stop offset="80%" stop-color="#dfaa48"/>
+      <stop offset="100%" stop-color="#5c4028"/>
+    </linearGradient>
+  </defs>
+  <!-- Background banner plate -->
+  <polygon points="20,10 780,10 800,60 780,110 20,110 0,60" fill="url(#frameGrad)" stroke="url(#metalRim)" stroke-width="4"/>
+  <!-- Inner filigree line -->
+  <polygon points="35,22 765,22 780,60 765,98 35,98 20,60" fill="none" stroke="#dfaa48" stroke-width="1.5" opacity="0.7"/>
+  <!-- Corner rivets -->
+  <circle cx="45" cy="32" r="5" fill="url(#metalRim)"/>
+  <circle cx="755" cy="32" r="5" fill="url(#metalRim)"/>
+  <circle cx="45" cy="88" r="5" fill="url(#metalRim)"/>
+  <circle cx="755" cy="88" r="5" fill="url(#metalRim)"/>
+</svg>
