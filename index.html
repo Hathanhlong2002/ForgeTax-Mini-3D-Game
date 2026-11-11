@@ -3524,7 +3524,7 @@ function workflowHint(){
   if(G.frenzy) return {txt:'FRENZY', act:'Gõ ngay — không thể vỡ', btn:'btnHit'};
   if(G.rainbow) return {txt:'CẦU VỒNG', act:'Gõ ngay — ×3.5, không vỡ', btn:'btnHit'};
   if(G.turns<=5) return {txt:'Gấp!', act:'còn '+G.turns+' lượt — chốt / cống', btn: G.gold>=G.target?'btnTribute':'btnBank'};
-  var near=smith&&smith.userData? smith.userData.nearStation:'';
+  var near=(isStationEngaged?activeStation:'')||currentNearStation||'';
   var stBy={furnace:{txt:'Vị trí',act:'🔥 Gần lò — NUNG (H)',btn:'btnHeat'},anvil:{txt:'Vị trí',act:'🔨 Gần đe — GÕ',btn:'btnHit'},bell:{txt:'Vị trí',act:'🔔 Gần chuông — NỘP',btn:'btnTribute'},rack:{txt:'Vị trí',act:'🗡 Gần giá — treo/CHỐT',btn:'btnBank'}};
   if(near&&stBy[near]) return stBy[near];
   return {txt:'', act:'', btn:''};
@@ -4233,7 +4233,8 @@ $('btnHeat').addEventListener('click', function(){
     shakeStationSprite('furnace');
     return;
   }
-  doHeat();
+  if(stF.action==='repair') doRepair();
+  else doHeat();
 });
 $('btnRepair').addEventListener('click', doRepair);
 $('btnHit').addEventListener('click', function(){
@@ -4244,7 +4245,8 @@ $('btnHit').addEventListener('click', function(){
     shakeStationSprite('anvil');
     return;
   }
-  doHit();
+  if(stA.action==='bank') doBank();
+  else doHit();
 });
 $('btnBank').addEventListener('click', doBank);
 $('btnTribute').addEventListener('click', function(){
@@ -4373,9 +4375,21 @@ window.addEventListener('keydown', function(e){
     }
   }
   else if(e.code==='KeyV') setInspect(!inspectOn);
-  else if(e.code==='KeyH'){ engageStation('furnace'); doHeat(); }
-  else if(e.code==='KeyB'){ engageStation('anvil'); doBank(); }
-  else if(e.code==='KeyT'){ engageStation('rack'); hangSword(); }
+  else if(e.code==='KeyH'){
+    var _hf=getStationStatus('furnace');
+    if(!_hf.ok){ toast(_hf.msg,'bad'); if(typeof crackSound==='function') crackSound(); shakeStationSprite('furnace'); return; }
+    if(engageStation('furnace', true)){ if(_hf.action==='repair') doRepair(); else doHeat(); }
+  }
+  else if(e.code==='KeyB'){
+    var _hb=getStationStatus('anvil');
+    if(!_hb.ok){ toast(_hb.msg,'bad'); if(typeof crackSound==='function') crackSound(); shakeStationSprite('anvil'); return; }
+  engageStation('anvil', true); doBank();
+  }
+  else if(e.code==='KeyT'){
+    var _ht=getStationStatus('rack');
+    if(!_ht.ok){ toast(_ht.msg,'bad'); if(typeof crackSound==='function') crackSound(); shakeStationSprite('rack'); return; }
+    if(engageStation('rack', true)) hangSword();
+  }
 });
 window.addEventListener('keyup', function(e){
   if(e.code==='KeyW'||e.code==='KeyA'||e.code==='KeyS'||e.code==='KeyD'||e.code==='ArrowUp'||e.code==='ArrowDown'||e.code==='ArrowLeft'||e.code==='ArrowRight') setMoveKey(e.code,0);
@@ -5683,8 +5697,25 @@ function syncMainModelVisual(){
     if(skinOrbit) skinOrbit.visible = lv>=100; /* orbiting crystals still crown the Lv.100 model */
   }
   modelHolder.scale.setScalar(1+lv*.0018); /* same gentle per-level growth as the procedural blade */
-  /* crack decals ride at the model's top surface while a real model shows */
-  cracks.forEach(function(c){ c.position.y = shown? .022 : 0; });
+  /* crack decals ride at the model's top surface and scale to fit the exact blade length */
+  if(shown && mainModelGroup){
+    var bbox = new THREE.Box3().setFromObject(mainModelGroup);
+    var bMinX = bbox.min.x - sword.position.x;
+    var bMaxX = bbox.max.x - sword.position.x;
+    var bladeSpan = Math.max(0.28, bMaxX - Math.max(0, bMinX));
+    var startX = Math.max(0.06, bMinX + 0.08);
+    cracks.forEach(function(c, i){
+      c.position.y = 0.024;
+      var targetX = startX + (i / 3.4) * (bladeSpan * 0.68);
+      c.position.x = targetX - (0.3 + i * 0.22);
+      c.scale.setScalar(Math.min(1.0, Math.max(0.42, bladeSpan / 1.1)));
+    });
+  } else {
+    cracks.forEach(function(c){
+      c.position.set(0, 0, 0);
+      c.scale.set(1, 1, 1);
+    });
+  }
 }
 /* ---------- rack: a hung sword shows a clone of its OWN level's model ---------- */
 function getRackClone(slot, lv){
