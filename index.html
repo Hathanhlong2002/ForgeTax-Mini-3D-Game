@@ -6335,16 +6335,19 @@ function impactFX(power){ ringT=0; impactLight.intensity=95*(power||1); flashTo(
 var shardMat = new THREE.MeshStandardMaterial({color:0xb9c2cc, roughness:.25, metalness:1, emissive:0xff5a00, emissiveIntensity:.5});
 var shardGeo = new THREE.TetrahedronGeometry(.065);
 var shards=[];
-for(var shi=0; shi<26; shi++){ var sm=new THREE.Mesh(shardGeo, shardMat); sm.visible=false; sm.castShadow=true; scene.add(sm); shards.push({m:sm, life:0, vx:0, vy:0, vz:0, rx:0, rz:0}); }
+for(var shi=0; shi<26; shi++){ var sm=new THREE.Mesh(shardGeo, shardMat); sm.visible=false; sm.castShadow=false; scene.add(sm); shards.push({m:sm, life:0, vx:0, vy:0, vz:0, rx:0, rz:0}); }
 function burstShards(x,y,z){
-  shards.forEach(function(s){
-    s.life=rnd(.7,1.35); s.m.visible=true;
+  var maxSh=(typeof IS_LOW!=='undefined'&&IS_LOW)?10:((typeof IS_MOBILE!=='undefined'&&IS_MOBILE)?14:22);
+  var lifeMul=(typeof IS_LOW!=='undefined'&&IS_LOW)?.65:1;
+  shards.forEach(function(s,i){
+    if(i>=maxSh){ s.life=0; if(s.m) s.m.visible=false; return; }
+    s.life=rnd(.45,.9)*lifeMul; s.m.visible=true;
     s.m.position.set(x+rnd(-.35,.55), y, z+rnd(-.08,.08));
-    s.m.scale.setScalar(rnd(.5,1.6));
-    s.vx=rnd(-1.7,1.7); s.vy=rnd(1.2,3.4); s.vz=rnd(-1.1,1.1); s.rx=rnd(-9,9); s.rz=rnd(-9,9);
+    s.m.scale.setScalar(rnd(.5,1.3));
+    s.vx=rnd(-1.4,1.4); s.vy=rnd(1.0,2.8); s.vz=rnd(-.9,.9); s.rx=rnd(-7,7); s.rz=rnd(-7,7);
   });
   sword.visible=false;
-  setTimeout(function(){ sword.visible=true; }, 430);
+  setTimeout(function(){ sword.visible=true; }, 320);
 }
 /* gold coin fountain */
 var COINS=Math.round(90*PF), coins=makePoints(COINS,.08,0xffd94d,1,true), coinDat=[], coinPos=coins.geometry.attributes.position.array;
@@ -7177,7 +7180,17 @@ function refreshHeatHudQuick(){
 }
 
 
-function updateAnvilHoloBoard(){
+var _ahbCacheKey='';
+function anvilHoloBoardStateKey(){
+  if(typeof G==='undefined'||!G) return '';
+  var rk=0;
+  if(typeof riskNow==='function'){ try{ rk=Math.round(riskNow()*200); }catch(e){ rk=0; } }
+  return [swordLevelNow(), Math.round(G.swordVal||0), G.gold||0, G.target||0, Math.round(G.heat/4), G.hits||0, G.turns||0, G.frenzy?1:0, G.rainbow?1:0, G.furnaceBroken?1:0, (typeof CURRENT_LANG!=='undefined'?CURRENT_LANG:'vi'), rk].join('|');
+}
+function maybeUpdateAnvilHoloBoard(force){
+  if(typeof updateAnvilHoloBoard==='function') updateAnvilHoloBoard(force);
+}
+function updateAnvilHoloBoard(force){
   var board = $('anvilHoloBoard');
   if(!board) return;
 
@@ -7190,6 +7203,10 @@ function updateAnvilHoloBoard(){
     return;
   }
   board.style.display = 'flex';
+
+  var _ahbKey=anvilHoloBoardStateKey();
+  var _ahbContent=!!force || _ahbKey!==_ahbCacheKey;
+  if(_ahbContent) _ahbCacheKey=_ahbKey;
 
   var isEn = (typeof CURRENT_LANG !== 'undefined' && CURRENT_LANG === 'en');
   var sLv = (typeof swordLevelNow === 'function') ? swordLevelNow() : (G ? (G.swordLevel || 1) : 1);
@@ -7210,6 +7227,7 @@ function updateAnvilHoloBoard(){
 
   var sShapeName = (typeof modelNameForLevel === 'function') ? modelNameForLevel(sLv) : 'Kiếm Sắt';
 
+  if(_ahbContent){
   // 1. Header
   var headTitle = isEn ? "FORGETAX · ANVIL SWORD STATS" : "FORGETAX · THÔNG SỐ RÈN KIẾM";
   var elHead = $('ahbHeaderTitle'); if(elHead) elHead.textContent = headTitle;
@@ -7312,6 +7330,7 @@ function updateAnvilHoloBoard(){
     barQuota.style.width = fillPct + "%";
   }
 
+  }
   // 6. Optimal Height Positioning
   if(!isAnvilStation && isNearAnvil && typeof camera !== "undefined" && camera){
     var anvilWorldPos = new THREE.Vector3(0, 1.40, -0.3);
@@ -7334,7 +7353,7 @@ function updateAnvilHoloBoard(){
 }
 
 function refreshUI(){
-  if(typeof updateAnvilHoloBoard === "function") updateAnvilHoloBoard();
+  if(typeof maybeUpdateAnvilHoloBoard === 'function') maybeUpdateAnvilHoloBoard(true);
   _setText('uiRound', String(G.round));
   _setText('uiGold', String(G.gold));
   _setText('uiTurns', String(G.turns));
@@ -7404,7 +7423,10 @@ function refreshUI(){
       if(sLv>=SWORD_LEVEL_MAX) shpNx.textContent=(CURRENT_LANG==='en'?'final blade model ★':'model cuối cùng ★');
       else shpNx.textContent=(CURRENT_LANG==='en'?('Lv.'+(sLv+1)+' → unique model'):('Lv.'+(sLv+1)+' → model khác hẳn'));
     }
-    if(typeof applySwordSkin==='function') applySwordSkin();
+    if(typeof applySwordSkin==='function'){
+      if(_skipApplySwordSkinOnce) _skipApplySwordSkinOnce=false;
+      else applySwordSkin();
+    }
   }
   _el('swordPlate').classList.toggle('frenzy', !!G.frenzy);
   _el('swordPlate').classList.toggle('rainbow', !!G.rainbow);
@@ -7792,19 +7814,19 @@ function hideProceduralDragonMesh(){
 }
 function orientSmokeDragonInCave(root){
   if(!root) return;
-  /* GLB authored neck along +Y (rearing); cave needs neck along +Z into the forge */
+  /* Y-up export → neck along parent +Z, muzzle toward forge (+world Z / camera) */
+  root.scale.setScalar(0.46);
+  root.position.set(0, 0, 0);
   root.rotation.order = 'YXZ';
   root.rotation.set(-Math.PI / 2, Math.PI, 0);
-  root.scale.setScalar(0.46);
-  root.position.set(0, 0.02, -0.12);
   root.updateMatrixWorld(true);
   var box = new THREE.Box3().setFromObject(root);
   var center = box.getCenter(new THREE.Vector3());
   root.position.x -= center.x;
   root.position.y -= center.y;
   root.position.z -= center.z;
-  root.position.z += 0.08;
-  root.position.y -= 0.05;
+  root.position.z += 0.32;
+  root.position.y -= 0.08;
 }
 function loadSmokeDragonHead(opts){
   opts=opts||{};
@@ -7823,10 +7845,10 @@ function loadSmokeDragonHead(opts){
     if(!gltf || !gltf.scene || typeof dragonHead==='undefined'){ if(onFail) onFail(); return; }
     smokeDragonRoot=gltf.scene;
     smokeDragonRoot.name='SmokeDragonHeadGLB';
+    dragonHead.add(smokeDragonRoot);
     if(typeof orientSmokeDragonInCave==='function') orientSmokeDragonInCave(smokeDragonRoot);
     hideProceduralDragonMesh();
     if(typeof setDragonCaveEyesVisible==='function') setDragonCaveEyesVisible(false);
-    dragonHead.add(smokeDragonRoot);
     smokeDragonRoot.visible=true;
     shadowDirty=true;
     if(onDone) onDone();
@@ -7968,6 +7990,19 @@ function doHeat(){
   toastL('Kẹp gắp kiếm bỏ vào lò nung…','Clamping blade into furnace…','info');
   spendTurn(); refreshUI();
 }
+var _bladeReskinTimer=0, _skipApplySwordSkinOnce=false;
+function scheduleBladeReskin(){
+  if(_bladeReskinTimer) clearTimeout(_bladeReskinTimer);
+  _bladeReskinTimer=setTimeout(function(){
+    _bladeReskinTimer=0;
+    if(typeof G==='undefined'||!G) return;
+    _txtCache.skinLvRendered=-1;
+    if(typeof applySwordSkin==='function') applySwordSkin();
+    _txtCache.skinLvRendered=swordLevelNow();
+    if(typeof maybeUpdateSwordTableDisplay==='function') maybeUpdateSwordTableDisplay(true);
+    if(typeof maybeUpdateAnvilHoloBoard==='function') maybeUpdateAnvilHoloBoard(true);
+  }, 48);
+}
 var RAINBOW_CHANCE=.04, RAINBOW_MULT=3.5;
 function doHit(){
   if(!G.started||G.over||G.turns<=0||G.heating||G.eventLock||G.repairing||hammerAnim<1) return;
@@ -7987,16 +8022,18 @@ function doHit(){
     if(wasRainbow) burstRainbow(-.05,1.3,.2,80,1.7);
     var broke = !wasFrenzy && !wasRainbow && Math.random()<hitRisk;
     if(broke){
-      shatterSound(); shake=.5;
-      burstShards(-.05,1.26,.14); impactFX(1.9); floatNum('VỠ KIẾM!', 'bad');
-      burstSparks(-.1,1.25,.25,70,1.7,1.4);
+      hitstopEnd=performance.now()+16;
+      shatterSound(); shake=.42;
+      var _brkSp=(typeof IS_LOW!=='undefined'&&IS_LOW)?14:((typeof IS_MOBILE!=='undefined'&&IS_MOBILE)?26:36);
+      burstShards(-.05,1.26,.14); impactFX(1.45); floatNum('VỠ KIẾM!', 'bad');
+      burstSparks(-.1,1.25,.25,_brkSp,1.45,1.1);
       var scrapGold = (levelBefore >= 15) ? Math.round(G.swordVal * 0.20) : 0;
       toastL('💥 VỠ KIẾM! Thanh kiếm '+G.swordVal+' vàng gãy nát…'+(scrapGold>0?' (thu hồi '+scrapGold+' vàng phế liệu)':''), '💥 BLADE SHATTERED! '+G.swordVal+' gold lost…'+(scrapGold>0?' (recovered '+scrapGold+' scrap)':''), 'bad');
       G.totalBroken++; metaOnBreak(levelBefore, G.swordVal);
       if(scrapGold > 0){
         G.gold += scrapGold;
         setTimeout(function(){
-          burstCoins(-.05,1.26,.14,16);
+          burstCoins(-.05,1.26,.14,12);
           floatNum('+'+scrapGold+' vàng phế liệu', 'good');
           toastL('🛡 Thu hồi được '+scrapGold+' vàng từ mảnh vụn kiếm vỡ bán cho lò!','🛡 Recovered '+scrapGold+' gold from broken blade scrap!','info');
           refreshUI();
@@ -8004,6 +8041,10 @@ function doHit(){
       }
       G.swordVal=25; G.swordLevel=1; G.hits=0; G.frenzy=false; G.rainbow=false; G.heat=Math.max(10,G.heat-25);
       G.carryingBlade=false; if(typeof bladeOnAnvilHome==='function') bladeOnAnvilHome();
+      _skipApplySwordSkinOnce=true;
+      _txtCache.skinLvRendered=0;
+      if(typeof scheduleBladeReskin==='function') scheduleBladeReskin();
+      invalidateSwordTable();
     } else {
       var gain=Math.round(rnd(16,28)*(0.7+heatAtStrike/100*0.95)*(wasRainbow?RAINBOW_MULT:(wasFrenzy?2.2:1))*(relic('value')?1.3:1)*(relic('r_value2')?1.15:1)*(1+.2*upLv('hammer'))*skinForLevel(levelBefore).valueBonus);
       var isGreat = !wasRainbow && Math.random() < (relic('r_great')? .13 : .08);
@@ -8629,7 +8670,7 @@ var frameNo=0;
 var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 function animate(){
   requestAnimationFrame(animate);
-  if(typeof updateAnvilHoloBoard === "function") updateAnvilHoloBoard();
+  if(typeof maybeUpdateAnvilHoloBoard === 'function') maybeUpdateAnvilHoloBoard(false);
   try{
     var dt=Math.min(clock.getDelta(), .05);
     if(performance.now()<hitstopEnd) dt*=.07; /* HITSTOP: freeze-frame 40-60ms on hammer impact */
@@ -8638,7 +8679,7 @@ function animate(){
        actually moves or the scene's shadow casters changed — idle frames
        (the common case: fire flicker + particles move no casters) skip the
        shadow pass entirely */
-    var _needSh=shadowDirty||dragonAnim||hammerAnim<1||bellSwing>0||anyShardAlive();
+    var _needSh=shadowDirty||dragonAnim||hammerAnim<1||bellSwing>0;
     if(heatAnim && frameNo%4===0) _needSh=true;
     if(typeof skinOrbit!=='undefined'&&skinOrbit&&skinOrbit.visible) _needSh=true;
     if(typeof anvilRunes!=='undefined'&&anvilRunes&&anvilRunes.visible&&frameNo%3===0) _needSh=true;
