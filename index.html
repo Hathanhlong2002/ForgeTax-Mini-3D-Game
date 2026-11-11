@@ -2766,7 +2766,7 @@
     pointer-events: auto !important;
   }
   #swordPlate {
-    order: 1 !important;
+    display: none !important;
   }
   .actions-main {
     order: 2 !important;
@@ -3626,6 +3626,294 @@ mesh(new THREE.CylinderGeometry(.2,.2,.02,14), matWoodDk, 0,.02,0, bucket);
 var water = mesh(new THREE.CircleGeometry(.235,18), new THREE.MeshPhysicalMaterial({color:0x39586b, roughness:.08, metalness:0, transparent:true, opacity:.9}), 0,.46,0, bucket, false); water.rotation.x=-Math.PI/2;
 [.14,.36].forEach(function(y){ var bb=mesh(new THREE.TorusGeometry(.245,.016,8,24), matIron, 0,y,0, bucket); bb.rotation.x=Math.PI/2; });
 
+/* ---------- 3D BLACKSMITH SWORD INSPECTION TABLE (BÀN XEM THUỘC TÍNH KIẾM) ---------- */
+var smithTable = new THREE.Group();
+smithTable.position.set(0, 0, 1.05);
+scene.add(smithTable);
+
+// 4 Heavy carved wooden legs with iron ferrules
+var tblLegGeo = RB(.065, .62, .065, .01);
+var tblFootGeo = RB(.075, .05, .075, .005);
+[[-.36, -.18], [.36, -.18], [-.36, .18], [.36, .18]].forEach(function(pos){
+  mesh(tblLegGeo, matWoodDk, pos[0], .31, pos[1], smithTable);
+  mesh(tblFootGeo, matIron, pos[0], .025, pos[1], smithTable);
+});
+
+// Lower stretchers connecting table legs
+mesh(RB(.72, .04, .04, .01), matWoodDk, 0, .18, -.18, smithTable);
+mesh(RB(.72, .04, .04, .01), matWoodDk, 0, .18, .18, smithTable);
+mesh(RB(.04, .04, .36, .01), matWoodDk, -.36, .18, 0, smithTable);
+mesh(RB(.04, .04, .36, .01), matWoodDk, .36, .18, 0, smithTable);
+
+// Lower tool shelf with raw ingots
+mesh(RB(.72, .025, .36, .01), matWoodDk, 0, .19, 0, smithTable);
+mesh(RB(.12, .04, .06, .01), matSteelDk, -.2, .22, 0, smithTable);
+mesh(RB(.12, .04, .06, .01), matSteelDk, -.2, .26, 0, smithTable);
+mesh(RB(.12, .04, .06, .01), matGold, .2, .22, 0, smithTable);
+
+// Heavy beveled oak tabletop
+mesh(RB(.88, .06, .50, .02), matWood, 0, .62, 0, smithTable);
+
+// 4 brass corner brackets on tabletop
+[[-.42, -.23], [.42, -.23], [-.42, .23], [.42, .23]].forEach(function(pos){
+  mesh(RB(.05, .065, .05, .005), matBrass, pos[0], .625, pos[1], smithTable);
+});
+
+// Small ambient brass lantern on the table corner
+var tableLamp = new THREE.Group();
+tableLamp.position.set(-.35, .65, -.15);
+smithTable.add(tableLamp);
+mesh(new THREE.CylinderGeometry(.045, .06, .03, 10), matBrass, 0, .015, 0, tableLamp);
+mesh(new THREE.CylinderGeometry(.035, .035, .07, 10, 1, true), new THREE.MeshPhysicalMaterial({color:0xffd580, roughness:.1, transparent:true, opacity:.75}), 0, .065, 0, tableLamp);
+mesh(new THREE.ConeGeometry(.02, .04, 8), new THREE.MeshBasicMaterial({color:0xffaa33}), 0, .065, 0, tableLamp);
+mesh(new THREE.CylinderGeometry(.05, .02, .025, 10), matBrass, 0, .11, 0, tableLamp);
+var tableLampLight = new THREE.PointLight(0xff9933, 1.2, 2.2, 1.5);
+tableLampLight.position.set(0, .08, 0);
+tableLamp.add(tableLampLight);
+
+// Angled Display Easel & Slate Tablet
+var displayStand = new THREE.Group();
+displayStand.position.set(0, .65, -.02);
+displayStand.rotation.x = -Math.PI / 5.2; // ~34.6 deg tilted towards camera
+smithTable.add(displayStand);
+
+// Wooden easel bracket behind tablet
+mesh(RB(.12, .32, .04, .01), matWoodDk, 0, .16, -.03, displayStand);
+// Slate backing plate (forged iron rim)
+mesh(RB(.84, .50, .022, .012), matSteelDk, 0, .25, 0, displayStand);
+mesh(new THREE.BoxGeometry(.845, .505, .006), matGold, 0, .25, -.002, displayStand);
+
+// Canvas Texture and Display Screen
+var swordTableCanvas, swordTableCtx, swordTableTexture, swordTableMesh;
+(function(){
+  swordTableCanvas = document.createElement("canvas");
+  swordTableCanvas.width = 1024;
+  swordTableCanvas.height = 576;
+  swordTableCtx = swordTableCanvas.getContext("2d");
+  swordTableTexture = new THREE.CanvasTexture(swordTableCanvas);
+  swordTableTexture.colorSpace = THREE.SRGBColorSpace;
+  swordTableTexture.anisotropy = (typeof IS_MOBILE !== "undefined" && IS_MOBILE) ? 2 : 4;
+  swordTableTexture.generateMipmaps = true;
+  swordTableTexture.minFilter = THREE.LinearMipmapLinearFilter;
+
+  var screenMat = new THREE.MeshBasicMaterial({
+    map: swordTableTexture,
+    toneMapped: false
+  });
+  swordTableMesh = new THREE.Mesh(new THREE.PlaneGeometry(.80, .46), screenMat);
+  swordTableMesh.position.set(0, .25, .013);
+  displayStand.add(swordTableMesh);
+})();
+
+function updateSwordTableDisplay(){
+  if(!swordTableCtx) return;
+  var c = swordTableCtx;
+  var w = 1024, h = 576;
+  var isEn = (typeof CURRENT_LANG !== "undefined" && CURRENT_LANG === "en");
+  var sLv = (typeof swordLevelNow === "function") ? swordLevelNow() : (G ? (G.swordLevel || 1) : 1);
+  var sSkin = (typeof skinForLevel === "function") ? skinForLevel(sLv) : { name: "Thép Thô", hue: 0.1 };
+  var sVal = (G && G.swordVal) ? G.swordVal : 25;
+  var sHeat = (G && typeof G.heat === "number") ? Math.max(0, Math.min(100, Math.round(G.heat))) : 0;
+  var rk = (typeof riskNow === "function") ? riskNow() : 0.02;
+  var sHits = (G && typeof G.hits === "number") ? G.hits : 0;
+  var sShapeName = (typeof modelNameForLevel === "function") ? modelNameForLevel(sLv) : "Kiếm Sắt";
+
+  // 1. Clear & Dark forged slate background
+  c.clearRect(0, 0, w, h);
+  var bg = c.createRadialGradient(w/2, h/2, 50, w/2, h/2, w*0.65);
+  bg.addColorStop(0, "#1c150f");
+  bg.addColorStop(0.7, "#120d09");
+  bg.addColorStop(1, "#090604");
+  c.fillStyle = bg;
+  c.fillRect(0, 0, w, h);
+
+  // 2. Ornate Border & Runic Filigree
+  c.strokeStyle = "rgba(232, 179, 60, 0.45)";
+  c.lineWidth = 4;
+  c.strokeRect(18, 18, w - 36, h - 36);
+
+  c.strokeStyle = "rgba(232, 179, 60, 0.2)";
+  c.lineWidth = 2;
+  c.strokeRect(26, 26, w - 52, h - 52);
+
+  // Corner accents
+  var cs = 28;
+  c.strokeStyle = "#ffd56a";
+  c.lineWidth = 3;
+  c.beginPath(); c.moveTo(18, 18+cs); c.lineTo(18, 18); c.lineTo(18+cs, 18); c.stroke();
+  c.beginPath(); c.moveTo(w-18-cs, 18); c.lineTo(w-18, 18); c.lineTo(w-18, 18+cs); c.stroke();
+  c.beginPath(); c.moveTo(18, h-18-cs); c.lineTo(18, h-18); c.lineTo(18+cs, h-18); c.stroke();
+  c.beginPath(); c.moveTo(w-18-cs, h-18); c.lineTo(w-18, h-18); c.lineTo(w-18, h-18-cs); c.stroke();
+
+  // 3. Header: Level & Skin Name (Left) + Value (Right)
+  var hue = Math.round((sSkin.hue || 0.1) * 360);
+  var skinColor = "hsl(" + hue + ", 85%, 78%)";
+
+  c.font = "bold 36px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, serif";
+  c.fillStyle = skinColor;
+  c.shadowColor = "rgba(0,0,0,0.8)";
+  c.shadowBlur = 8;
+  c.textAlign = "left";
+  var lvTitle = "Lv." + sLv + " · " + (sSkin.name || "") + (sLv >= 100 ? (isEn ? " ★ MAX" : " ★ CỰC HẠN") : "");
+  c.fillText(lvTitle, 46, 74);
+
+  // Gold value (Right)
+  c.textAlign = "right";
+  c.fillStyle = "#ffe073";
+  c.font = "900 42px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+  c.fillText("🪙 " + sVal + " " + (isEn ? "GOLD" : "VÀNG"), w - 46, 76);
+
+  // Model silhouette & next tier (Sub header)
+  c.textAlign = "left";
+  c.font = "500 22px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+  c.fillStyle = "#bda98e";
+  var nextDesc = (sLv >= 100) ? (isEn ? "★ Final Blade Archetype" : "★ Tuyệt phẩm tối thượng")
+                              : (isEn ? ("Lv." + (sLv+1) + " → unique model") : ("Lv." + (sLv+1) + " → model khác biệt"));
+  c.fillText("⚔ " + (isEn ? "Model: " : "Mẫu kiếm: ") + sShapeName + "   ·   " + nextDesc, 46, 114);
+
+  // Divider line
+  var divGrd = c.createLinearGradient(46, 0, w - 46, 0);
+  divGrd.addColorStop(0, "rgba(232,179,60,0.1)");
+  divGrd.addColorStop(0.5, "rgba(232,179,60,0.5)");
+  divGrd.addColorStop(1, "rgba(232,179,60,0.1)");
+  c.fillStyle = divGrd;
+  c.fillRect(46, 134, w - 92, 2);
+
+  // 4. Meters: HEAT, SHATTER RISK, STRIKES
+  function drawMeter(y, label, valText, pct, fillColor){
+    c.textAlign = "left";
+    c.font = "bold 22px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+    c.fillStyle = "#e8d6be";
+    c.fillText(label, 46, y + 20);
+
+    c.textAlign = "right";
+    c.font = "bold 22px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+    c.fillStyle = (typeof fillColor === "string") ? fillColor : "#ffd56a";
+    c.fillText(valText, w - 46, y + 20);
+
+    var bx = 46, by = y + 32, bw = w - 92, bh = 22;
+    c.fillStyle = "rgba(20, 14, 10, 0.85)";
+    c.strokeStyle = "rgba(232, 179, 60, 0.25)";
+    c.lineWidth = 1.5;
+    c.beginPath();
+    if(c.roundRect) c.roundRect(bx, by, bw, bh, 6); else c.rect(bx, by, bw, bh);
+    c.fill();
+    c.stroke();
+
+    var fw = Math.max(0, Math.min(bw, bw * pct));
+    if(fw > 4){
+      c.fillStyle = fillColor;
+      c.beginPath();
+      if(c.roundRect) c.roundRect(bx + 2, by + 2, fw - 4, bh - 4, 4); else c.rect(bx + 2, by + 2, fw - 4, bh - 4);
+      c.fill();
+    }
+  }
+
+  // Meter 1: Heat
+  var heatGrd = c.createLinearGradient(46, 0, w - 46, 0);
+  heatGrd.addColorStop(0, "#d95a14");
+  heatGrd.addColorStop(0.6, "#ff9514");
+  heatGrd.addColorStop(1, "#ffe566");
+  var heatLbl = isEn ? "🔥 BLADE HEAT" : "🔥 NHIỆT ĐỘ LƯỠI KIẾM";
+  drawMeter(152, heatLbl, sHeat + "%", sHeat / 100, heatGrd);
+
+  // Meter 2: Shatter Risk
+  var rkPct = (G && (G.rainbow || G.frenzy)) ? 0 : rk;
+  var rkText = (G && G.rainbow) ? (isEn ? "0% 🌈 (IMMUNE)" : "0% 🌈 (BẤT TỬ)")
+              : ((G && G.frenzy) ? (isEn ? "0% ★ (ARMED)" : "0% ★ (BẢO HỘ)")
+              : (rk < 0.095 ? (rk * 100).toFixed(1) + "%" : Math.round(rk * 100) + "%"));
+  var rkColor = (G && (G.rainbow || G.frenzy)) ? "#5ae875" : (rk >= 0.15 ? "#ff4030" : (rk >= 0.07 ? "#ffaa30" : "#5ae875"));
+  var rkFill = (G && (G.rainbow || G.frenzy)) ? 0 : Math.min(1, rk * 3.5);
+  var rkLbl = isEn ? "⚠ SHATTER RISK" : "⚠ NGUY CƠ VỠ KIẾM";
+  drawMeter(230, rkLbl, rkText, rkFill, rkColor);
+
+  // Meter 3: Strikes
+  var strikeGrd = c.createLinearGradient(46, 0, w - 46, 0);
+  strikeGrd.addColorStop(0, "#8c621e");
+  strikeGrd.addColorStop(1, "#ffd152");
+  var strikeLbl = isEn ? "🔨 HAMMER STRIKES" : "🔨 SỐ NHÁT GÕ";
+  drawMeter(308, strikeLbl, sHits + " / 99", sHits / 99, strikeGrd);
+
+  // 5. Special Status Banner or Forge Lore Advice (Bottom)
+  var bannerY = 412, bannerH = 120;
+  if(G && G.rainbow){
+    var rbGrd = c.createLinearGradient(46, bannerY, w - 46, bannerY);
+    rbGrd.addColorStop(0, "rgba(255, 60, 60, 0.35)");
+    rbGrd.addColorStop(0.25, "rgba(255, 200, 40, 0.35)");
+    rbGrd.addColorStop(0.5, "rgba(60, 255, 120, 0.35)");
+    rbGrd.addColorStop(0.75, "rgba(50, 180, 255, 0.35)");
+    rbGrd.addColorStop(1, "rgba(220, 80, 255, 0.35)");
+    c.fillStyle = rbGrd;
+    c.strokeStyle = "#fff";
+    c.lineWidth = 2;
+    c.beginPath();
+    if(c.roundRect) c.roundRect(46, bannerY, w - 92, bannerH, 10); else c.rect(46, bannerY, w - 92, bannerH);
+    c.fill(); c.stroke();
+
+    c.textAlign = "center";
+    c.fillStyle = "#ffffff";
+    c.font = "bold 30px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+    c.fillText(isEn ? "🌈 RAINBOW SURGE ACTIVE 🌈" : "🌈 CẦU VỒNG THẦN THÁNH KÍCH HOẠT 🌈", w/2, bannerY + 48);
+    c.font = "600 21px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+    c.fillStyle = "#ffffea";
+    c.fillText(isEn ? "Next strike: ×3.5 Value · 100% Unbreakable (1 Hit)" : "Nhát tới: ×3.5 Giá trị · 100% Bất tử không vỡ (1 Nhát)", w/2, bannerY + 86);
+  } else if(G && G.frenzy){
+    c.fillStyle = "rgba(255, 120, 20, 0.28)";
+    c.strokeStyle = "#ffa238";
+    c.lineWidth = 2;
+    c.beginPath();
+    if(c.roundRect) c.roundRect(46, bannerY, w - 92, bannerH, 10); else c.rect(46, bannerY, w - 92, bannerH);
+    c.fill(); c.stroke();
+
+    c.textAlign = "center";
+    c.fillStyle = "#ffe08a";
+    c.font = "bold 30px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+    c.fillText(isEn ? "★ FRENZY STRIKE READY ★" : "★ FRENZY BÙNG NỔ ★", w/2, bannerY + 48);
+    c.font = "600 21px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+    c.fillStyle = "#fff4db";
+    c.fillText(isEn ? "Next strike: ×2.2 Value Multiplier · Unbreakable" : "Nhát kế tiếp: ×2.2 Giá trị · Không thể vỡ", w/2, bannerY + 86);
+  } else if(G && G.furnaceBroken){
+    c.fillStyle = "rgba(255, 40, 30, 0.28)";
+    c.strokeStyle = "#ff6050";
+    c.lineWidth = 2;
+    c.beginPath();
+    if(c.roundRect) c.roundRect(46, bannerY, w - 92, bannerH, 10); else c.rect(46, bannerY, w - 92, bannerH);
+    c.fill(); c.stroke();
+
+    c.textAlign = "center";
+    c.fillStyle = "#ff7b70";
+    c.font = "bold 28px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+    c.fillText(isEn ? "⚠ FURNACE DAMAGED BY DRAGON ⚠" : "⚠ LÒ NUNG BỊ RỒNG PHÁ HỎNG ⚠", w/2, bannerY + 48);
+    c.font = "600 20px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+    c.fillStyle = "#ffc2be";
+    c.fillText(isEn ? "Repair furnace at the forge hearth before heating blades" : "Hãy tới Lò Nung bấm [SỬA LÒ] để tiếp tục nung kiếm", w/2, bannerY + 86);
+  } else {
+    c.fillStyle = "rgba(24, 18, 12, 0.7)";
+    c.strokeStyle = "rgba(232, 179, 60, 0.25)";
+    c.lineWidth = 1;
+    c.beginPath();
+    if(c.roundRect) c.roundRect(46, bannerY, w - 92, bannerH, 10); else c.rect(46, bannerY, w - 92, bannerH);
+    c.fill(); c.stroke();
+
+    c.textAlign = "center";
+    c.fillStyle = "#e8b33c";
+    c.font = "bold 22px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+    c.fillText(isEn ? "🔥 MASTER SMITH DIRECTIVE" : "📜 BÍ QUYẾT RÈN THẦN KIẾM", w/2, bannerY + 42);
+    c.font = "500 19px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+    c.fillStyle = "#bfae97";
+    c.fillText(isEn ? "Heat ≥60% halves shatter risk. Bank gold to meet dragon tribute."
+                    : "Nung nhiệt ≥60% giảm 50% nguy cơ vỡ · Đủ cống hãy rung chuông qua vòng", w/2, bannerY + 76);
+    c.font = "italic 16px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+    c.fillStyle = "#8f806e";
+    c.fillText(isEn ? "Hot forge increases value per strike · Press Space / Tap Strike"
+                    : "Gõ khi kiếm đỏ rực để tăng giá trị cực đại · Phím Space hoặc bấm Gõ Búa", w/2, bannerY + 102);
+  }
+
+  c.shadowBlur = 0;
+  if(swordTableTexture) swordTableTexture.needsUpdate = true;
+}
+updateSwordTableDisplay();
+
 /* ================= SWORD SHAPES — a new SILHOUETTE every 3 levels =================
    Colour changes every level (skin families below), but the blade's SHAPE
    changes every 3 levels: shape index = floor((level-1)/3), so 100 levels
@@ -3637,24 +3925,26 @@ var water = mesh(new THREE.CircleGeometry(.235,18), new THREE.MeshPhysicalMateri
    the ONE source of truth: the 3D extruded blade and the gallery SVG
    are both drawn from it, so the collection shows the real shapes. */
 var SHAPE_ARCH=[
-  {name:'Cong Samurai',        len:1.38, w:.052, bend:.05,  wave:0,   wf:0, serr:0, tip:'point'},
-  {name:'Thẳng Song Phong',    len:1.34, w:.048, bend:0,    wave:0,   wf:0, serr:0, tip:'point'},
-  {name:'Bản Rộng Chiến',      len:1.26, w:.072, bend:.015, wave:0,   wf:0, serr:0, tip:'point'},
-  {name:'Lượn Sóng Hỏa Xà',    len:1.40, w:.050, bend:.02,  wave:.03, wf:3, serr:0, tip:'point'},
-  {name:'Răng Cưa Săn Thú',    len:1.32, w:.056, bend:.01,  wave:0,   wf:0, serr:9, tip:'point'},
-  {name:'Mũi Móc Câu',         len:1.30, w:.050, bend:.03,  wave:0,   wf:0, serr:0, tip:'hook'},
-  {name:'Lá Liễu Phiêu',       len:1.36, w:.066, bend:.05,  wave:0,   wf:0, serr:0, tip:'point', leaf:1},
-  {name:'Tam Giác Đâm',        len:1.30, w:.034, bend:0,    wave:0,   wf:0, serr:0, tip:'point'},
-  {name:'Mũi Vuông Hành Quyết',len:1.28, w:.060, bend:.005, wave:0,   wf:0, serr:0, tip:'square'},
-  {name:'Cong Sâu Scimitar',   len:1.42, w:.050, bend:.15,  wave:0,   wf:0, serr:0, tip:'point'},
-  {name:'Bành Đầu Trọng Kiếm', len:1.34, w:.054, bend:.01,  wave:0,   wf:0, serr:0, tip:'point', flare:1},
-  {name:'Tanto Ngắn',          len:.98,  w:.046, bend:.03,  wave:0,   wf:0, serr:0, tip:'point'}
+  {name:'Cong Samurai', nameEn:'Samurai Curve',        len:1.38, w:.052, bend:.05,  wave:0,   wf:0, serr:0, tip:'point'},
+  {name:'Thẳng Song Phong', nameEn:'Twin-Peak Straight',    len:1.34, w:.048, bend:0,    wave:0,   wf:0, serr:0, tip:'point'},
+  {name:'Bản Rộng Chiến', nameEn:'War Broadblade',      len:1.26, w:.072, bend:.015, wave:0,   wf:0, serr:0, tip:'point'},
+  {name:'Lượn Sóng Hỏa Xà', nameEn:'Fire Serpent Wave',    len:1.40, w:.050, bend:.02,  wave:.03, wf:3, serr:0, tip:'point'},
+  {name:'Răng Cưa Săn Thú', nameEn:'Beast-Saw Edge',    len:1.32, w:.056, bend:.01,  wave:0,   wf:0, serr:9, tip:'point'},
+  {name:'Mũi Móc Câu', nameEn:'Hooked Tip',         len:1.30, w:.050, bend:.03,  wave:0,   wf:0, serr:0, tip:'hook'},
+  {name:'Lá Liễu Phiêu', nameEn:'Willow Leaf',       len:1.36, w:.066, bend:.05,  wave:0,   wf:0, serr:0, tip:'point', leaf:1},
+  {name:'Tam Giác Đâm', nameEn:'Stiletto Triangle',        len:1.30, w:.034, bend:0,    wave:0,   wf:0, serr:0, tip:'point'},
+  {name:'Mũi Vuông Hành Quyết', nameEn:'Square Judgment Tip',len:1.28, w:.060, bend:.005, wave:0,   wf:0, serr:0, tip:'square'},
+  {name:'Cong Sâu Scimitar', nameEn:'Deep Scimitar',   len:1.42, w:.050, bend:.15,  wave:0,   wf:0, serr:0, tip:'point'},
+  {name:'Bành Đầu Trọng Kiếm', nameEn:'Flared Heavy Blade', len:1.34, w:.054, bend:.01,  wave:0,   wf:0, serr:0, tip:'point', flare:1},
+  {name:'Tanto Ngắn', nameEn:'Short Tanto',          len:.98,  w:.046, bend:.03,  wave:0,   wf:0, serr:0, tip:'point'}
 ];
 function shapeForLevel(lv){
   lv=Math.max(1, Math.min(100, Math.round(Number(lv)||1)));
   var idx=Math.floor((lv-1)/3);
   var arch=SHAPE_ARCH[idx%SHAPE_ARCH.length], cyc=Math.floor(idx/SHAPE_ARCH.length);
-  return { idx:idx, baseName:arch.name, name:arch.name+(cyc? ' · Thế '+(cyc+1):''),
+  var genVi=cyc? ' · Thế '+(cyc+1):'';
+  var genEn=cyc? ' · Gen '+(cyc+1):'';
+  return { idx:idx, baseName:L(arch.name, arch.nameEn||arch.name), name:L(arch.name+genVi, (arch.nameEn||arch.name)+genEn),
     len:arch.len*(1+cyc*.06), w:arch.w*(1+cyc*.07), bend:arch.bend+cyc*.008,
     wave:arch.wave, wf:arch.wf, serr:arch.serr, tip:arch.tip,
     leaf:!!arch.leaf, flare:!!arch.flare, guard:idx%5, pommel:idx%4 };
@@ -4038,7 +4328,7 @@ function setLanguage(lang){
 
 
 var HELP_BODY_VI = "<details class=\"help-first-run\" open>\n        <summary><b>\ud83c\udf93 H\u01b0\u1edbng d\u1eabn l\u1ea7n \u0111\u1ea7u v\u00e0o l\u00f2</b></summary>\n        <p class=\"sheet-note\" style=\"margin:6px 0 8px\">Overlay 4 b\u01b0\u1edbc + d\u00f2ng ph\u00edm ch\u1ec9 hi\u1ec7n <b>l\u1ea7n \u0111\u1ea7u</b> ch\u01a1i. Sau \u0111\u00f3 xem l\u1ea1i t\u1ea1i \u0111\u00e2y ho\u1eb7c b\u1ea5m \u00abXem l\u1ea1i h\u01b0\u1edbng d\u1eabn trong l\u00f2\u00bb.</p>\n        <ol class=\"wf-steps\">\n          <li><b>B\u01b0\u1edbc 1:</b> NUNG (H) \u2014 nhi\u1ec7t \u226560% gi\u1ea3m m\u1ed9t n\u1eeda nguy c\u01a1 v\u1ee1.</li>\n          <li><b>B\u01b0\u1edbc 2:</b> G\u00f5 3 nh\u00e1t b\u00faa (Space) \u2014 m\u1ed7i nh\u00e1t l\u00ean 1 level, \u0111\u1ed5i model.</li>\n          <li><b>B\u01b0\u1edbc 3:</b> 10 nh\u00e1t kh\u00f4ng v\u1ee1 \u2192 FRENZY (\u00d72.2, kh\u00f4ng v\u1ee1).</li>\n          <li><b>B\u01b0\u1edbc 4:</b> CH\u1ed0T (B) \u2014 v\u00e0ng v\u00e0o kho; \u0111\u1ee7 c\u1ed1ng th\u00ec N\u1ed8P C\u1ed0NG.</li>\n        </ol>\n        <p><b>Ph\u00edm:</b> <kbd>WASD</kbd> \u0111i b\u1ed9 \u00b7 <kbd>E</kbd> t\u01b0\u01a1ng t\u00e1c tr\u1ea1m \u00b7 <kbd>Q</kbd> r\u1eddi tr\u1ea1m \u00b7 <kbd>Space</kbd> h\u00e0nh \u0111\u1ed9ng \u00b7 <kbd>1\u20135</kbd> ch\u1ecdn tr\u1ea1m \u00b7 <kbd>H</kbd> nung \u00b7 <kbd>B</kbd> ch\u1ed1t \u00b7 <kbd>V</kbd> ng\u1eafm ki\u1ebfm</p>\n      </details>\n      <details class=\"help-workflow\" open>\n        <summary><b>\u26a1 Quy tr\u00ecnh ch\u01a1i (1 ph\u00fat)</b></summary>\n        <ol class=\"wf-steps\">\n          <li><b>WASD / pad \u25b2\u25c0\u25b6\u25bc</b> (mobile) \u2014 di chuy\u1ec3n th\u1ee3 r\u00e8n trong l\u00f2; \u0111\u1ee9ng g\u1ea7n l\u00f2/\u0111e/chu\u00f4ng \u0111\u1ec3 g\u1ee3i \u00fd h\u00e0nh \u0111\u1ed9ng.</li>\n          <li><b>Nung (H)</b> \u2192 gi\u1eef nhi\u1ec7t \u226560% tr\u01b0\u1edbc khi g\u00f5.</li>\n          <li><b>G\u00f5 (Space)</b> \u2192 t\u0103ng gi\u00e1 + level; <b>10 nh\u00e1t</b> \u2192 Frenzy.</li>\n          <li><b>Ch\u1ed1t (B)</b> khi \u0111\u1ee7 l\u1eddi \u2192 v\u00e0ng v\u00e0o kho.</li>\n          <li><b>N\u1ed9p c\u1ed1ng</b> khi kho \u0111\u1ee7 (ho\u1eb7c <b>ti\u1ec1m n\u0103ng</b> \u0111\u1ee7 n\u1ebfu ch\u1ed1t h\u1ebft ki\u1ebfm).</li>\n          <li><b>M\u00e1y relic / n\u00e2ng c\u1ea5p</b> \u2014 \u0111\u1eebng \u0111\u00fat ki\u1ebfm \u0111ang d\u00f9ng cho c\u1ed1ng.</li>\n        </ol>\n        <p class=\"sheet-note\" style=\"margin:8px 0 6px\">Tr\u00ean menu ch\u1ec9 c\u00f2n t\u00f3m t\u1eaft l\u1ea7n \u0111\u1ea7u; chi ti\u1ebft \u0111\u1ea7y \u0111\u1ee7 \u1edf c\u00e1c m\u1ee5c b\u00ean d\u01b0\u1edbi.</p>\n        <button type=\"button\" id=\"btnCoachReplay\" class=\"goldbtn\" style=\"width:100%;margin-top:4px\">\ud83c\udf93 B\u1eadt l\u1ea1i overlay 4 b\u01b0\u1edbc trong l\u00f2</button>\n      </details>\n\n        <div>\u2699\ufe0f <b>M\u00e1y Relic:</b> 3 \u00f4 ng\u1eabu nhi\u00ean m\u1ed7i v\u00f2ng \u2014 mua b\u1eb1ng <b>v\u00e0ng kho</b> ho\u1eb7c <b>\u0111\u00fat ki\u1ebfm tr\u00ean \u0111e</b> (m\u1ea5t blade). <b>X\u00e1o l\u1ea1i</b> t\u1ed1n v\u00e0ng (t\u0103ng m\u1ed7i l\u1ea7n x\u00e1o trong v\u00f2ng).</div>\n        <div>\ud83e\uddd9 <b>Th\u01b0\u01a1ng nh\u00e2n ma:</b> t\u1ef1 gh\u00e9 <b>v\u00f2ng 3, 6, 9\u2026</b> \u2014 b\u00e1n ki\u1ebfm gi\u00e1 treo/\u0111e, ho\u1eb7c mua +3 l\u01b0\u1ee3t (60 v\u00e0ng).</div>\n        <div>\ud83d\udc09 <b>Ki\u00ean nh\u1eabn R\u1ed3ng (ForgeTax):</b> m\u1ed7i l\u1ea7n h\u1ebft l\u01b0\u1ee3t m\u00e0 ch\u01b0a \u0111\u1ee7 c\u1ed1ng +1 ki\u00ean nh\u1eabn (0\u21923). L\u1ea7n th\u1ee9 3 = thua v\u00e1n. <b>Ti\u1ec1m n\u0103ng c\u1ed1ng</b> = kho + ki\u1ebfm tr\u00ean \u0111e + gi\u00e1 treo \u2014 ch\u1ed1t / treo \u0111\u00fang l\u00fac nh\u01b0 Cloverpit.</div>\n\n      <div>\ud83d\udd25 <b>Nung tr\u01b0\u1edbc, g\u00f5 sau:</b> b\u1ea5m NUNG (ph\u00edm H) \u2014 k\u1eb9p g\u1eafp ki\u1ebfm b\u1ecf v\u00e0o l\u00f2, l\u01b0\u1ee1i \u0111\u1ecf d\u1ea7n theo % nhi\u1ec7t. Nhi\u1ec7t quy\u1ebft \u0111\u1ecbnh nguy c\u01a1 v\u1ee1: <b>nhi\u1ec7t \u226560% \u2192 nguy c\u01a1 gi\u1ea3m m\u1ed9t n\u1eeda</b>, 30\u201359% \u2192 gi\u1ea3m 1/4, <b>d\u01b0\u1edbi 30% \u2192 nguy c\u01a1 t\u0103ng 15%</b>. Gi\u1eef ki\u1ebfm n\u00f3ng l\u00e0 ch\u00eca kh\u00f3a leo level. Ki\u1ebfm ngu\u1ed9i d\u1ea7n theo th\u1eddi gian.</div>\n      <div>\ud83d\udd28 <b>G\u00f5 b\u00faa</b> (Space): m\u1ed7i nh\u00e1t th\u00e0nh c\u00f4ng t\u0103ng gi\u00e1 ki\u1ebfm, l\u00ean \u0111\u00fang <b>1 LEVEL</b> v\u00e0 thay b\u1eb1ng model c\u1ee7a level m\u1edbi. <b>Nguy c\u01a1 v\u1ee1</b> t\u0103ng r\u1ea5t nh\u1eb9 theo level \u2014 0.08% \u1edf Lv.1, +0.23% m\u1ed7i level (Lv.10 \u2248 2.2%, Lv.50 \u2248 11.4% tr\u01b0\u1edbc khi t\u00ednh nhi\u1ec7t &amp; \u0111e) \u2014 con s\u1ed1 % tr\u00ean HUD l\u00e0 t\u1ec9 l\u1ec7 th\u1eadt c\u1ee7a nh\u00e1t t\u1edbi sau m\u1ecdi h\u1ec7 s\u1ed1. V\u1ee1 l\u00e0 m\u1ea5t thanh ki\u1ebfm \u0111\u00f3, l\u00e0m l\u1ea1i t\u1eeb Lv.1.</div>\n      <div>\ud83d\udce5 <b>Ch\u1ed1t ki\u1ebfm</b> (ph\u00edm B) khi th\u1ea5y \u0111\u1ee7 l\u1eddi: c\u1ea5t gi\u00e1 tr\u1ecb v\u00e0o kho v\u00e0ng, l\u1ea5y thanh ki\u1ebfm m\u1edbi. \u0110\u1ee7 v\u00e0ng c\u1ed1ng trong kho th\u00ec b\u1ea5m <b>N\u1ed8P C\u1ed0NG</b> rung chu\u00f4ng qua v\u00f2ng \u2014 <b>ki\u1ebfm tr\u00ean \u0111e \u0111\u01b0\u1ee3c gi\u1eef nguy\u00ean</b> (level, nh\u00e1t, nhi\u1ec7t, Frenzy/C\u1ea7u V\u1ed3ng) qua m\u1ecdi v\u00f2ng cho t\u1edbi khi ch\u1ed1t ho\u1eb7c v\u1ee1, n\u00ean c\u1ee9 r\u00e8n ti\u1ebfp \u0111\u1ec3 leo Lv.60\u2013100.</div>\n      <div>\ud83d\udc09 <b>Tr\u1ec5 c\u1ed1ng \u2192 r\u1ed3ng ph\u00e1 l\u00f2:</b> h\u1ebft 30 l\u01b0\u1ee3t m\u00e0 kho ch\u01b0a \u0111\u1ee7 c\u1ed1ng, R\u1ed3ng Kh\u00f3i phun l\u1eeda <b>ph\u00e1 h\u1ee7y l\u00f2 nung</b> \u2014 kh\u00f4ng NUNG \u0111\u01b0\u1ee3c n\u1eefa (c\u1ea5p l\u00f2 v\u1eabn gi\u1eef nguy\u00ean), ph\u1ea3i g\u00f5 ngu\u1ed9i ki\u1ebfm v\u00e0ng r\u1ed3i b\u1ea5m <b>\ud83d\udd27 S\u1eecA L\u00d2</b> (60 v\u00e0ng \u00d7 s\u1ed1 v\u00f2ng, tr\u1eeb v\u00e0ng trong kho) m\u1edbi nung l\u1ea1i \u0111\u01b0\u1ee3c. Ki\u1ebfm tr\u00ean \u0111e v\u00e0 gi\u00e1 treo kh\u00f4ng b\u1ecb \u1ea3nh h\u01b0\u1edfng.</div>\n      <div>\u2605 <b>FRENZY:</b> g\u00f5 10 nh\u00e1t kh\u00f4ng v\u1ee1 \u2192 nh\u00e1t t\u1edbi \u00d72.2 v\u00e0 ch\u1eafc ch\u1eafn kh\u00f4ng v\u1ee1.</div>\n      <div>\ud83c\udf08 <b>Combo C\u1ea7u V\u1ed3ng (hi\u1ebfm!):</b> ch\u1ec9 <b>4%</b> xu\u1ea5t hi\u1ec7n sau m\u1ed7i nh\u00e1t g\u00f5 th\u00e0nh c\u00f4ng \u2014 hi\u1ebfm h\u01a1n Frenzy nhi\u1ec1u. Khi l\u01b0\u1ee1i ki\u1ebfm s\u00e1ng c\u1ea7u v\u1ed3ng: nh\u00e1t t\u1edbi <b>ch\u1eafc ch\u1eafn kh\u00f4ng v\u1ee1</b> v\u00e0 gi\u00e1 t\u0103ng <b>\u00d73.5</b>, ch\u1ec9 \u00e1p d\u1ee5ng \u0111\u00fang 1 nh\u00e1t r\u1ed3i t\u1eaft.</div>\n      <div>\ud83d\udde1 <b>Gi\u00e1 treo ki\u1ebfm (3 \u00f4):</b> treo thanh \u0111ang r\u00e8n d\u1edf l\u00ean gi\u00e1 (ph\u00edm T) \u0111\u1ec3 r\u00e8n thanh kh\u00e1c \u2014 gi\u00e1 tr\u1ecb, level, s\u1ed1 nh\u00e1t, nhi\u1ec7t v\u00e0 Frenzy/C\u1ea7u V\u1ed3ng \u0111\u01b0\u1ee3c gi\u1eef nguy\u00ean. B\u1ea5m v\u00e0o \u00f4 treo ho\u1eb7c ch\u1ea1m ki\u1ebfm tr\u00ean gi\u00e1 trong l\u00f2 \u0111\u1ec3 l\u1ea5y xu\u1ed1ng r\u00e8n ti\u1ebfp.</div>\n      <div>\u2b06 <b>N\u00e2ng c\u1ea5p \u0111\u1ed3 r\u00e8n:</b> b\u00faa g\u00f5 l\u1eddi h\u01a1n, \u0111e gi\u1ea3m nguy c\u01a1 v\u1ee1, l\u00f2 nung n\u00f3ng h\u01a1n v\u00e0 gi\u1eef nhi\u1ec7t l\u00e2u h\u01a1n.</div>\n      <div>\u2694 <b>100 c\u1ea5p ki\u1ebfm:</b> gi\u00e1 m\u1ed7i nh\u00e1t t\u0103ng +2% m\u1ed7i level. Quan tr\u1ecdng nh\u1ea5t: <b>m\u1ed7i level l\u00e0 m\u1ed9t MODEL 3D RI\u00caNG</b> \u2014 \u0111\u1ee7 100 model th\u1eadt (ki\u1ebfm th\u1eb3ng, katana, scimitar, rapier, m\u00e3 t\u1ea5u, dao g\u0103m\u2026), m\u1ecdi model \u0111\u1ec1u h\u01b0\u1edbng m\u0169i c\u00f9ng m\u1ed9t chi\u1ec1u, n\u1eb1m tr\u1ecdn tr\u00ean \u0111e. T\u00ean model hi\u1ec7n ngay d\u01b0\u1edbi d\u00f2ng level, m\u1edf S\u01afU T\u1eacP \u0111\u1ec3 xem \u0111\u1ee7 100 model.</div>\n      <div>\u2728 <b>VFX nguy\u00ean t\u1ed1 (Lv.11\u2013100):</b> t\u1eeb Lv.11, m\u1ed7i ki\u1ebfm mang m\u1ed9t nguy\u00ean t\u1ed1 ri\u00eang (l\u1eeda, s\u00e9t, b\u0103ng, huy\u1ebft\u2026) v\u1edbi hi\u1ec7u \u1ee9ng leo theo 7 tier: l\u01b0\u1ee1i ph\u00e1t s\u00e1ng + h\u1ea1t linh kh\u00ed qu\u1ea5n quanh l\u01b0\u1ee1i \u2192 ki\u1ebfm th\u00e0nh ngu\u1ed3n s\u00e1ng th\u1eadt \u2192 \u0111\u1ea5t d\u01b0\u1edbi \u0111e n\u1ee9t s\u00e1ng, linh kh\u00ed bao ki\u1ebfm. G\u00f5 tr\u00fang l\u00e0 b\u00f9ng h\u1ea1t nguy\u00ean t\u1ed1; l\u00ean level c\u00f3 v\u00f2ng s\u00f3ng \u0103n m\u1eebng.</div>\n      <div>\ud83d\udc32 <b>Endgame Lv.90\u2013100 \u2014 ki\u1ebfm Thrixel:</b> 11 thanh cu\u1ed1i l\u00e0 model Thrixel nguy\u00ean b\u1ea3n (katana h\u1eafc kim r\u1ed3ng, \u0111\u1ea1i ki\u1ebfm kim c\u01b0\u01a1ng ph\u01b0\u1ee3ng ho\u00e0ng\u2026), m\u1ed7i thanh c\u00f3 <b>linh th\u00fa ph\u00e1t s\u00e1ng hi\u1ec7n sau l\u01b0ng ki\u1ebfm</b> trong l\u00f2 \u2014 v\u00e0o NG\u1eaeM KI\u1ebeM th\u1ea5y r\u00f5 nh\u1ea5t. Trong S\u01afU T\u1eacP, panel c\u1ee7a Lv.90\u2013100 d\u00f9ng poster linh th\u00fa c\u1ee7a \u0111\u00fang level \u0111\u00f3.</div>\n      <div>\ud83d\udd0d <b>Ng\u1eafm ki\u1ebfm</b> (ph\u00edm V): camera \u00e1p s\u00e1t soi tr\u1ecdn c\u00e1n \u2014 ch\u1eafn tay \u2014 l\u01b0\u1ee1i \u2014 m\u0169i. G\u00f5 b\u00faa / nung / ch\u1ed1t l\u00e0 camera t\u1ef1 v\u1ec1 g\u00f3c l\u00f2.</div>\n      <div>\ud83d\udc46 <b>Ch\u1ea1m 3D:</b> ch\u1ea1m l\u00f2 l\u1eeda \u0111\u1ec3 nung \u00b7 ch\u1ea1m \u0111e \u0111\u1ec3 g\u00f5 \u00b7 ch\u1ea1m chu\u00f4ng v\u00e0ng \u0111\u1ec3 n\u1ed9p c\u1ed1ng \u00b7 ch\u1ea1m ki\u1ebfm tr\u00ean gi\u00e1 treo \u0111\u1ec3 l\u1ea5y xu\u1ed1ng \u00b7 k\u00e9o \u0111\u1ec3 ng\u00f3 quanh l\u00f2.</div>";
-var HELP_BODY_EN = "<details class=\"help-first-run\" open>\n        <summary><b>\ud83c\udf93 First-time forge tutorial</b></summary>\n        <p class=\"sheet-note\" style=\"margin:6px 0 8px\">The 4-step overlay + key line appear only on your <b>first</b> run. Come back here later or tap \u00abReplay in-forge tutorial\u00bb.</p>\n        <ol class=\"wf-steps\">\n          <li><b>Step 1:</b> HEAT (H) \u2014 heat \u226560% halves break risk.</li>\n          <li><b>Step 2:</b> Strike 3 hammer hits (Space) \u2014 each hit +1 level, new model.</li>\n          <li><b>Step 3:</b> 10 hits without breaking \u2192 FRENZY (\u00d72.2, unbreakable).</li>\n          <li><b>Step 4:</b> BANK (B) \u2014 gold to vault; when tribute is met, PAY TRIBUTE.</li>\n        </ol>\n        <p><b>Keys:</b> <kbd>WASD</kbd> walk \u00b7 <kbd>E</kbd> interact \u00b7 <kbd>Q</kbd> leave station \u00b7 <kbd>Space</kbd> action \u00b7 <kbd>1\u20135</kbd> stations \u00b7 <kbd>H</kbd> heat \u00b7 <kbd>B</kbd> bank \u00b7 <kbd>V</kbd> inspect</p>\n      </details>\n      <details class=\"help-workflow\" open>\n        <summary><b>\u26a1 One-minute loop</b></summary>\n        <ol class=\"wf-steps\">\n          <li><b>WASD / pad \u25b2\u25c0\u25b6\u25bc</b> (mobile) \u2014 move the smith; stand near furnace/anvil/bell for prompts.</li>\n          <li><b>Heat (H)</b> \u2192 keep heat \u226560% before striking.</li>\n          <li><b>Strike (Space)</b> \u2192 value + level; <b>10 hits</b> \u2192 Frenzy.</li>\n          <li><b>Bank (B)</b> when profitable \u2192 gold to vault.</li>\n          <li><b>Pay tribute</b> when vault is enough (or <b>potential</b> if you bank all blades).</li>\n          <li><b>Relic machine / upgrades</b> \u2014 don\u2019t feed a blade you need for tribute.</li>\n        </ol>\n        <p class=\"sheet-note\" style=\"margin:8px 0 6px\">The main menu only has the short primer; full detail is below.</p>\n        <button type=\"button\" id=\"btnCoachReplay\" class=\"goldbtn\" style=\"width:100%;margin-top:4px\">\ud83c\udf93 Replay 4-step overlay in the forge</button>\n      </details>\n\n        <div>\u2699\ufe0f <b>Relic machine:</b> 3 random slots each round \u2014 buy with <b>vault gold</b> or <b>feed anvil blade</b> (loses the blade). <b>Reroll</b> costs gold (increases each reroll this round).</div>\n        <div>\ud83e\uddd9 <b>Ghost merchant:</b> visits on <b>rounds 3, 6, 9\u2026</b> \u2014 buys rack/anvil blades, or sells +3 turns (60 gold).</div>\n        <div>\ud83d\udc09 <b>Dragon patience (ForgeTax):</b> each time you run out of turns without enough tribute +1 patience (0\u21923). Third strike = game over. <b>Tribute potential</b> = vault + anvil + rack \u2014 bank / rack like Cloverpit.</div>\n\n      <div>\ud83d\udd25 <b>Heat first, strike later:</b> HEAT (H) clamps the blade in the furnace; heat % drives break risk: <b>\u226560% \u2192 half risk</b>, 30\u201359% \u2192 \u221225%, <b>&lt;30% \u2192 +15%</b>. Keep the blade hot to climb levels. Blades cool over time.</div>\n      <div>\ud83d\udd28 <b>Hammer (Space):</b> each success raises value, exactly <b>+1 LEVEL</b>, new model. <b>Break risk</b> rises gently with level \u2014 0.08% at Lv.1, +0.23% per level (Lv.10 \u2248 2.2%, Lv.50 \u2248 11.4% before heat &amp; anvil) \u2014 HUD % is the true next-hit chance. Break = lose that blade, restart at Lv.1.</div>\n      <div>\ud83d\udce5 <b>Bank blade (B)</b> when it\u2019s worth it: value to vault, fresh blade. Enough vault gold \u2192 <b>PAY TRIBUTE</b> \u2014 <b>anvil blade is kept</b> (level, hits, heat, Frenzy/Rainbow) across rounds until bank or break, so push Lv.60\u2013100.</div>\n      <div>\ud83d\udc09 <b>Late tribute \u2192 dragon breaks furnace:</b> 30 turns with short vault, Smoke Dragon <b>destroys the furnace</b> \u2014 no HEAT (furnace level kept). Strike cold blades for gold, then <b>\ud83d\udd27 REPAIR</b> (60 gold \u00d7 round) to heat again. Anvil &amp; rack unaffected.</div>\n      <div>\u2605 <b>FRENZY:</b> 10 hits without breaking \u2192 next hit \u00d72.2 and cannot break.</div>\n      <div>\ud83c\udf08 <b>Rainbow combo (rare!):</b> only <b>4%</b> after a successful hit \u2014 rarer than Frenzy. Rainbow blade: next hit <b>cannot break</b>, value <b>\u00d73.5</b>, one hit only.</div>\n      <div>\ud83d\udde1 <b>Sword rack (3 slots):</b> hang WIP blade (T) to forge another \u2014 value, level, hits, heat, Frenzy/Rainbow kept. Click slot or tap rack blade in 3D to retrieve.</div>\n      <div>\u2b06 <b>Forge upgrades:</b> hammer earns more, anvil lowers break risk, furnace heats faster and holds heat longer.</div>\n      <div>\u2694 <b>100 blade levels:</b> +2% value per level per hit. Each level is a <b>unique 3D model</b> \u2014 100 real models (straight sword, katana, scimitar\u2026), tips aligned on the anvil. Model name under level line; open GALLERY for all 100.</div>\n      <div>\u2728 <b>Element VFX (Lv.11\u2013100):</b> each blade has an element (fire, lightning, ice, blood\u2026) with 7 tiers: glowing edge \u2192 true light source \u2192 cracked anvil floor, aura wrap. Hits burst particles; level-ups celebrate.</div>\n      <div>\ud83d\udc32 <b>Endgame Lv.90\u2013100 \u2014 Thrixel blades:</b> final 11 are Thrixel models with <b>spirit beasts behind the blade</b> in the forge \u2014 best in INSPECT. Gallery Lv.90\u2013100 uses spirit posters.</div>\n      <div>\ud83d\udd0d <b>Inspect (V):</b> close-up handle \u2192 guard \u2192 blade \u2192 tip. Heat / strike / bank returns to forge cam.</div>\n      <div>\ud83d\udc46 <b>3D touch:</b> tap furnace to heat \u00b7 anvil to strike \u00b7 bell to pay \u00b7 rack blade to retrieve \u00b7 drag to look around.</div>";
+var HELP_BODY_EN = "<details class=\"help-first-run\" open>\n        <summary><b>\ud83c\udf93 First-time forge tutorial</b></summary>\n        <p class=\"sheet-note\" style=\"margin:6px 0 8px\">The 4-step overlay + key line appear only on your <b>first</b> run. Come back here later or tap \u00abReplay in-forge tutorial\u00bb.</p>\n        <ol class=\"wf-steps\">\n          <li><b>Step 1:</b> HEAT (H) \u2014 heat \u226560% halves break risk.</li>\n          <li><b>Step 2:</b> Strike 3 hammer hits (Space) \u2014 each hit +1 level, new model.</li>\n          <li><b>Step 3:</b> 10 hits without breaking \u2192 FRENZY (\u00d72.2, unbreakable).</li>\n          <li><b>Step 4:</b> BANK (B) \u2014 gold to vault; when tribute is met, PAY TRIBUTE.</li>\n        </ol>\n        <p><b>Keys:</b> <kbd>WASD</kbd> walk \u00b7 <kbd>E</kbd> interact \u00b7 <kbd>Q</kbd> leave station \u00b7 <kbd>Space</kbd> action \u00b7 <kbd>1\u20135</kbd> stations \u00b7 <kbd>C</kbd> carry blade \u00b7 <kbd>H</kbd> heat \u00b7 <kbd>B</kbd> bank \u00b7 <kbd>V</kbd> inspect</p>\n      </details>\n      <details class=\"help-workflow\" open>\n        <summary><b>\u26a1 One-minute loop</b></summary>\n        <ol class=\"wf-steps\">\n          <li><b>WASD / pad \u25b2\u25c0\u25b6\u25bc</b> (mobile) \u2014 move the smith; stand near furnace/anvil/bell for prompts.</li>\n          <li><b>Heat (H)</b> \u2192 keep heat \u226560% before striking.</li>\n          <li><b>Strike (Space)</b> \u2192 value + level; <b>10 hits</b> \u2192 Frenzy.</li>\n          <li><b>Bank (B)</b> when profitable \u2192 gold to vault.</li>\n          <li><b>Pay tribute</b> when vault is enough (or <b>potential</b> if you bank all blades).</li>\n          <li><b>Relic machine / upgrades</b> \u2014 don\u2019t feed a blade you need for tribute.</li>\n        </ol>\n        <p class=\"sheet-note\" style=\"margin:8px 0 6px\">The main menu only has the short primer; full detail is below.</p>\n        <button type=\"button\" id=\"btnCoachReplay\" class=\"goldbtn\" style=\"width:100%;margin-top:4px\">\ud83c\udf93 Replay 4-step overlay in the forge</button>\n      </details>\n\n        <div>\u2699\ufe0f <b>Relic machine:</b> 3 random slots each round \u2014 buy with <b>vault gold</b> or <b>feed anvil blade</b> (loses the blade). <b>Reroll</b> costs gold (increases each reroll this round).</div>\n        <div>\ud83e\uddd9 <b>Ghost merchant:</b> visits on <b>rounds 3, 6, 9\u2026</b> \u2014 buys rack/anvil blades, or sells +3 turns (60 gold).</div>\n        <div>\ud83d\udc09 <b>Dragon patience (ForgeTax):</b> each time you run out of turns without enough tribute +1 patience (0\u21923). Third strike = game over. <b>Tribute potential</b> = vault + anvil + rack \u2014 bank / rack like Cloverpit.</div>\n\n      <div>\ud83d\udd25 <b>Heat first, strike later:</b> HEAT (H) clamps the blade in the furnace; heat % drives break risk: <b>\u226560% \u2192 half risk</b>, 30\u201359% \u2192 \u221225%, <b>&lt;30% \u2192 +15%</b>. Keep the blade hot to climb levels. Blades cool over time.</div>\n      <div>\ud83d\udd28 <b>Hammer (Space):</b> each success raises value, exactly <b>+1 LEVEL</b>, new model. <b>Break risk</b> rises gently with level \u2014 0.08% at Lv.1, +0.23% per level (Lv.10 \u2248 2.2%, Lv.50 \u2248 11.4% before heat &amp; anvil) \u2014 HUD % is the true next-hit chance. Break = lose that blade, restart at Lv.1.</div>\n      <div>\ud83d\udce5 <b>Bank blade (B)</b> when it\u2019s worth it: value to vault, fresh blade. Enough vault gold \u2192 <b>PAY TRIBUTE</b> \u2014 <b>anvil blade is kept</b> (level, hits, heat, Frenzy/Rainbow) across rounds until bank or break, so push Lv.60\u2013100.</div>\n      <div>\ud83d\udc09 <b>Late tribute \u2192 dragon breaks furnace:</b> 30 turns with short vault, Smoke Dragon <b>destroys the furnace</b> \u2014 no HEAT (furnace level kept). Strike cold blades for gold, then <b>\ud83d\udd27 REPAIR</b> (60 gold \u00d7 round) to heat again. Anvil &amp; rack unaffected.</div>\n      <div>\u2605 <b>FRENZY:</b> 10 hits without breaking \u2192 next hit \u00d72.2 and cannot break.</div>\n      <div>\ud83c\udf08 <b>Rainbow combo (rare!):</b> only <b>4%</b> after a successful hit \u2014 rarer than Frenzy. Rainbow blade: next hit <b>cannot break</b>, value <b>\u00d73.5</b>, one hit only.</div>\n      <div>\ud83d\udde1 <b>Sword rack (3 slots):</b> hang WIP blade (T) to forge another \u2014 value, level, hits, heat, Frenzy/Rainbow kept. Click slot or tap rack blade in 3D to retrieve.</div>\n      <div>\u2b06 <b>Forge upgrades:</b> hammer earns more, anvil lowers break risk, furnace heats faster and holds heat longer.</div>\n      <div>\u2694 <b>100 blade levels:</b> +2% value per level per hit. Each level is a <b>unique 3D model</b> \u2014 100 real models (straight sword, katana, scimitar\u2026), tips aligned on the anvil. Model name under level line; open GALLERY for all 100.</div>\n      <div>\u2728 <b>Element VFX (Lv.11\u2013100):</b> each blade has an element (fire, lightning, ice, blood\u2026) with 7 tiers: glowing edge \u2192 true light source \u2192 cracked anvil floor, aura wrap. Hits burst particles; level-ups celebrate.</div>\n      <div>\ud83d\udc32 <b>Endgame Lv.90\u2013100 \u2014 Thrixel blades:</b> final 11 are Thrixel models with <b>spirit beasts behind the blade</b> in the forge \u2014 best in INSPECT. Gallery Lv.90\u2013100 uses spirit posters.</div>\n      <div>\ud83d\udd0d <b>Inspect (V):</b> close-up handle \u2192 guard \u2192 blade \u2192 tip. Heat / strike / bank returns to forge cam.</div>\n      <div>\ud83d\udc46 <b>3D touch:</b> tap furnace to heat \u00b7 anvil to strike \u00b7 bell to pay \u00b7 rack blade to retrieve \u00b7 drag to look around.</div>";
 function renderHelpBody(){
   var el = $('helpBodyRoot');
   if(!el) return;
@@ -4046,6 +4336,7 @@ function renderHelpBody(){
 }
 
 function relocalizeDynamicUI(){
+  if(typeof LEVEL_MODELS!=='undefined'&&LEVEL_MODELS.length){ LEVEL_MODELS.forEach(function(e){ if(e&&e.lv&&typeof SWORD_NAME_EN!=='undefined') e.nameEn=SWORD_NAME_EN[e.lv]||e.name; }); }
   renderHelpBody();
   var d = $('dragonBanner');
   if(d) d.textContent = L('🔥 RỒNG KHÓI ĐÃ PHÁ HỦY LÒ NUNG!','🔥 SMOKE DRAGON DESTROYED THE FURNACE!');
@@ -4290,6 +4581,7 @@ function applyLanguageUI(){
 
   // Clear text cache so refreshUI re-renders everything in new language
   _txtCache = {};
+  _txtCache.skinLvRendered=-1;
   if(typeof _lastPromptNear !== 'undefined') {
     _lastPromptNear = null; _lastPromptEngaged = null; _lastPromptStatusKey = '';
   }
@@ -4410,12 +4702,36 @@ function getStationStatus(st){
         action: 'turns_out'
       };
     }
-    if(G.turns <= 0 && G.hits > 0){
+    if(G.carryingBlade){
+      if(G.turns <= 0 && G.hits > 0){
+        return {
+          ok: true,
+          shortMsg: isEn ? ('Bank blade (' + G.swordVal + 'g)') : ('Chốt kiếm (' + G.swordVal + ' vàng)'),
+          msg: isEn ? '💰 Carrying — press [E] to bank gold to vault' : '💰 Đang cầm — bấm [E] chốt vàng vào kho',
+          action: 'bank'
+        };
+      }
       return {
         ok: true,
-        shortMsg: isEn ? ('Bank blade (' + G.swordVal + 'g)') : ('Chốt kiếm (' + G.swordVal + ' vàng)'),
-        msg: isEn ? '💰 Press [E] to bank blade and stash gold to vault' : '💰 Bấm [E] chốt kiếm cất vàng vào kho',
-        action: 'bank'
+        shortMsg: isEn ? 'Put blade on anvil' : 'Đặt kiếm xuống đe',
+        msg: isEn ? '🫳 Carrying — press [C] to set blade on anvil for forging' : '🫳 Đang cầm — bấm [C] đặt kiếm xuống đe để gõ/nung',
+        action: 'carry_put'
+      };
+    }
+    if(G.hits > 0){
+      if(G.turns <= 0){
+        return {
+          ok: true,
+          shortMsg: isEn ? ('Bank blade (' + G.swordVal + 'g)') : ('Chốt kiếm (' + G.swordVal + ' vàng)'),
+          msg: isEn ? '💰 Press [C] to pick up, then [E] to bank' : '💰 Bấm [C] cầm kiếm, rồi [E] chốt vào kho',
+          action: 'bank'
+        };
+      }
+      return {
+        ok: true,
+        shortMsg: isEn ? 'Hammer blade' : 'Gõ búa rèn kiếm',
+        msg: isEn ? '🛠 [E] strike · [C] pick up to rack, bank, or sell' : '🛠 [E] gõ búa · [C] cầm kiếm để treo, chốt hoặc giao thương nhân',
+        action: 'hit'
       };
     }
     return {
@@ -4436,10 +4752,20 @@ function getStationStatus(st){
         action: 'rack_empty'
       };
     }
+    if(G.hits>0 && !G.carryingBlade){
+      return {
+        ok: false,
+        shortMsg: isEn ? 'Pick up blade first' : 'Chưa cầm kiếm',
+        msg: isEn ? '🗡 Press [C] at the anvil to pick up the blade, then come here' : '🗡 Ở đe bấm [C] cầm kiếm, rồi mang lên giá treo',
+        action: 'rack_need_carry'
+      };
+    }
     return {
       ok: true,
       shortMsg: isEn ? ('Manage rack (' + rackCount + '/3)') : ('Quản lý kiếm (' + rackCount + '/3)'),
-      msg: isEn ? '🗡 Press [E] to manage sword rack blades' : '🗡 Bấm [E] quản lý kiếm trên giá',
+      msg: G.carryingBlade
+        ? (isEn ? '🗡 Carrying — press [E] to hang blade on rack' : '🗡 Đang cầm — bấm [E] treo lên giá')
+        : (isEn ? '🗡 Press [E] to manage sword rack blades' : '🗡 Bấm [E] quản lý kiếm trên giá'),
       action: 'rack'
     };
   }
@@ -4451,7 +4777,7 @@ function _stationStatusSig(){
   if(!G) return '';
   var rc = 0;
   if(G.rack){ for(var i=0;i<3;i++){ var s=G.rack[i]; if(s) rc += s.val; } }
-  return [G.started,G.over,G.eventLock,G.heating,G.repairing,G.turns,G.hits,G.gold,G.target,G.furnaceBroken,rc].join('|');
+  return [G.started,G.over,G.eventLock,G.heating,G.repairing,G.turns,G.hits,G.gold,G.target,G.furnaceBroken,!!G.carryingBlade,rc].join('|');
 }
 function invalidateStationStatusCache(){ _stStatusCache = {}; _stStatusSig = ''; }
 var _getStationStatusRaw = getStationStatus;
@@ -4945,17 +5271,20 @@ function applyUpgradeVisuals(){
    changes the blade's whole colour identity. */
 var SWORD_LEVEL_MAX=100;
 var SKIN_VARIANTS=['Thô','Luyện','Tôi','Sắc','Bóng','Vân Sóng','Chạm Trổ','Phát Sáng','Thần','Tuyệt Đỉnh'];
+var SKIN_VARIANTS_EN=['Raw','Refined','Tempered','Sharp','Polished','Ripple','Engraved','Radiant','Divine','Apex'];
+function skinVariantName(sub){ return L(SKIN_VARIANTS[sub], SKIN_VARIANTS_EN[sub]); }
+function skinFamilyName(fam){ return L(fam.name, fam.nameEn||fam.name); }
 var SKIN_FAMILIES=[
-  {name:'Thép', hue:.58, sat:.07, light:.74, handle:0x5e1410},
-  {name:'Đồng Cổ', hue:.07, sat:.5, light:.5, handle:0x4a2c10},
-  {name:'Thép Tôi Xanh', hue:.58, sat:.42, light:.7, handle:0x1d3552},
-  {name:'Bạc Băng', hue:.54, sat:.22, light:.82, handle:0x20303c},
-  {name:'Hoàng Kim', hue:.11, sat:.72, light:.58, handle:0x3a2405},
-  {name:'Ngọc Lục Bảo', hue:.38, sat:.58, light:.52, handle:0x0f3524},
-  {name:'Sapphire Hải Dương', hue:.6, sat:.68, light:.58, handle:0x102a4a},
-  {name:'Hồng Ngọc Lửa', hue:.99, sat:.68, light:.55, handle:0x4a0d16},
-  {name:'Thạch Anh Tím', hue:.78, sat:.55, light:.6, handle:0x2c1440},
-  {name:'Long Kiếm Huyền Thoại', hue:.09, sat:.85, light:.6, handle:0x6b0f1e}
+  {name:'Thép', nameEn:'Steel', hue:.58, sat:.07, light:.74, handle:0x5e1410},
+  {name:'Đồng Cổ', nameEn:'Ancient Bronze', hue:.07, sat:.5, light:.5, handle:0x4a2c10},
+  {name:'Thép Tôi Xanh', nameEn:'Blue Tempered Steel', hue:.58, sat:.42, light:.7, handle:0x1d3552},
+  {name:'Bạc Băng', nameEn:'Frost Silver', hue:.54, sat:.22, light:.82, handle:0x20303c},
+  {name:'Hoàng Kim', nameEn:'Royal Gold', hue:.11, sat:.72, light:.58, handle:0x3a2405},
+  {name:'Ngọc Lục Bảo', nameEn:'Emerald', hue:.38, sat:.58, light:.52, handle:0x0f3524},
+  {name:'Sapphire Hải Dương', nameEn:'Ocean Sapphire', hue:.6, sat:.68, light:.58, handle:0x102a4a},
+  {name:'Hồng Ngọc Lửa', nameEn:'Ruby Flame', hue:.99, sat:.68, light:.55, handle:0x4a0d16},
+  {name:'Thạch Anh Tím', nameEn:'Amethyst', hue:.78, sat:.55, light:.6, handle:0x2c1440},
+  {name:'Long Kiếm Huyền Thoại', nameEn:'Legendary Dragonsteel', hue:.09, sat:.85, light:.6, handle:0x6b0f1e}
 ];
 function clampLv(lv){ lv=Math.round(Number(lv)||1); return Math.max(1, Math.min(SWORD_LEVEL_MAX, lv)); }
 function calcValueBonus(lv){
@@ -4968,8 +5297,8 @@ function skinForLevel(lv){
   lv=clampLv(lv);
   var famIdx=Math.floor((lv-1)/10), sub=(lv-1)%10, fam=SKIN_FAMILIES[famIdx];
   var sh=shapeForLevel(lv);
-  return { level:lv, family:famIdx, sub:sub, familyName:fam.name,
-    name: fam.name+' '+SKIN_VARIANTS[sub],
+  return { level:lv, family:famIdx, sub:sub, familyName:skinFamilyName(fam),
+    name: skinFamilyName(fam)+' '+skinVariantName(sub),
     hue:fam.hue, sat:Math.min(.95, fam.sat+sub*.025),
     light:Math.max(.18, Math.min(.88, fam.light+sub*.012)),
     handle:fam.handle, glow:.1+lv*.013, valueBonus: calcValueBonus(lv),
@@ -5342,8 +5671,8 @@ var G, BESTROUND=0;
 function newGame(){
   G={ started:false, over:false, heating:false, runMode:'contract', contractGoal:12, dragonAnger:0, round:1, gold:0, target:120, turns:30, best:BESTROUND,
       swordVal:25, swordLevel:1, hits:0, heat:20, frenzy:false, rainbow:false, totalForged:0, totalBroken:0,
-      furnaceBroken:false, eventLock:false, repairing:false, freeHeat:false, nextHitDouble:false, roundMaxLevel:1, roundGold:0, roundHits:0, heat100:0, eventAt:-1, eventDone:true, missions:[],
-      relicOffers:[], relicRerolls:0, up:{hammer:0, anvil:0, furnace:0}, rack:[null,null,null] };
+      furnaceBroken:false, eventLock:false, repairing:false, nextHitDouble:false, roundMaxLevel:1, roundGold:0, roundHits:0, heat100:0, eventAt:-1, eventDone:true, missions:[],
+      relicOffers:[], relicRerolls:0, up:{hammer:0, anvil:0, furnace:0}, rack:[null,null,null], carryingBlade:false };
   RELICS.forEach(function(r){ r.owned=false; });
   dragonAnim=null;
   if(dragonBannerEl) dragonBannerEl.classList.remove('show');
@@ -5424,11 +5753,12 @@ function doRelicReroll(){
 }
 function feedBladeToRelicMachine(r){
   if(!G||G.hits===0) return false;
+  if(!G.carryingBlade){ toastL('Cầm kiếm (C) rồi đút vào máy relic','Carry the blade ([C]) to feed the relic machine','info'); return false; }
   var v=G.swordVal, lv=swordLevelNow(), need=relicSwordFeed(r);
   if(v<need) return false;
   toastL('⚙️ Máy nuốt kiếm Lv.'+lv+' ('+v+' vàng) — kiếm này không còn cho cống!', '⚙️ Machine ate Lv.'+lv+' blade ('+v+' gold) — not available for tribute!', 'info');
   whoosh(); burstSparks(-.05,1.3,.2,28,1.1,1); flashTo(.25);
-  freshSword();
+  freshSword(); G.carryingBlade=false; bladeOnAnvilHome();
   return true;
 }
 
@@ -5477,6 +5807,30 @@ RELICS.push(
   {id:'r_box', name:'🧰 Hộp Tiết Kiệm', desc:'Mua xong mở hộp ngay: +70 vàng vào kho.', price:30, owned:false, unlock:'a_rich'}
 );
 
+function relicName(id){ var r=relicDef(id); return r ? relicLabel(r).name : id; }
+function achById(id){ for(var i=0;i<ACHS.length;i++) if(ACHS[i].id===id) return ACHS[i]; return null; }
+function achUnlock(id){
+  if(META.ach[id]) return;
+  var a=achById(id); if(!a) return;
+  META.ach[id]=true; META.unlocked[a.relic]=true; metaSave();
+  bellSound(); flashTo(.5); burstCoins(-.05,1.5,.2,30);
+  floatNum('🏅 THÀNH TÍCH!', 'info');
+  setTimeout(function(){ var al=achLabel(a); toastL('🏅 THÀNH TÍCH "'+al.name+'"! Mở relic mới: '+relicName(a.relic)+' — xem trong RELIC', '🏅 Achievement "'+al.name+'"! Unlocked relic: '+relicName(a.relic)+' — see RELIC shop', 'good'); }, 500);
+  var uc=$('uiAchCount'); if(uc) uc.textContent=Object.keys(META.ach).length+'/15';
+  if($('achSheet') && $('achSheet').classList.contains('open')) buildAchSheet();
+}
+function achCount(){ return Object.keys(META.ach).length; }
+/* ---------- session missions (3 per round) ---------- */
+var MISSION_POOL=[
+  {id:'m_rainbow', key:'rainbow',   need:1,  reward:60, txt:'Kích hoạt Cầu Vồng 1 lần'},
+  {id:'m_bank30',  key:'bankLv30',  need:1,  reward:70, txt:'Chốt 1 kiếm đạt Lv.30+'},
+  {id:'m_tribfast',key:'tributeFast',need:1, reward:80, txt:'Nộp cống khi còn ≥8 lượt'},
+  {id:'m_heat100', key:'heat100',   need:3,  reward:60, txt:'Nung đạt 100% nhiệt ×3'},
+  {id:'m_frenzy',  key:'frenzy',    need:1,  reward:50, txt:'Kích hoạt Frenzy 1 lần'},
+  {id:'m_bank300', key:'bank300',   need:1,  reward:60, txt:'Chốt 1 kiếm ≥300 vàng'},
+  {id:'m_hits15',  key:'hits',      need:15, reward:45, txt:'Gõ trúng 15 nhát trong vòng'},
+  {id:'m_lv50',    key:'lv50',      need:1,  reward:90, txt:'Đưa 1 kiếm lên Lv.50'}
+];
 (function seedGameDataI18n(){
   var relicEn={
     luck:{nameEn:'🍀 Lucky Charm',descEn:'30% lower break risk. Saves greedy blades.'},
@@ -5539,30 +5893,6 @@ RELICS.push(
   MISSION_POOL.forEach(function(m){ if(missEn[m.id]) for(var k in missEn[m.id]) m[k]=missEn[m.id][k]; });
 })();
 
-function relicName(id){ var r=relicDef(id); return r ? relicLabel(r).name : id; }
-function achById(id){ for(var i=0;i<ACHS.length;i++) if(ACHS[i].id===id) return ACHS[i]; return null; }
-function achUnlock(id){
-  if(META.ach[id]) return;
-  var a=achById(id); if(!a) return;
-  META.ach[id]=true; META.unlocked[a.relic]=true; metaSave();
-  bellSound(); flashTo(.5); burstCoins(-.05,1.5,.2,30);
-  floatNum('🏅 THÀNH TÍCH!', 'info');
-  setTimeout(function(){ var al=achLabel(a); toastL('🏅 THÀNH TÍCH "'+al.name+'"! Mở relic mới: '+relicName(a.relic)+' — xem trong RELIC', '🏅 Achievement "'+al.name+'"! Unlocked relic: '+relicName(a.relic)+' — see RELIC shop', 'good'); }, 500);
-  var uc=$('uiAchCount'); if(uc) uc.textContent=Object.keys(META.ach).length+'/15';
-  if($('achSheet') && $('achSheet').classList.contains('open')) buildAchSheet();
-}
-function achCount(){ return Object.keys(META.ach).length; }
-/* ---------- session missions (3 per round) ---------- */
-var MISSION_POOL=[
-  {id:'m_rainbow', key:'rainbow',   need:1,  reward:60, txt:'Kích hoạt Cầu Vồng 1 lần'},
-  {id:'m_bank30',  key:'bankLv30',  need:1,  reward:70, txt:'Chốt 1 kiếm đạt Lv.30+'},
-  {id:'m_tribfast',key:'tributeFast',need:1, reward:80, txt:'Nộp cống khi còn ≥8 lượt'},
-  {id:'m_heat100', key:'heat100',   need:3,  reward:60, txt:'Nung đạt 100% nhiệt ×3'},
-  {id:'m_frenzy',  key:'frenzy',    need:1,  reward:50, txt:'Kích hoạt Frenzy 1 lần'},
-  {id:'m_bank300', key:'bank300',   need:1,  reward:60, txt:'Chốt 1 kiếm ≥300 vàng'},
-  {id:'m_hits15',  key:'hits',      need:15, reward:45, txt:'Gõ trúng 15 nhát trong vòng'},
-  {id:'m_lv50',    key:'lv50',      need:1,  reward:90, txt:'Đưa 1 kiếm lên Lv.50'}
-];
 function rollMissions(){
   if(!G) return;
   var pool=MISSION_POOL.slice(), picked=[];
@@ -5718,7 +6048,8 @@ function openGhostMerchant(scheduled){
     parts.push('đe: kiếm '+G.swordVal+'→<b>'+ap+'</b> vàng (×1.25, mất kiếm)');
     addBtn('💰 Bán kiếm trên đe — '+ap+' vàng', function(){
       if(G.hits===0) return;
-      G.gold+=ap; metaOnBank(ap, swordLevelNow()); freshSword(); coinSound(); burstCoins(0,1.35,.25,22);
+      if(!G.carryingBlade){ toastL('Cầm kiếm (C) trước khi giao cho thương nhân','Carry the blade ([C]) before selling to the merchant','info'); return; }
+      G.gold+=ap; metaOnBank(ap, swordLevelNow()); freshSword(); G.carryingBlade=false; bladeOnAnvilHome(); coinSound(); burstCoins(0,1.35,.25,22);
       floatNum('+'+ap+' vàng (ma mua đe)', ''); toastL('🧙 Thương nhân ma mua kiếm trên đe — '+ap+' vàng!','🧙 Ghost merchant bought anvil blade — '+ap+' gold!','good');
     });
   }
@@ -5740,7 +6071,7 @@ function maybeOpenEvent(){
   if(!G || G.over || !G.started || G.eventDone || G.heating || G.eventLock || G.repairing) return;
   G.eventDone=true;
   var hasRack = G.rack.some(function(s){ return !!s; });
-  var kind = ['furnace','ore'][Math.floor(Math.random()*2)]; /* merchant -> openGhostMerchant mỗi 3 vòng */
+  var kind = 'ore'; /* merchant -> openGhostMerchant; furnace ancestral event removed */
   var title=$('evTitle'), txt=$('evText'), box=$('evChoices'); if(!title||!box) return;
   box.innerHTML='';
   function addBtn(label, fn){ var b=document.createElement('button'); b.type='button'; b.innerHTML=label; b.addEventListener('click', function(){ audio(); closeSheets(); fn(); refreshUI(); }); box.appendChild(b); }
@@ -5752,11 +6083,6 @@ function maybeOpenEvent(){
     txt.innerHTML='Một thương nhân râu bạc ngắm thanh <b>'+modelNameForLevel(sv.level)+'</b> (Lv.'+clampLv(sv.level)+', '+sv.val+' vàng) trên giá treo và trả <b>'+price+' vàng</b> (×'+mult+') — bán luôn không?';
     addBtn('🤝 BÁN — nhận '+price+' vàng', function(){ G.gold+=price; G.rack[idx]=null; updateRackVisuals(); buildRackUI(); coinSound(); burstCoins(2.3,1.5,0,24); floatNum('+'+price+' vàng (thương nhân)', ''); toastL('🧙 Thương nhân ôm kiếm đi, để lại '+price+' vàng!','🧙 Merchant took the blade, left '+price+' gold!','good'); });
     addBtn('🚶 Bỏ qua — giữ kiếm lại rèn tiếp', function(){ toastL('Thương nhân nhún vai bỏ đi…','The merchant shrugs and leaves…','info'); });
-  } else if(kind==='furnace'){
-    title.textContent='🔥 Lò tổ tiên phù hộ';
-    txt.innerHTML='Khói lò bỗng cuộn thành hình tổ tiên rèn kiếm — lần <b>NUNG tiếp theo miễn phí</b>, không tốn lượt!';
-    addBtn('🙏 Nhận phước — nung miễn phí 1 lần', function(){ G.freeHeat=true; bellSound(); floatNum('🔥 NUNG MIỄN PHÍ ×1', 'info'); toastL('🔥 Lò tổ tiên phù hộ: lần nung tới không tốn lượt!','🔥 Ancestral blessing: next heat costs no turn!','good'); });
-    addBtn('🚶 Bỏ qua', function(){});
   } else {
     title.textContent='⛏️ Mỏ quặng lạ sau lò';
     txt.innerHTML='Đào sau lò thấy một vỉa quặng lạ phát sáng. Chỉ lấy được <b>một</b> thứ:';
@@ -6089,6 +6415,7 @@ function refreshUI(){
   invalidateStationStatusCache();
   if(typeof updateInteractPrompt==='function') updateInteractPrompt(currentNearStation);
   if(typeof updateSwordAttrBoard==='function') updateSwordAttrBoard();
+  if(typeof updateSwordTableDisplay==='function') updateSwordTableDisplay();
   applyHudChrome(); renderWorkflowRibbon();
 }
 function buildShop(){
@@ -6294,6 +6621,7 @@ function checkEndOfTurns(){
 }
 function doHeat(){
   if(!G.started||G.over||G.turns<=0||G.heating||G.eventLock||G.repairing) return;
+  if(G.carryingBlade){ toastL('Đặt kiếm xuống đe trước khi nung (phím C)','Put the blade on the anvil before heating ([C])','info'); return; }
   if(G.furnaceBroken){ toastL('🔥 Lò đã bị phá hủy — bấm 🔧 SỬA LÒ ('+repairCost()+' vàng) mới nung lại được!','🔥 Furnace destroyed — 🔧 REPAIR ('+repairCost()+' gold) to heat again!','bad'); return; }
   if(inspectOn) setInspect(false);
   audio();
@@ -6307,12 +6635,12 @@ function doHeat(){
   coachOn('heat');
   whoosh();
   toastL('Kẹp gắp kiếm bỏ vào lò nung…','Clamping blade into furnace…','info');
-  if(G.freeHeat){ G.freeHeat=false; setTimeout(function(){ toastL('🔥 Lò tổ tiên phù hộ — lần nung này MIỄN PHÍ, không tốn lượt!','🔥 Ancestral blessing — this heat is FREE, no turn cost!','good'); }, 400); refreshUI(); }
-  else spendTurn(); refreshUI();
+  spendTurn(); refreshUI();
 }
 var RAINBOW_CHANCE=.04, RAINBOW_MULT=3.5;
 function doHit(){
   if(!G.started||G.over||G.turns<=0||G.heating||G.eventLock||G.repairing||hammerAnim<1) return;
+  if(G.carryingBlade){ toastL('Đang cầm kiếm — đặt xuống đe (C) rồi mới gõ','You are carrying the blade — put it down ([C]) before striking','info'); return; }
   if(inspectOn) setInspect(false);
   audio();
   hammerAnim=0; hammerT0=performance.now();
@@ -6343,6 +6671,7 @@ function doHit(){
         }, 550);
       }
       G.swordVal=25; G.swordLevel=1; G.hits=0; G.frenzy=false; G.rainbow=false; G.heat=Math.max(10,G.heat-25);
+      G.carryingBlade=false; if(typeof bladeOnAnvilHome==='function') bladeOnAnvilHome();
     } else {
       var gain=Math.round(rnd(16,28)*(0.7+heatAtStrike/100*0.95)*(wasRainbow?RAINBOW_MULT:(wasFrenzy?2.2:1))*(relic('value')?1.3:1)*(relic('r_value2')?1.15:1)*(1+.2*upLv('hammer'))*skinForLevel(levelBefore).valueBonus);
       var isGreat = !wasRainbow && Math.random() < (relic('r_great')? .13 : .08);
@@ -6396,6 +6725,8 @@ function doHit(){
 }
 function doBank(){
   if(!G.started||G.over||G.heating||G.eventLock||G.repairing||G.hits===0) return;
+  if(!G.carryingBlade){ toastL('Cầm kiếm lên đe trước (phím C) rồi mới chốt kho','Pick up the blade first ([C]) before banking','info'); return; }
+  if(!isStationEngaged||activeStation!=='anvil'){ if(!engageStation('anvil', true)) return; }
   if(inspectOn) setInspect(false);
   audio(); coinSound();
   metaOnBank(G.swordVal, swordLevelNow());
@@ -6405,6 +6736,7 @@ function doBank(){
   floatNum('+'+G.swordVal+' vàng vào kho', 'info');
   toastL('Chốt kiếm! +'+G.swordVal+' vàng vào kho','Banked blade! +'+G.swordVal+' gold to vault','good');
   G.swordVal=25; G.swordLevel=1; G.hits=0; G.frenzy=false; G.rainbow=false; G.heat=Math.min(G.heat,35);
+  G.carryingBlade=false; bladeOnAnvilHome();
   refreshUI();
 }
 function buyRelic(id, payMode){
@@ -6444,6 +6776,54 @@ function buyUpgrade(id){
   toast(u.icon+' '+u.name+' lên cấp '+(lv+1)+'! Ngó mô hình trong lò — xịn hơn hẳn', 'good');
   buildUpgrades(); refreshUI();
 }
+
+/* ---------- carry blade: pick up before bank / rack / sell ---------- */
+var BLADE_HOME = { x:-0.5, y:1.175, z:0.1, yaw:-0.28 };
+function bladeOnAnvilHome(){
+  if(typeof sword==='undefined'||!sword) return;
+  sword.position.set(BLADE_HOME.x, BLADE_HOME.y, BLADE_HOME.z);
+  sword.rotation.y = BLADE_HOME.yaw;
+  if(typeof tongs!=='undefined' && tongs) tongs.visible = false;
+}
+function syncBladeCarryVisual(){
+  if(!G||!G.started||heatAnim) return;
+  if(G.carryingBlade){
+    var yaw = (typeof camYaw!=='undefined')? camYaw : 0;
+    sword.position.set(
+      playerPos.x + Math.sin(yaw)*0.44,
+      playerPos.y - 0.78,
+      playerPos.z + Math.cos(yaw)*0.44
+    );
+    sword.rotation.y = yaw - 0.12;
+    if(typeof tongs!=='undefined' && tongs) tongs.visible = true;
+  } else bladeOnAnvilHome();
+}
+function pickUpBlade(silent){
+  if(!G||!G.started||G.over||G.heating||G.eventLock||G.repairing||G.hits===0||G.carryingBlade) return false;
+  if(G.furnaceBroken&&G.heat<25){ /* still ok */ }
+  var atAnvil = isStationEngaged && activeStation==='anvil';
+  if(!atAnvil && playerStationNear()!=='anvil'){ toastL('Đến đe và bấm [E] rồi bấm [C] để cầm kiếm','Stand at the anvil, press [E], then [C] to pick up the blade','info'); return false; }
+  if(!atAnvil && !engageStation('anvil', true)) return false;
+  G.carryingBlade = true;
+  if(!silent){ audio(); if(typeof whoosh==='function') whoosh(); toastL('🫳 Đã cầm kiếm — mang tới giá treo, chốt kho hoặc giao thương nhân','🫳 Carrying blade — take to rack, bank, or merchant','good'); }
+  invalidateStationStatusCache(); refreshUI(); return true;
+}
+function putDownBlade(silent){
+  if(!G||!G.carryingBlade) return false;
+  if(!isStationEngaged || activeStation!=='anvil'){
+    toastL('Chỉ đặt kiếm xuống đe khi đang ở trạm đe (1)','Put the blade down only at the anvil station (1)','bad');
+    return false;
+  }
+  G.carryingBlade = false;
+  bladeOnAnvilHome();
+  if(!silent){ audio(); toastL('Đặt kiếm xuống đe — gõ búa hoặc nung tiếp','Blade on anvil — strike or heat again','info'); }
+  invalidateStationStatusCache(); refreshUI(); return true;
+}
+function toggleCarryBlade(){
+  if(!G||!G.started||G.over||G.heating||G.eventLock||G.repairing) return;
+  if(G.carryingBlade) putDownBlade(); else pickUpBlade();
+}
+
 /* ---------- sword rack: hang / take down, nothing is lost ---------- */
 function rackBestSlot(){
   if(!G||!G.rack) return -1;
@@ -6456,12 +6836,14 @@ function loadSword(s){ G.swordVal=s.val; G.swordLevel=clampLv(s.level); G.hits=s
 function freshSword(){ G.swordVal=25; G.swordLevel=1; G.hits=0; G.frenzy=false; G.rainbow=false; G.heat=20; }
 function hangSword(slot){
   if(!G.started||G.over||G.heating||G.eventLock||G.repairing) return;
+  if(!G.carryingBlade){ toastL('Cầm kiếm trên đe trước (phím C), rồi mang tới giá treo','Pick up the blade on the anvil ([C]), then go to the rack','info'); return; }
+  if(!isStationEngaged||activeStation!=='rack'){ if(!engageStation('rack', true)) return; }
   if(G.hits===0){ toastL('Kiếm trên đe chưa rèn nhát nào — gõ vài nhát rồi hãy treo','Anvil blade has no hits — strike a few times before hanging','info'); return; }
   var i = (typeof slot==='number')? slot : G.rack.indexOf(null);
   if(i<0||i>2||G.rack[i]){ toastL('Giá treo đã đầy 3/3 ô — lấy một thanh xuống hoặc chốt bán trước!','Rack full 3/3 — retrieve or bank a blade first!','bad'); return; }
   audio(); whoosh();
   var snap=swordSnapshot();
-  G.rack[i]=snap; metaOnHang(); freshSword();
+  G.rack[i]=snap; metaOnHang(); freshSword(); G.carryingBlade=false; bladeOnAnvilHome();
   burstSparks(3.1,1.5,-1.6,22,.8,.8); flashTo(.2);
   floatNum('🗡 Treo kiếm '+snap.val+' vàng lên ô '+(i+1), 'info');
   toastL('Đã treo kiếm '+snap.val+' vàng ('+snap.hits+' nhát, nhiệt '+snap.heat+'%) lên giá — lấy thanh mới rèn tiếp!','Hung blade '+snap.val+' gold ('+snap.hits+' hits, '+snap.heat+'% heat) — fresh blade ready!','good');
@@ -6473,13 +6855,13 @@ function clickRackSlot(i){
   if(!s){ hangSword(i); return; }
   audio(); whoosh();
   if(G.hits===0){
-    loadSword(s); G.rack[i]=null;
+    loadSword(s); G.rack[i]=null; G.carryingBlade=true;
     burstSparks(0,1.35,.25,24,.9,.9); flashTo(.25);
     floatNum('🗡 Lấy kiếm '+s.val+' vàng xuống đe', 'info');
-    toastL('Lấy kiếm '+s.val+' vàng xuống đe — giữ nguyên '+s.hits+' nhát, nhiệt '+s.heat+'%, model Lv.'+clampLv(s.level)+' '+modelNameForLevel(s.level)+(s.frenzy?', FRENZY còn nguyên!':'')+(s.rainbow?', 🌈 CẦU VỒNG còn nguyên!':''), 'Took blade '+s.val+' gold to anvil — kept '+s.hits+' hits, '+s.heat+'% heat, Lv.'+clampLv(s.level)+' '+modelNameForLevel(s.level)+(s.frenzy?', Frenzy intact!':'')+(s.rainbow?', 🌈 Rainbow intact!':''), 'good');
+    toastL('Đang cầm kiếm '+s.val+' vàng — mang về đe, bấm [C] đặt xuống rồi rèn — giữ nguyên '+s.hits+' nhát, nhiệt '+s.heat+'%, model Lv.'+clampLv(s.level)+' '+modelNameForLevel(s.level)+(s.frenzy?', FRENZY còn nguyên!':'')+(s.rainbow?', 🌈 CẦU VỒNG còn nguyên!':''), 'Carrying blade '+s.val+' gold — go to anvil, [C] to put down — kept '+s.hits+' hits, '+s.heat+'% heat, Lv.'+clampLv(s.level)+' '+modelNameForLevel(s.level)+(s.frenzy?', Frenzy intact!':'')+(s.rainbow?', 🌈 Rainbow intact!':''), 'good');
   } else {
     var cur=swordSnapshot();
-    loadSword(s); G.rack[i]=cur;
+    loadSword(s); G.rack[i]=cur; G.carryingBlade=true;
     burstSparks(3.1,1.5,-1.6,18,.8,.8); burstSparks(0,1.35,.25,18,.8,.8); flashTo(.25);
     floatNum('🔁 Hoán đổi kiếm trên giá', 'info');
     toastL('Hoán đổi! Kiếm '+s.val+' vàng xuống đe, kiếm '+cur.val+' vàng lên giá ô '+(i+1)+' — không mất gì cả', 'Swapped! '+s.val+'g to anvil, '+cur.val+'g to rack slot '+(i+1)+' — nothing lost', 'good');
@@ -6665,6 +7047,7 @@ window.addEventListener('keydown', function(e){
   }
   else if(e.code==='KeyV') setInspect(!inspectOn);
   else if(e.code==='KeyH'){ if(engageStation('furnace', true)) runStationAction('furnace'); }
+  else if(e.code==='KeyC'){ e.preventDefault(); toggleCarryBlade(); }
   else if(e.code==='KeyB'){ if(engageStation('anvil', true)) doBank(); }
   else if(e.code==='KeyT'){ if(engageStation('rack', true)) runStationAction('rack'); }
 });
@@ -6740,7 +7123,7 @@ window.addEventListener('pointerup', function(e){
 
   var hitsF=ray.intersectObject(furnace, true);
   var hitsB=ray.intersectObject(bellStand, true);
-  var hitsA=ray.intersectObjects([anvil, sword], true);
+  var hitsA=ray.intersectObjects([anvil, sword, smithTable], true);
   var hitsR=ray.intersectObject(rack, true);
   var dF=hitsF.length?hitsF[0].distance:1e9, dB=hitsB.length?hitsB[0].distance:1e9, dA=hitsA.length?hitsA[0].distance:1e9, dR=hitsR.length?hitsR[0].distance:1e9;
   var m=Math.min(dF,dB,dA,dR); if(m>50) return;
@@ -7027,12 +7410,14 @@ function animate(){
           sword.position.set(heatAnim.fromX, 1.175, heatAnim.fromZ);
           sword.rotation.y=heatAnim.fromYaw;
           if(typeof tongs!=='undefined' && tongs) tongs.visible=false;
+          if(G) G.carryingBlade=false;
           heatAnim=null; G.heating=false;
           if(G.heat>=99.5){ G.heat100=(G.heat100||0)+1; missionEvent('heat100'); }
           if(!G.over) toastL('Nung đỏ kiếm — nhiệt '+Math.round(G.heat)+'% — gõ thôi!','Blade is hot — '+Math.round(G.heat)+'% — strike!','info');
           refreshUI();
         }
       }
+      syncBladeCarryVisual();
       /* sword heat glow + cracks + SKIN colours (rainbow overrides everything while active) */
     if(G){
       var hov=G.heat/100;
@@ -7481,7 +7866,7 @@ function selectGalLevel(lv, scrollCard){
           '<div class="gdh-title-wrap">' +
             '<div class="gdh-tier-badge" style="color:' + rarityTier.color + ';border-color:' + rarityTier.color + '">★ ' + rarityTier.name + '</div>' +
             '<h3 class="gdh-name">' + modelNameForLevel(galSelected) + '</h3>' +
-            '<div class="gdh-sub">' + (isEn?'Level ':'Cấp ') + sk.level + ' / 100 · ' + (isEn?'Skin: ':'Dòng: ') + sk.familyName + ' · ' + SKIN_VARIANTS[sk.sub] + ' (' + (sk.family + 1) + '/10)</div>' +
+            '<div class="gdh-sub">' + (isEn?'Level ':'Cấp ') + sk.level + ' / 100 · ' + (isEn?'Skin: ':'Dòng: ') + sk.familyName + ' · ' + skinVariantName(sk.sub) + ' (' + (sk.family + 1) + '/10)</div>' +
           '</div>' +
           '<div class="gdh-status-wrap">' + statusBadge + '</div>' +
         '</div>' +
@@ -7520,7 +7905,7 @@ function buildGallery(){
     filt.appendChild(all);
     SKIN_FAMILIES.forEach(function(fam, fi){
       var b=document.createElement('button'); b.type='button'; b.className='gal-chip'; b.setAttribute('data-fam', fi);
-      b.textContent='Lv.'+(fi*10+1)+'–'+(fi*10+10)+' · '+fam.name;
+      b.textContent='Lv.'+(fi*10+1)+'–'+(fi*10+10)+' · '+skinFamilyName(fam);
       b.addEventListener('click', function(){ setGalFilter(fi); });
       filt.appendChild(b);
     });
@@ -7530,7 +7915,7 @@ function buildGallery(){
     var sec=document.createElement('div'); sec.className='gal-family'; sec.setAttribute('data-famsec', fi);
     if(galFilter!==-1 && galFilter!==fi) sec.style.display='none';
     var famCol=hslCss(fam.hue, Math.max(.35,fam.sat), .62);
-    sec.innerHTML='<div class="gal-family-head"><h3><i style="background:'+famCol+'"></i>'+L('Họ ','Line ')+(fi+1)+' · '+fam.name+'</h3><span>Level '+(fi*10+1)+' – '+(fi*10+10)+' · 10 '+L('Tuyệt Tác','Masterworks')+'</span></div>';
+    sec.innerHTML='<div class="gal-family-head"><h3><i style="background:'+famCol+'"></i>'+L('Họ ','Line ')+(fi+1)+' · '+skinFamilyName(fam)+'</h3><span>Level '+(fi*10+1)+' – '+(fi*10+10)+' · 10 '+L('Tuyệt Tác','Masterworks')+'</span></div>';
     var grid=document.createElement('div'); grid.className='gal-grid';
     for(var sub=0; sub<10; sub++){
       (function(lv){
@@ -7630,8 +8015,12 @@ var LEVEL_MODELS=[], MODEL_B64=null;
    texture files, ~8.7 MB raw) are the two application/json blocks just
    before this script; the payload block is only parsed by parseBigData()
    on window load, and each file is decoded only when its level needs it. */
+var SWORD_NAME_EN={"1": "Training Iron Sword", "2": "Recruit Short Sword", "3": "Common Steel Blade", "4": "Sentry Sword Edge", "5": "Warrior's Sword", "6": "Ancient Bronze Sword", "7": "Hand-Forged Steel Blade", "8": "Hunter's Dagger", "9": "Squire Practice Blade", "10": "Nightshade Dagger", "11": "Blue Steel Sword", "12": "Great Iron Sword", "13": "Two-Handed Claymore", "14": "Ripple Steel Blade", "15": "Sentry Greatsword", "16": "Silver Guard Blade", "17": "Black Steel Broadsword", "18": "Mercenary Greatsword", "19": "Royal Longsword", "20": "Bronze Guard Sword", "21": "Wyrmling Hunter Blade", "22": "Ruby Blade", "23": "Noble Stiletto", "24": "Wavy Steel Sword", "25": "Sapphire Sword", "26": "Assassin's Dagger", "27": "Emerald Sword", "28": "Thorned Broadsword", "29": "Cavalry Saber", "30": "Glacier Blue Blade", "31": "Great Blue Steel Sword", "32": "Jade Green Sword", "33": "Arcane Katana", "34": "Golden Sword", "35": "Desert Scimitar", "36": "Sapphire Sea Blade", "37": "Horned Broadsword", "38": "Crimson Frost Blade", "39": "Legendary Broadsword", "40": "Ancient Rune Blade", "41": "Alchemical Scimitar", "42": "White Light Sword", "43": "Final Claymore", "44": "Glazed Crystal Blade", "45": "Sacrificial Longsword", "46": "Golden Azure Blade", "47": "Stylized Green Blade", "48": "Battle-Leather Blade", "49": "Arcane Iron Sword", "50": "Crimson Sapphire Blade", "51": "Sacred Forest Longsword", "52": "White Bone Blade", "53": "Stylized Red Blade", "54": "Jade Gem Sword", "55": "Mystic Iron Katana", "56": "Azure Glaze Blade", "57": "Regal Broadsword", "58": "Glass Crystal Blade", "59": "Shadow Greatsword", "60": "Azure Rune Blade", "61": "Blue Crystal Blade", "62": "Stylized Gold Blade", "63": "Ancient Bone Blade", "64": "Legendary Ulfberht", "65": "Platinum Blade", "66": "Black Steel Greatsword", "67": "Mystic Iron Blade", "68": "Amethyst Blade", "69": "Stylized Greatsword", "70": "Violet Glaze Blade", "71": "Arcane Frost Blade", "72": "Green Glass Blade", "73": "Ancient Bronze Warblade", "74": "Crimson Gold Blade", "75": "Blood-Bone Blade", "76": "Gold-Plated Greatsword", "77": "Red Crystal Blade", "78": "Crimson Sapphire Blade", "79": "Crimson Glaze Blade", "80": "Golden Sea Blade", "81": "Imperial Jade Blade", "82": "Golden Frost Blade", "83": "Golden Guard Blade", "84": "Gold-Plated Greatsword II", "85": "Black Bone Blade", "86": "Crimson Gem Blade", "87": "Blue Glass Blade", "88": "Crimson Rune Blade", "89": "White Glaze Blade", "90": "Black-Gold Dragon Katana", "91": "Golden Eagle Scimitar", "92": "Ruby Tiger Tanto", "93": "Platinum Crane Willow Blade", "94": "Jade Qilin Sword", "95": "Obsidian Wolf Blade", "96": "Meteor Xuanwu Blade", "97": "Titan Flamberge · Thunder Serpent", "98": "Crystal Ice Greatsword", "99": "Moonstone Stag Blade", "100": "Diamond Phoenix Greatsword"};
 try{
   LEVEL_MODELS=JSON.parse(document.getElementById('levelModelsData').textContent);
+  if(LEVEL_MODELS && LEVEL_MODELS.length) LEVEL_MODELS.forEach(function(e){
+    if(e && e.lv) e.nameEn=SWORD_NAME_EN[e.lv]||e.name;
+  });
 }catch(e){ if(window.console) console.warn('ForgeTax: level model data failed to parse — procedural swords remain', e); }
 var bigDataReady=false;
 function parseBigData(){
@@ -7692,18 +8081,18 @@ function dropOrphanTextureB64(texPath){
   if(MODEL_B64[texPath]) delete MODEL_B64[texPath];
 }
 function modelEntryForLevel(lv){ lv=clampLv(lv); return (typeof LEVEL_MODELS!=='undefined' && LEVEL_MODELS && LEVEL_MODELS[lv-1])? LEVEL_MODELS[lv-1] : null; }
-function modelNameForLevel(lv){ var e=modelEntryForLevel(lv); return e? e.name : ('Level '+clampLv(lv)); }
+function modelNameForLevel(lv){ var e=modelEntryForLevel(lv); if(!e) return L('Level '+clampLv(lv),'Level '+clampLv(lv)); return L(e.name, e.nameEn||e.name); }
 function meshIdForLevel(lv){ var e=modelEntryForLevel(lv); return e? e.mesh : ''; }
 function levelHasEmission(lv){ var e=modelEntryForLevel(lv); return !!(e && e.maps && e.maps.emission); }
 function mapsSummaryForLevel(lv){
   var e=modelEntryForLevel(lv); if(!e) return '';
-  if(e.self) return 'Model Thrixel nguyên bản · chất liệu gốc';
+  if(e.self) return L('Model Thrixel nguyên bản · chất liệu gốc','Native Thrixel model · original materials');
   var m=e.maps||{}, parts=[];
-  if(m.albedo) parts.push('màu');
+  if(m.albedo) parts.push(L('màu','albedo'));
   if(m.normal) parts.push('normal');
-  if(m.metallic) parts.push('kim loại');
-  if(m.emission) parts.push('phát sáng');
-  return parts.length? ('Texture: '+parts.join(' + ')) : 'Không texture';
+  if(m.metallic) parts.push(L('kim loại','metallic'));
+  if(m.emission) parts.push(L('phát sáng','emission'));
+  return parts.length? ('Texture: '+parts.join(' + ')) : L('Không texture','No textures');
 }
 /* ---------- textures: one cached THREE.Texture per unique file ---------- */
 var texCache={};
