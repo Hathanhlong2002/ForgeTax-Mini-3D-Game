@@ -4038,40 +4038,40 @@ var water = mesh(new THREE.CircleGeometry(.235,18), new THREE.MeshPhysicalMateri
 
 /* ---------- 3D BLACKSMITH SWORD INSPECTION TABLE (BÀN XEM THUỘC TÍNH KIẾM) ---------- */
 var smithTable = new THREE.Group();
-smithTable.position.set(0, 0, 1.05);
+smithTable.position.set(0, 0, 1.18);
 scene.add(smithTable);
 
 // 4 Heavy carved wooden legs with iron ferrules
 var tblLegGeo = RB(.065, .62, .065, .01);
 var tblFootGeo = RB(.075, .05, .075, .005);
-[[-.36, -.18], [.36, -.18], [-.36, .18], [.36, .18]].forEach(function(pos){
+[[-.40, -.20], [.40, -.20], [-.40, .20], [.40, .20]].forEach(function(pos){
   mesh(tblLegGeo, matWoodDk, pos[0], .31, pos[1], smithTable);
   mesh(tblFootGeo, matIron, pos[0], .025, pos[1], smithTable);
 });
 
 // Lower stretchers connecting table legs
-mesh(RB(.72, .04, .04, .01), matWoodDk, 0, .18, -.18, smithTable);
-mesh(RB(.72, .04, .04, .01), matWoodDk, 0, .18, .18, smithTable);
-mesh(RB(.04, .04, .36, .01), matWoodDk, -.36, .18, 0, smithTable);
-mesh(RB(.04, .04, .36, .01), matWoodDk, .36, .18, 0, smithTable);
+mesh(RB(.80, .04, .04, .01), matWoodDk, 0, .18, -.20, smithTable);
+mesh(RB(.80, .04, .04, .01), matWoodDk, 0, .18, .20, smithTable);
+mesh(RB(.04, .04, .40, .01), matWoodDk, -.40, .18, 0, smithTable);
+mesh(RB(.04, .04, .40, .01), matWoodDk, .40, .18, 0, smithTable);
 
 // Lower tool shelf with raw ingots
-mesh(RB(.72, .025, .36, .01), matWoodDk, 0, .19, 0, smithTable);
+mesh(RB(.80, .025, .40, .01), matWoodDk, 0, .19, 0, smithTable);
 mesh(RB(.12, .04, .06, .01), matSteelDk, -.2, .22, 0, smithTable);
 mesh(RB(.12, .04, .06, .01), matSteelDk, -.2, .26, 0, smithTable);
 mesh(RB(.12, .04, .06, .01), matGold, .2, .22, 0, smithTable);
 
 // Heavy beveled oak tabletop
-mesh(RB(.88, .06, .50, .02), matWood, 0, .62, 0, smithTable);
+mesh(RB(1.02, .06, .54, .02), matWood, 0, .64, 0, smithTable);
 
 // 4 brass corner brackets on tabletop
-[[-.42, -.23], [.42, -.23], [-.42, .23], [.42, .23]].forEach(function(pos){
-  mesh(RB(.05, .065, .05, .005), matBrass, pos[0], .625, pos[1], smithTable);
+[[-.49, -.25], [.49, -.25], [-.49, .25], [.49, .25]].forEach(function(pos){
+  mesh(RB(.05, .065, .05, .005), matBrass, pos[0], .645, pos[1], smithTable);
 });
 
 // Small ambient brass lantern on the table corner
 var tableLamp = new THREE.Group();
-tableLamp.position.set(-.35, .65, -.15);
+tableLamp.position.set(-.44, .67, -.18);
 smithTable.add(tableLamp);
 mesh(new THREE.CylinderGeometry(.045, .06, .03, 10), matBrass, 0, .015, 0, tableLamp);
 mesh(new THREE.CylinderGeometry(.035, .035, .07, 10, 1, true), new THREE.MeshPhysicalMaterial({color:0xffd580, roughness:.1, transparent:true, opacity:.75}), 0, .065, 0, tableLamp);
@@ -4083,25 +4083,24 @@ tableLamp.add(tableLampLight);
 
 // Angled Display Easel & Slate Tablet
 var displayStand = new THREE.Group();
-displayStand.position.set(0, .66, .02);
-displayStand.rotation.x = -Math.PI / 4.1; // ~43.9 deg tilted directly perpendicular to camera line of sight
+displayStand.position.set(0, .68, .04);
+displayStand.rotation.x = -Math.PI / 3.9; // ~46.1 deg tilted directly perpendicular to camera line of sight
 smithTable.add(displayStand);
 
 // Wooden easel bracket behind tablet
-mesh(RB(.12, .34, .04, .01), matWoodDk, 0, .18, -.03, displayStand);
+mesh(RB(.14, .36, .04, .01), matWoodDk, 0, .20, -.03, displayStand);
 // Slate backing plate (forged iron rim)
-mesh(RB(.94, .54, .022, .012), matSteelDk, 0, .27, 0, displayStand);
-mesh(new THREE.BoxGeometry(.945, .545, .006), matGold, 0, .27, -.002, displayStand);
+mesh(RB(1.10, .62, .024, .012), matSteelDk, 0, .31, 0, displayStand);
+mesh(new THREE.BoxGeometry(1.105, .625, .006), matGold, 0, .31, -.002, displayStand);
 
-// Canvas Texture and Display Screen (hi-DPI for readable text in 3D)
-var SWORD_TABLE_W = 1024, SWORD_TABLE_H = 576;
-var swordTableCanvas, swordTableCtx, swordTableTexture, swordTableMesh, swordTableDpr = 1;
+// Canvas Texture and Display Screen (native 2K UHD for extreme legibility in 3D)
+var SWORD_TABLE_W = 2048, SWORD_TABLE_H = 1152;
+var swordTableCanvas, swordTableCtx, swordTableTexture, swordTableMesh;
 function applySwordTableCanvasDpr(){
   if(!swordTableCanvas||!swordTableCtx) return;
-  swordTableDpr = IS_LOW ? 1.5 : (IS_MOBILE ? 2.0 : Math.min(2.5, Math.max(2, window.devicePixelRatio || 2)));
-  swordTableCanvas.width = Math.round(SWORD_TABLE_W * swordTableDpr);
-  swordTableCanvas.height = Math.round(SWORD_TABLE_H * swordTableDpr);
-  swordTableCtx.setTransform(swordTableDpr, 0, 0, swordTableDpr, 0, 0);
+  swordTableCanvas.width = SWORD_TABLE_W;
+  swordTableCanvas.height = SWORD_TABLE_H;
+  swordTableCtx.setTransform(1, 0, 0, 1, 0, 0);
   swordTableCtx.imageSmoothingEnabled = true;
   if(swordTableCtx.imageSmoothingQuality) swordTableCtx.imageSmoothingQuality = 'high';
 }
@@ -4111,8 +4110,7 @@ function applySwordTableCanvasDpr(){
   applySwordTableCanvasDpr();
   swordTableTexture = new THREE.CanvasTexture(swordTableCanvas);
   swordTableTexture.colorSpace = THREE.SRGBColorSpace;
-  var _maxA = (renderer && renderer.capabilities && renderer.capabilities.getMaxAnisotropy) ? renderer.capabilities.getMaxAnisotropy() : 8;
-  swordTableTexture.anisotropy = Math.min(16, _maxA);
+  swordTableTexture.anisotropy = 16;
   swordTableTexture.generateMipmaps = true;
   swordTableTexture.minFilter = THREE.LinearMipmapLinearFilter;
   swordTableTexture.magFilter = THREE.LinearFilter;
@@ -4121,15 +4119,21 @@ function applySwordTableCanvasDpr(){
     map: swordTableTexture,
     toneMapped: false
   });
-  swordTableMesh = new THREE.Mesh(new THREE.PlaneGeometry(.92, .52), screenMat);
-  swordTableMesh.position.set(0, .27, .013);
+  screenMat.onBeforeCompile = function(shader){
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <map_fragment>',
+      '#ifdef USE_MAP\nvec4 sampledDiffuseColor = texture2D( map, vMapUv, -2.0 );\ndiffuseColor *= sampledDiffuseColor;\n#endif'
+    );
+  };
+  swordTableMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.06, .58), screenMat);
+  swordTableMesh.position.set(0, .31, .014);
   displayStand.add(swordTableMesh);
 })();
 
 function updateSwordTableDisplay(){
   if(!swordTableCtx) return;
   var c = swordTableCtx;
-  var w = (typeof SWORD_TABLE_W !== 'undefined') ? SWORD_TABLE_W : 1024, h = (typeof SWORD_TABLE_H !== 'undefined') ? SWORD_TABLE_H : 576;
+  var w = (typeof SWORD_TABLE_W !== 'undefined') ? SWORD_TABLE_W : 2048, h = (typeof SWORD_TABLE_H !== 'undefined') ? SWORD_TABLE_H : 1152;
   var isEn = (typeof CURRENT_LANG !== "undefined" && CURRENT_LANG === "en");
   var sLv = (typeof swordLevelNow === "function") ? swordLevelNow() : (G ? (G.swordLevel || 1) : 1);
   var sSkin = (typeof skinForLevel === "function") ? skinForLevel(sLv) : { name: "Thép Thô", hue: 0.1 };
@@ -4143,7 +4147,7 @@ function updateSwordTableDisplay(){
     c.font = font;
     c.textAlign = align || "left";
     if(strokeW){
-      c.strokeStyle = strokeStyle || "rgba(0,0,0,0.92)";
+      c.strokeStyle = strokeStyle || "rgba(0,0,0,0.95)";
       c.lineWidth = strokeW;
       c.lineJoin = "round";
       c.miterLimit = 2;
@@ -4155,91 +4159,91 @@ function updateSwordTableDisplay(){
 
   // 1. Clear & Dark forged slate background
   c.clearRect(0, 0, w, h);
-  var bg = c.createRadialGradient(w/2, h/2, 40, w/2, h/2, w*0.7);
-  bg.addColorStop(0, "#1a130c");
+  var bg = c.createRadialGradient(w/2, h/2, 60, w/2, h/2, w*0.72);
+  bg.addColorStop(0, "#1c140c");
   bg.addColorStop(0.65, "#100b07");
-  bg.addColorStop(1, "#070403");
+  bg.addColorStop(1, "#050302");
   c.fillStyle = bg;
   c.fillRect(0, 0, w, h);
 
   // 2. High-contrast Ornate Border
-  c.strokeStyle = "rgba(232, 179, 60, 0.55)";
-  c.lineWidth = 4;
-  c.strokeRect(16, 16, w - 32, h - 32);
+  c.strokeStyle = "rgba(232, 179, 60, 0.65)";
+  c.lineWidth = 8;
+  c.strokeRect(28, 28, w - 56, h - 56);
 
-  c.strokeStyle = "rgba(232, 179, 60, 0.22)";
-  c.lineWidth = 2;
-  c.strokeRect(24, 24, w - 48, h - 48);
+  c.strokeStyle = "rgba(232, 179, 60, 0.28)";
+  c.lineWidth = 4;
+  c.strokeRect(44, 44, w - 88, h - 88);
 
   // Corner accents
-  var cs = 32;
+  var cs = 64;
   c.strokeStyle = "#ffd56a";
-  c.lineWidth = 3.5;
-  c.beginPath(); c.moveTo(16, 16+cs); c.lineTo(16, 16); c.lineTo(16+cs, 16); c.stroke();
-  c.beginPath(); c.moveTo(w-16-cs, 16); c.lineTo(w-16, 16); c.lineTo(w-16, 16+cs); c.stroke();
-  c.beginPath(); c.moveTo(16, h-16-cs); c.lineTo(16, h-16); c.lineTo(16+cs, h-16); c.stroke();
-  c.beginPath(); c.moveTo(w-16-cs, h-16); c.lineTo(w-16, h-16); c.lineTo(w-16, h-16-cs); c.stroke();
+  c.lineWidth = 7;
+  c.beginPath(); c.moveTo(28, 28+cs); c.lineTo(28, 28); c.lineTo(28+cs, 28); c.stroke();
+  c.beginPath(); c.moveTo(w-28-cs, 28); c.lineTo(w-28, 28); c.lineTo(w-28, 28+cs); c.stroke();
+  c.beginPath(); c.moveTo(28, h-28-cs); c.lineTo(28, h-28); c.lineTo(28+cs, h-28); c.stroke();
+  c.beginPath(); c.moveTo(w-28-cs, h-28); c.lineTo(w-28, h-28); c.lineTo(w-28, h-28-cs); c.stroke();
 
   // 3. Header: Level & Skin Name (Left) + Value (Right)
   var hue = Math.round((sSkin.hue || 0.1) * 360);
-  var skinColor = "hsl(" + hue + ", 88%, 78%)";
+  var skinColor = "hsl(" + hue + ", 92%, 80%)";
   var lvTitle = "Lv." + sLv + " · " + (sSkin.name || "") + (sLv >= 100 ? (isEn ? " ★ MAX" : " ★ CỰC HẠN") : "");
-  drawCrispText(lvTitle, 40, 62, "900 42px system-ui, -apple-system, sans-serif", skinColor, "left", 6);
+  drawCrispText(lvTitle, 72, 126, "900 84px system-ui, -apple-system, sans-serif", skinColor, "left", 12);
 
   // Gold value (Right)
   var goldText = "🪙 " + sVal + " " + (isEn ? "GOLD" : "VÀNG");
-  drawCrispText(goldText, w - 40, 62, "900 46px system-ui, -apple-system, sans-serif", "#ffe566", "right", 6);
+  drawCrispText(goldText, w - 72, 126, "900 90px system-ui, -apple-system, sans-serif", "#ffe566", "right", 12);
 
   // Model silhouette & next tier (Sub header)
   var nextDesc = (sLv >= 100) ? (isEn ? "★ Final Blade Archetype" : "★ Tuyệt phẩm tối thượng")
                               : (isEn ? ("Lv." + (sLv+1) + " → unique model") : ("Lv." + (sLv+1) + " → model khác biệt"));
   var subTitle = "⚔ " + (isEn ? "Model: " : "Mẫu kiếm: ") + sShapeName + "   ·   " + nextDesc;
-  drawCrispText(subTitle, 40, 102, "700 24px system-ui, -apple-system, sans-serif", "#d1c0a8", "left", 4);
+  drawCrispText(subTitle, 72, 206, "800 46px system-ui, -apple-system, sans-serif", "#d6c5ad", "left", 8);
 
   // Divider line
-  var divGrd = c.createLinearGradient(40, 0, w - 40, 0);
+  var divGrd = c.createLinearGradient(72, 0, w - 72, 0);
   divGrd.addColorStop(0, "rgba(232,179,60,0.15)");
-  divGrd.addColorStop(0.5, "rgba(232,179,60,0.85)");
+  divGrd.addColorStop(0.5, "rgba(232,179,60,0.95)");
   divGrd.addColorStop(1, "rgba(232,179,60,0.15)");
   c.fillStyle = divGrd;
-  c.fillRect(40, 120, w - 80, 3);
+  c.fillRect(72, 240, w - 144, 5);
 
   // 4. Meters: HEAT, SHATTER RISK, STRIKES
   function drawMeter(y, label, valText, pct, fillColor, valColor){
     // Label
-    drawCrispText(label, 40, y + 22, "800 25px system-ui, -apple-system, sans-serif", "#eedcc6", "left", 4);
+    drawCrispText(label, 72, y + 42, "900 48px system-ui, -apple-system, sans-serif", "#eedcc6", "left", 8);
 
     // Value
     var vc = valColor || (typeof fillColor === "string" ? fillColor : "#ffd56a");
-    drawCrispText(valText, w - 40, y + 22, "900 27px system-ui, -apple-system, sans-serif", vc, "right", 5);
+    drawCrispText(valText, w - 72, y + 42, "900 52px system-ui, -apple-system, sans-serif", vc, "right", 9);
 
     // Bar track
-    var bx = 40, by = y + 32, bw = w - 80, bh = 22;
-    c.fillStyle = "rgba(14, 10, 6, 0.9)";
-    c.strokeStyle = "rgba(232, 179, 60, 0.35)";
-    c.lineWidth = 2;
+    var bx = 72, by = y + 62, bw = w - 144, bh = 42;
+    c.fillStyle = "rgba(12, 8, 5, 0.95)";
+    c.strokeStyle = "rgba(232, 179, 60, 0.45)";
+    c.lineWidth = 4;
     c.beginPath();
-    if(c.roundRect) c.roundRect(bx, by, bw, bh, 6); else c.rect(bx, by, bw, bh);
+    if(c.roundRect) c.roundRect(bx, by, bw, bh, 10); else c.rect(bx, by, bw, bh);
     c.fill();
     c.stroke();
 
     // Bar fill
     var fw = Math.max(0, Math.min(bw, bw * pct));
-    if(fw > 4){
+    if(fw > 6){
       c.fillStyle = fillColor;
       c.beginPath();
-      if(c.roundRect) c.roundRect(bx + 2, by + 2, fw - 4, bh - 4, 4); else c.rect(bx + 2, by + 2, fw - 4, bh - 4);
+      if(c.roundRect) c.roundRect(bx + 3, by + 3, fw - 6, bh - 6, 8); else c.rect(bx + 3, by + 3, fw - 6, bh - 6);
       c.fill();
     }
   }
 
   // Meter 1: Heat
-  var heatGrd = c.createLinearGradient(40, 0, w - 40, 0);
+  var heatGrd = c.createLinearGradient(72, 0, w - 72, 0);
   heatGrd.addColorStop(0, "#d94414");
   heatGrd.addColorStop(0.5, "#ff8b14");
   heatGrd.addColorStop(1, "#ffe566");
   var heatLbl = isEn ? "🔥 BLADE HEAT" : "🔥 NHIỆT ĐỘ LƯỠI KIẾM";
-  drawMeter(136, heatLbl, sHeat + "%", sHeat / 100, heatGrd, "#ffbe66");
+  drawMeter(268, heatLbl, sHeat + "%", sHeat / 100, heatGrd, "#ffbe66");
 
   // Meter 2: Shatter Risk
   var rkPct = (G && (G.rainbow || G.frenzy)) ? 0 : rk;
@@ -4249,19 +4253,19 @@ function updateSwordTableDisplay(){
   var rkColor = (G && (G.rainbow || G.frenzy)) ? "#5ae875" : (rk >= 0.15 ? "#ff4030" : (rk >= 0.07 ? "#ffaa30" : "#5ae875"));
   var rkFill = (G && (G.rainbow || G.frenzy)) ? 0 : Math.min(1, rk * 3.5);
   var rkLbl = isEn ? "⚠ SHATTER RISK" : "⚠ NGUY CƠ VỠ KIẾM";
-  drawMeter(206, rkLbl, rkText, rkFill, rkColor, rkColor);
+  drawMeter(412, rkLbl, rkText, rkFill, rkColor, rkColor);
 
   // Meter 3: Strikes
-  var strikeGrd = c.createLinearGradient(40, 0, w - 40, 0);
+  var strikeGrd = c.createLinearGradient(72, 0, w - 72, 0);
   strikeGrd.addColorStop(0, "#9e6f22");
   strikeGrd.addColorStop(1, "#ffd56a");
   var strikeLbl = isEn ? "🔨 HAMMER STRIKES" : "🔨 SỐ NHÁT GÕ";
-  drawMeter(276, strikeLbl, sHits + " / 99", sHits / 99, strikeGrd, "#ffe08a");
+  drawMeter(556, strikeLbl, sHits + " / 99", sHits / 99, strikeGrd, "#ffe08a");
 
   // 5. Special Status Banner or Forge Lore Advice (Bottom)
-  var bannerY = 358, bannerH = 184;
+  var bannerY = 716, bannerH = 372;
   if(G && G.rainbow){
-    var rbGrd = c.createLinearGradient(40, bannerY, w - 40, bannerY);
+    var rbGrd = c.createLinearGradient(72, bannerY, w - 72, bannerY);
     rbGrd.addColorStop(0, "rgba(255, 60, 60, 0.45)");
     rbGrd.addColorStop(0.25, "rgba(255, 200, 40, 0.45)");
     rbGrd.addColorStop(0.5, "rgba(60, 255, 120, 0.45)");
@@ -4269,49 +4273,49 @@ function updateSwordTableDisplay(){
     rbGrd.addColorStop(1, "rgba(220, 80, 255, 0.45)");
     c.fillStyle = rbGrd;
     c.strokeStyle = "#ffffff";
-    c.lineWidth = 2.5;
+    c.lineWidth = 5;
     c.beginPath();
-    if(c.roundRect) c.roundRect(40, bannerY, w - 80, bannerH, 12); else c.rect(40, bannerY, w - 80, bannerH);
+    if(c.roundRect) c.roundRect(72, bannerY, w - 144, bannerH, 20); else c.rect(72, bannerY, w - 144, bannerH);
     c.fill(); c.stroke();
 
-    drawCrispText(isEn ? "🌈 RAINBOW SURGE ACTIVE 🌈" : "🌈 CẦU VỒNG THẦN THÁNH KÍCH HOẠT 🌈", w/2, bannerY + 54, "900 36px system-ui, -apple-system, sans-serif", "#ffffff", "center", 6);
-    drawCrispText(isEn ? "Next strike: ×3.5 Value · 100% Unbreakable (1 Hit)" : "Nhát tới: ×3.5 Giá trị · 100% Bất tử không vỡ (1 Nhát)", w/2, bannerY + 104, "800 26px system-ui, -apple-system, sans-serif", "#ffffed", "center", 5);
-    drawCrispText(isEn ? "Press SPACE / Tap STRIKE HAMMER now!" : "Bấm phím SPACE hoặc nhấn GÕ BÚA ngay!", w/2, bannerY + 148, "700 22px system-ui, -apple-system, sans-serif", "#ffe082", "center", 4);
+    drawCrispText(isEn ? "🌈 RAINBOW SURGE ACTIVE 🌈" : "🌈 CẦU VỒNG THẦN THÁNH KÍCH HOẠT 🌈", w/2, bannerY + 104, "900 72px system-ui, -apple-system, sans-serif", "#ffffff", "center", 12);
+    drawCrispText(isEn ? "Next strike: ×3.5 Value · 100% Unbreakable (1 Hit)" : "Nhát tới: ×3.5 Giá trị · 100% Bất tử không vỡ (1 Nhát)", w/2, bannerY + 204, "800 52px system-ui, -apple-system, sans-serif", "#ffffed", "center", 10);
+    drawCrispText(isEn ? "Press SPACE / Tap STRIKE HAMMER now!" : "Bấm phím SPACE hoặc nhấn GÕ BÚA ngay!", w/2, bannerY + 294, "700 44px system-ui, -apple-system, sans-serif", "#ffe082", "center", 8);
   } else if(G && G.frenzy){
     c.fillStyle = "rgba(255, 120, 20, 0.35)";
     c.strokeStyle = "#ffa238";
-    c.lineWidth = 2.5;
+    c.lineWidth = 5;
     c.beginPath();
-    if(c.roundRect) c.roundRect(40, bannerY, w - 80, bannerH, 12); else c.rect(40, bannerY, w - 80, bannerH);
+    if(c.roundRect) c.roundRect(72, bannerY, w - 144, bannerH, 20); else c.rect(72, bannerY, w - 144, bannerH);
     c.fill(); c.stroke();
 
-    drawCrispText(isEn ? "★ FRENZY STRIKE READY ★" : "★ FRENZY BÙNG NỔ ★", w/2, bannerY + 54, "900 36px system-ui, -apple-system, sans-serif", "#ffe08a", "center", 6);
-    drawCrispText(isEn ? "Next strike: ×2.2 Value Multiplier · Unbreakable" : "Nhát kế tiếp: ×2.2 Giá trị · Không thể vỡ", w/2, bannerY + 104, "800 26px system-ui, -apple-system, sans-serif", "#fff4db", "center", 5);
-    drawCrispText(isEn ? "Hammer rapidly while frenzy is ignited!" : "Rèn nhanh trước khi hiệu ứng cuồng nộ vụt tắt!", w/2, bannerY + 148, "700 22px system-ui, -apple-system, sans-serif", "#ffd56a", "center", 4);
+    drawCrispText(isEn ? "★ FRENZY STRIKE READY ★" : "★ FRENZY BÙNG NỔ ★", w/2, bannerY + 104, "900 72px system-ui, -apple-system, sans-serif", "#ffe08a", "center", 12);
+    drawCrispText(isEn ? "Next strike: ×2.2 Value Multiplier · Unbreakable" : "Nhát kế tiếp: ×2.2 Giá trị · Không thể vỡ", w/2, bannerY + 204, "800 52px system-ui, -apple-system, sans-serif", "#fff4db", "center", 10);
+    drawCrispText(isEn ? "Hammer rapidly while frenzy is ignited!" : "Rèn nhanh trước khi hiệu ứng cuồng nộ vụt tắt!", w/2, bannerY + 294, "700 44px system-ui, -apple-system, sans-serif", "#ffd56a", "center", 8);
   } else if(G && G.furnaceBroken){
     c.fillStyle = "rgba(255, 40, 30, 0.35)";
     c.strokeStyle = "#ff6050";
-    c.lineWidth = 2.5;
+    c.lineWidth = 5;
     c.beginPath();
-    if(c.roundRect) c.roundRect(40, bannerY, w - 80, bannerH, 12); else c.rect(40, bannerY, w - 80, bannerH);
+    if(c.roundRect) c.roundRect(72, bannerY, w - 144, bannerH, 20); else c.rect(72, bannerY, w - 144, bannerH);
     c.fill(); c.stroke();
 
-    drawCrispText(isEn ? "⚠ FURNACE DAMAGED BY DRAGON ⚠" : "⚠ LÒ NUNG BỊ RỒNG PHÁ HỎNG ⚠", w/2, bannerY + 54, "900 34px system-ui, -apple-system, sans-serif", "#ff7b70", "center", 6);
-    drawCrispText(isEn ? "Repair furnace at the hearth before heating blades" : "Hãy tới Lò Nung bấm [SỬA LÒ] để tiếp tục nung kiếm", w/2, bannerY + 104, "800 26px system-ui, -apple-system, sans-serif", "#ffc2be", "center", 5);
-    drawCrispText(isEn ? "Move to Furnace Station (Key 2) to restore heat" : "Di chuyển tới Lò (Phím 2) để dập lửa và sửa chữa lò", w/2, bannerY + 148, "700 22px system-ui, -apple-system, sans-serif", "#ff9b94", "center", 4);
+    drawCrispText(isEn ? "⚠ FURNACE DAMAGED BY DRAGON ⚠" : "⚠ LÒ NUNG BỊ RỒNG PHÁ HỎNG ⚠", w/2, bannerY + 104, "900 68px system-ui, -apple-system, sans-serif", "#ff7b70", "center", 12);
+    drawCrispText(isEn ? "Repair furnace at the hearth before heating blades" : "Hãy tới Lò Nung bấm [SỬA LÒ] để tiếp tục nung kiếm", w/2, bannerY + 204, "800 50px system-ui, -apple-system, sans-serif", "#ffc2be", "center", 10);
+    drawCrispText(isEn ? "Move to Furnace Station (Key 2) to restore heat" : "Di chuyển tới Lò (Phím 2) để dập lửa và sửa chữa lò", w/2, bannerY + 294, "700 44px system-ui, -apple-system, sans-serif", "#ff9b94", "center", 8);
   } else {
-    c.fillStyle = "rgba(24, 18, 12, 0.85)";
-    c.strokeStyle = "rgba(232, 179, 60, 0.35)";
-    c.lineWidth = 1.5;
+    c.fillStyle = "rgba(24, 18, 12, 0.88)";
+    c.strokeStyle = "rgba(232, 179, 60, 0.4)";
+    c.lineWidth = 3;
     c.beginPath();
-    if(c.roundRect) c.roundRect(40, bannerY, w - 80, bannerH, 12); else c.rect(40, bannerY, w - 80, bannerH);
+    if(c.roundRect) c.roundRect(72, bannerY, w - 144, bannerH, 20); else c.rect(72, bannerY, w - 144, bannerH);
     c.fill(); c.stroke();
 
-    drawCrispText(isEn ? "🔥 MASTER SMITH DIRECTIVE" : "📜 BÍ QUYẾT RÈN THẦN KIẾM", w/2, bannerY + 46, "900 28px system-ui, -apple-system, sans-serif", "#ffd56a", "center", 5);
+    drawCrispText(isEn ? "🔥 MASTER SMITH DIRECTIVE" : "📜 BÍ QUYẾT RÈN THẦN KIẾM", w/2, bannerY + 92, "900 56px system-ui, -apple-system, sans-serif", "#ffd56a", "center", 10);
     drawCrispText(isEn ? "Heat ≥60% halves shatter risk · Bank gold to satisfy dragon tribute"
-                       : "Nung nhiệt ≥60% giảm 50% nguy cơ vỡ · Đủ cống hãy rung chuông qua vòng", w/2, bannerY + 92, "700 24px system-ui, -apple-system, sans-serif", "#e8dac4", "center", 4);
+                       : "Nung nhiệt ≥60% giảm 50% nguy cơ vỡ · Đủ cống hãy rung chuông qua vòng", w/2, bannerY + 192, "800 48px system-ui, -apple-system, sans-serif", "#e8dac4", "center", 8);
     drawCrispText(isEn ? "Hot forge increases value per hit · Press Space or Tap Strike Hammer"
-                       : "Gõ khi kiếm đỏ rực để tăng giá trị cực đại · Phím Space hoặc bấm Gõ Búa", w/2, bannerY + 138, "700 22px system-ui, -apple-system, sans-serif", "#bda98e", "center", 4);
+                       : "Gõ khi kiếm đỏ rực để tăng giá trị cực đại · Phím Space hoặc bấm Gõ Búa", w/2, bannerY + 284, "700 42px system-ui, -apple-system, sans-serif", "#bda98e", "center", 7);
   }
 
   c.shadowBlur = 0;
@@ -5000,7 +5004,7 @@ function applyLanguageUI(){
 }
 
 var STATION_DESTINATIONS = {
-  anvil:   { pos: new THREE.Vector3(0, 1.85, 2.05), yaw: 0, pitch: -0.40 },
+  anvil:   { pos: new THREE.Vector3(0, 1.80, 1.95), yaw: 0, pitch: -0.45 },
   furnace: { pos: new THREE.Vector3(-2.3, 1.85, -1.1), yaw: Math.PI * 0.48, pitch: -0.16 },
   bell:    { pos: new THREE.Vector3(2.3, 1.85, -1.7), yaw: -Math.PI * 0.70, pitch: -0.14 },
   rack:    { pos: new THREE.Vector3(2.6, 1.85, 1.5), yaw: -Math.PI * 0.50, pitch: -0.12 },
@@ -5673,7 +5677,7 @@ function applyUpgradeVisuals(){
 /* ---------- SWORD SKINS: blade visibly evolves as its value climbs ---------- */
 /* ================= 100 SWORD LEVELS =================
    Every successful hammer hit = exactly +1 level (1..100). Each level pays
-   exponential hit value + level-up surge on blade price (Lv.100 ≈ 1B gold) and wears its OWN skin: 10 skin families x 10
+   exponential hit value + level-up surge (Lv.100 ≈ 1000 tỷ gold) and wears its OWN skin: 10 skin families x 10
    variants. Within a family every level brightens the blade, shifts the
    fuller/guard colours and grows the glow + silhouette a step, so level N+1
    never looks identical to level N; crossing into a new family (11/21/.../91)
@@ -5696,24 +5700,30 @@ var SKIN_FAMILIES=[
   {name:'Long Kiếm Huyền Thoại', nameEn:'Legendary Dragonsteel', hue:.09, sat:.85, light:.6, handle:0x6b0f1e}
 ];
 function clampLv(lv){ lv=Math.round(Number(lv)||1); return Math.max(1, Math.min(SWORD_LEVEL_MAX, lv)); }
+/* Lv.1–50: mỗi lên cấp nhân đôi giá kiếm (sau vàng nhát đúng); trần 1000 tỷ.
+   Lv.51–100: không ×2 — bù từng cấp tới trần sao cho Lv.100 ≈ 1000 tỷ. */
+var BLADE_VALUE_CAP = 1e12;
+var BLADE_DOUBLE_MAX_LV = 50;
 function calcValueBonus(lv){
-  if(lv<=20) return 1 + (lv-1)*0.055;
-  if(lv<=50) return 2.02 + (lv-20)*0.22;
-  if(lv<=89) return 8.62 + (lv-50)*0.65;
-  return 34.12 + (lv-89)*8.5;
+  lv = clampLv(lv);
+  if(lv <= BLADE_DOUBLE_MAX_LV) return 1 + (lv - 1) * 0.055;
+  var t = (lv - BLADE_DOUBLE_MAX_LV) / (SWORD_LEVEL_MAX - BLADE_DOUBLE_MAX_LV);
+  return 3.7 + t * 14;
 }
-/* Level-up gold surge: nhát gõ + % giá kiếm khi lên level — Lv.100 ~1 tỷ (nhiệt 70%, không relic) */
-var LEVEL_SURGE_K = 0.268, LEVEL_SURGE_POW = 1.65, LEVEL_SURGE_BASE = 0.028;
-function levelUpGoldBonus(newLv, hitGain, familyChanged, valBefore){
-  if(!hitGain || hitGain < 1) hitGain = 1;
-  valBefore = Math.max(25, valBefore || 0);
+function applyBladeLevelUpPricing(newLv){
   newLv = clampLv(newLv);
-  var sub = (newLv - 1) % 10;
-  var hitMult = (familyChanged && newLv > 1) ? 2.6 : (sub === 9 ? 2.0 : (1.12 + sub * 0.10));
-  var surge = LEVEL_SURGE_BASE + Math.pow(newLv / 100, LEVEL_SURGE_POW) * LEVEL_SURGE_K;
-  if(familyChanged && newLv > 1) surge *= 1.28;
-  if(sub === 9) surge *= 1.15;
-  return Math.round(hitGain * hitMult + valBefore * surge);
+  var before = G.swordVal;
+  if(newLv <= BLADE_DOUBLE_MAX_LV){
+    G.swordVal = Math.min(Math.round(G.swordVal * 2), BLADE_VALUE_CAP);
+    return G.swordVal - before;
+  }
+  if(G.swordVal < BLADE_VALUE_CAP){
+    var stepsLeft = Math.max(1, SWORD_LEVEL_MAX - newLv + 1);
+    var catchUp = Math.ceil((BLADE_VALUE_CAP - G.swordVal) / stepsLeft);
+    G.swordVal = Math.min(G.swordVal + catchUp, BLADE_VALUE_CAP);
+  }
+  if(newLv >= SWORD_LEVEL_MAX) G.swordVal = Math.max(G.swordVal, BLADE_VALUE_CAP);
+  return G.swordVal - before;
 }
 
 function skinForLevel(lv){
@@ -7192,16 +7202,17 @@ function doHit(){
       if(G.swordLevel>levelBefore){
         metaOnLevel(G.swordLevel);
         var skL=skinForLevel(G.swordLevel), famChanged = skL.family!==famBefore;
-        var lvBonus = levelUpGoldBonus(G.swordLevel, gain, famChanged, G.swordVal);
+        var lvBonus = applyBladeLevelUpPricing(G.swordLevel);
         if(lvBonus > 0){
-          G.swordVal += lvBonus;
           var upLv = G.swordLevel, upFam = skinFamilyName(skL);
           setTimeout(function(){
             floatNum('⬆ Lv.'+upLv+' +'+lvBonus+' '+L('vàng','gold'), 'big');
-            if(famChanged){
-              toastL('⚔ Lv.'+upLv+' — dòng '+upFam+'! Bùng giá lên cấp (+'+lvBonus+' vàng)','⚔ Lv.'+upLv+' — '+upFam+' line! Price surge (+'+lvBonus+' gold)','good');
+            if(upLv <= BLADE_DOUBLE_MAX_LV){
+              toastL('⬆ Lv.'+upLv+' — giá kiếm ×2 (+'+lvBonus+' vàng)','⬆ Lv.'+upLv+' — blade price ×2 (+'+lvBonus+' gold)','good');
+            } else if(famChanged){
+              toastL('⚔ Lv.'+upLv+' — dòng '+upFam+'! Đuổi kịp mốc cuối (+'+lvBonus+' vàng)','⚔ Lv.'+upLv+' — '+upFam+' line! Endgame catch-up (+'+lvBonus+' gold)','good');
             } else if((upLv-1)%10===9){
-              toastL('★ Lv.'+upLv+' — tuyệt đỉnh dòng! Bonus lên cấp ×2 (+'+lvBonus+' vàng)','★ Lv.'+upLv+' — family apex! Level bonus ×2 (+'+lvBonus+' gold)','good');
+              toastL('★ Lv.'+upLv+' — tuyệt đỉnh dòng! (+'+lvBonus+' vàng)','★ Lv.'+upLv+' — family apex! (+'+lvBonus+' gold)','good');
             }
           }, famChanged ? 520 : 280);
         }
