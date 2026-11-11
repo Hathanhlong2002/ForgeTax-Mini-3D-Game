@@ -2625,7 +2625,7 @@
   }
 
   /* ============================================================
-     STITCH TAMAHAGANE 3-CLUSTER POD ARCHITECTURE
+     STITCH TAMAHAGANE 3-CLUSTER POD & TACTICAL WORKSTATION
      ============================================================ */
   .topbar {
     display: flex !important;
@@ -2728,6 +2728,253 @@
   .pod-highlight {
     background: linear-gradient(180deg, rgba(196, 88, 18, 0.4) 0%, rgba(138, 53, 5, 0.5) 100%) !important;
     border-color: rgba(255, 180, 50, 0.5) !important;
+  }
+
+  /* ============================================================
+     TACTICAL WORKSTATION CONSOLE (BOTTOM ZONE ORDER & PROPORTIONS)
+     ============================================================ */
+  #controls {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    pointer-events: auto !important;
+  }
+  #swordPlate {
+    order: 1 !important;
+  }
+  .actions-main {
+    order: 2 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
+    max-width: 440px !important;
+    width: 100% !important;
+    margin: 8px auto 0 !important;
+  }
+  #stationNav {
+    order: 3 !important;
+    margin-top: 10px !important;
+  }
+  #keyHints {
+    order: 4 !important;
+    margin-top: 6px !important;
+  }
+
+  /* Action Buttons Typography: Clean, Punchy, No Sentence Overflows */
+  .actions-main button {
+    font-family: var(--font-display) !important;
+    font-weight: 800 !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+    letter-spacing: .04em !important;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8) !important;
+  }
+  /* Kill paragraph sentences inside button labels that cause collisions */
+  .actions-main button .sub {
+    display: none !important;
+  }
+
+  /* Free Walk Mode: Complete clarity, ZERO action buttons */
+  body:not(.station-engaged) .actions-main,
+  body:not(.station-engaged) .actions-main button,
+  body:not(.station-engaged) #rackBar,
+  body:not(.station-engaged) #btnLeaveStation {
+    display: none !important;
+  }
+
+  /* Anvil Station Hero & Sub Actions */
+  body.station-engaged.st-anvil #btnHit {
+    display: inline-flex !important;
+    flex: 1 1 100% !important;
+    height: 50px !important;
+    font-size: 15px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: linear-gradient(180deg, #d68910 0%, #a05d08 60%, #683a04 100%) !important;
+    border: 1.5px solid #ffd56a !important;
+    box-shadow: inset 0 1px 0 rgba(255, 240, 180, 0.4), 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 16px rgba(232, 179, 60, 0.35) !important;
+    color: #fff !important;
+  }
+  body.station-engaged.st-anvil #btnHit::after {
+    content: " [SPACE]";
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0.75;
+    margin-left: 6px;
+    font-family: var(--font-ui);
+  }
+  body.station-engaged.st-anvil #btnHit::before {
+    content: "";
+    width: 26px;
+    height: 26px;
+    background: url('assets/ui/btn_hammer.jpg') center/cover no-repeat;
+    border-radius: 6px;
+    border: 1.5px solid rgba(255, 213, 106, 0.7);
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+
+  /* Clean Sub-Row: CHỐT [B] · TREO [T] · RỜI [Q] */
+  body.station-engaged.st-anvil #btnBank,
+  body.station-engaged.st-anvil #btnHang,
+  body.station-engaged.st-anvil #btnLeaveStation {
+    display: inline-flex !important;
+    flex: 1 1 0 !important;
+    height: 40px !important;
+    padding: 0 8px !important;
+    font-size: 12px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  body.station-engaged.st-anvil #btnBank::before {
+    content: "";
+    width: 20px;
+    height: 20px;
+    background: url('assets/ui/btn_vault.jpg') center/cover no-repeat;
+    border-radius: 4px;
+    border: 1px solid rgba(232, 179, 60, 0.6);
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+  body.station-engaged.st-anvil #btnBank::after {
+    content: " [B]";
+    font-size: 10px;
+    opacity: 0.7;
+    margin-left: 4px;
+    font-family: var(--font-ui);
+  }
+  body.station-engaged.st-anvil #btnHang::after {
+    content: " [T]";
+    font-size: 10px;
+    opacity: 0.7;
+    margin-left: 4px;
+    font-family: var(--font-ui);
+  }
+  body.station-engaged.st-anvil #btnLeaveStation {
+    flex: 0 0 auto !important;
+    padding: 0 12px !important;
+  }
+  body.station-engaged.st-anvil #btnHeat,
+  body.station-engaged.st-anvil #btnRepair,
+  body.station-engaged.st-anvil #btnTribute,
+  body.station-engaged.st-anvil #rackBar {
+    display: none !important;
+  }
+
+  /* Furnace Station Focus */
+  body.station-engaged.st-furnace #btnHeat {
+    display: inline-flex !important;
+    flex: 1 1 100% !important;
+    height: 50px !important;
+    font-size: 15px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: linear-gradient(180deg, #a8360d 0%, #681d05 100%) !important;
+    border: 1.5px solid #ff8b4d !important;
+    color: #ffe3c2 !important;
+  }
+  body.station-engaged.st-furnace #btnHeat::after {
+    content: " [H / SPACE]";
+    font-size: 11px;
+    opacity: 0.75;
+    margin-left: 6px;
+    font-family: var(--font-ui);
+  }
+  body.station-engaged.st-furnace #btnHeat::before {
+    content: "";
+    width: 26px;
+    height: 26px;
+    background: url('assets/ui/btn_furnace.jpg') center/cover no-repeat;
+    border-radius: 6px;
+    border: 1.5px solid rgba(255, 140, 30, 0.7);
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  body.station-engaged.st-furnace #btnLeaveStation {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    height: 40px !important;
+    padding: 0 14px !important;
+    font-size: 11px !important;
+  }
+  body.station-engaged.st-furnace #btnHit,
+  body.station-engaged.st-furnace #btnBank,
+  body.station-engaged.st-furnace #btnTribute,
+  body.station-engaged.st-furnace #btnHang,
+  body.station-engaged.st-furnace #rackBar {
+    display: none !important;
+  }
+
+  /* Bell Station Focus */
+  body.station-engaged.st-bell #btnTribute {
+    display: inline-flex !important;
+    flex: 1 1 100% !important;
+    height: 50px !important;
+    font-size: 15px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: linear-gradient(180deg, #b88220 0%, #6d4a0a 100%) !important;
+    border: 1.5px solid #ffd56a !important;
+    color: #fff !important;
+  }
+  body.station-engaged.st-bell #btnTribute::after {
+    content: " [SPACE / E]";
+    font-size: 11px;
+    opacity: 0.75;
+    margin-left: 6px;
+    font-family: var(--font-ui);
+  }
+  body.station-engaged.st-bell #btnTribute::before {
+    content: "";
+    width: 26px;
+    height: 26px;
+    background: url('assets/ui/dragon_crest.jpg') center/cover no-repeat;
+    border-radius: 6px;
+    border: 1.5px solid rgba(255, 213, 106, 0.7);
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  body.station-engaged.st-bell #btnLeaveStation {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    height: 40px !important;
+    padding: 0 14px !important;
+    font-size: 11px !important;
+  }
+  body.station-engaged.st-bell #btnHit,
+  body.station-engaged.st-bell #btnBank,
+  body.station-engaged.st-bell #btnHeat,
+  body.station-engaged.st-bell #btnHang,
+  body.station-engaged.st-bell #btnRepair,
+  body.station-engaged.st-bell #rackBar {
+    display: none !important;
+  }
+
+  /* Rack Station Focus */
+  body.station-engaged.st-rack #btnHang {
+    display: inline-flex !important;
+    flex: 1 1 100% !important;
+    height: 44px !important;
+  }
+  body.station-engaged.st-rack #btnLeaveStation {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    height: 40px !important;
+    padding: 0 14px !important;
+  }
+  body.station-engaged.st-rack #btnHit,
+  body.station-engaged.st-rack #btnHeat,
+  body.station-engaged.st-rack #btnBank,
+  body.station-engaged.st-rack #btnTribute,
+  body.station-engaged.st-rack #btnRepair {
+    display: none !important;
   }
 
   /* Sword Attribute Certificate (#swordAttrBoard) */
