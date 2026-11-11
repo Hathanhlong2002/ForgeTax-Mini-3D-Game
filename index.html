@@ -4156,7 +4156,7 @@ function applySwordTableCanvasDpr(){
 function updateSwordTableDisplay(){
   if(!swordTableCtx) return;
   var c = swordTableCtx;
-  var w = (typeof SWORD_TABLE_W !== 'undefined') ? SWORD_TABLE_W : 2048, h = (typeof SWORD_TABLE_H !== 'undefined') ? SWORD_TABLE_H : 1152;
+  var w = (typeof SWORD_TABLE_W !== "undefined") ? SWORD_TABLE_W : 2048, h = (typeof SWORD_TABLE_H !== "undefined") ? SWORD_TABLE_H : 1152;
   var isEn = (typeof CURRENT_LANG !== "undefined" && CURRENT_LANG === "en");
   var sLv = (typeof swordLevelNow === "function") ? swordLevelNow() : (G ? (G.swordLevel || 1) : 1);
   var sSkin = (typeof skinForLevel === "function") ? skinForLevel(sLv) : { name: "Thép Thô", hue: 0.1 };
@@ -4164,28 +4164,38 @@ function updateSwordTableDisplay(){
   var sHeat = (G && typeof G.heat === "number") ? Math.max(0, Math.min(100, Math.round(G.heat))) : 0;
   var rk = 0.02;
   if(G && typeof riskNow === "function"){ try{ rk = riskNow(); }catch(e){ rk = 0.02; } }
+
   function formatBoardGold(n){
     n = Math.round(Number(n) || 0);
-    if(n >= 1e12) return (n/1e12).toFixed(n % 1e12 === 0 ? 0 : 2).replace(/\.0$/,'') + (isEn ? 'T' : ' nghìn tỷ');
-    if(n >= 1e9) return (n/1e9).toFixed(n % 1e9 === 0 ? 0 : 2).replace(/\.0$/,'') + (isEn ? 'B' : ' tỷ');
-    if(n >= 1e6) return (n/1e6).toFixed(n % 1e6 === 0 ? 0 : 1).replace(/\.0$/,'') + (isEn ? 'M' : ' triệu');
+    if(n >= 1e12) return (n/1e12).toFixed(n % 1e12 === 0 ? 0 : 2).replace(/\.0$/,"") + (isEn ? "T" : " nghìn tỷ");
+    if(n >= 1e9) return (n/1e9).toFixed(n % 1e9 === 0 ? 0 : 2).replace(/\.0$/,"") + (isEn ? "B" : " tỷ");
+    if(n >= 1e6) return (n/1e6).toFixed(n % 1e6 === 0 ? 0 : 1).replace(/\.0$/,"") + (isEn ? "M" : " triệu");
     if(n >= 1e4) return n.toLocaleString();
     return String(n);
   }
+
   var sShapeName = (typeof modelNameForLevel === "function") ? modelNameForLevel(sLv) : "Kiếm Sắt";
 
-  function drawCrispText(text, x, y, font, fillStyle, align, strokeW, strokeStyle){
-    c.font = font;
+  // Adaptive auto-scaling text to guarantee zero overflow / truncation
+  function drawFittedText(text, x, y, maxW, fontFam, baseSize, weight, fillStyle, align, strokeW, strokeStyle){
+    var size = baseSize;
+    c.font = weight + " " + size + "px " + fontFam;
+    var measured = (c.measureText ? c.measureText(text).width : (text.length * size * 0.6));
+    if(maxW && measured > maxW && maxW > 0){
+      size = Math.max(18, Math.floor(baseSize * (maxW / measured)));
+      c.font = weight + " " + size + "px " + fontFam;
+    }
     c.textAlign = align || "left";
     if(strokeW){
       c.strokeStyle = strokeStyle || "rgba(0,0,0,0.95)";
-      c.lineWidth = strokeW;
+      c.lineWidth = Math.max(2, Math.round(strokeW * (size / baseSize)));
       c.lineJoin = "round";
       c.miterLimit = 2;
       c.strokeText(text, x, y);
     }
     c.fillStyle = fillStyle;
     c.fillText(text, x, y);
+    return size;
   }
 
   function drawRoundedPill(x, y, pw, ph, rad, fillStyle, strokeColor, strokeWidth, shadowColor, shadowBlur){
@@ -4197,7 +4207,7 @@ function updateSwordTableDisplay(){
       c.shadowOffsetY = 4;
     }
     c.beginPath();
-    if(c.roundRect) {
+    if(c.roundRect){
       c.roundRect(x, y, pw, ph, rad);
     } else {
       c.moveTo(x + rad, y);
@@ -4222,125 +4232,160 @@ function updateSwordTableDisplay(){
     c.restore();
   }
 
-  // 1. Clear & Dark forged slate background
+  // Draw modern segmented meter bar (Stitch style)
+  function drawSegmentedBar(x, y, bw, bh, ratio, segCount, activeStartColor, activeEndColor, baseBg, borderCol){
+    drawRoundedPill(x, y, bw, bh, 10, baseBg || "rgba(10, 8, 7, 0.95)", borderCol || "rgba(229, 169, 60, 0.40)", 2);
+    ratio = Math.max(0, Math.min(1, ratio));
+    var innerW = bw - 8;
+    var innerH = bh - 8;
+    var activeW = Math.round(innerW * ratio);
+    if(activeW > 3){
+      c.save();
+      c.beginPath();
+      if(c.roundRect) c.roundRect(x + 4, y + 4, activeW, innerH, 6);
+      else c.rect(x + 4, y + 4, activeW, innerH);
+      c.clip();
+      var grad = c.createLinearGradient(x + 4, 0, x + 4 + innerW, 0);
+      grad.addColorStop(0, activeStartColor || "#d48a20");
+      grad.addColorStop(1, activeEndColor || "#ffd56a");
+      c.fillStyle = grad;
+      c.fillRect(x + 4, y + 4, activeW, innerH);
+      c.restore();
+    }
+    // Slot segment dividers
+    if(segCount > 1){
+      c.strokeStyle = "rgba(0, 0, 0, 0.55)";
+      c.lineWidth = 2.5;
+      for(var i = 1; i < segCount; i++){
+        var sx = x + 4 + (innerW / segCount) * i;
+        c.beginPath();
+        c.moveTo(sx, y + 4);
+        c.lineTo(sx, y + 4 + innerH);
+        c.stroke();
+      }
+    }
+  }
+
+  // 1. Clear & Dark obsidian forged slate backdrop
   c.clearRect(0, 0, w, h);
-  var bg = c.createRadialGradient(w/2, h/2, 100, w/2, h/2, w * 0.75);
-  bg.addColorStop(0, "#1a110a");
-  bg.addColorStop(0.65, "#0d0805");
-  bg.addColorStop(1, "#040201");
+  var bg = c.createRadialGradient(w/2, h/2, 120, w/2, h/2, w * 0.75);
+  bg.addColorStop(0, "#191512");
+  bg.addColorStop(0.60, "#0e0a07");
+  bg.addColorStop(1, "#050302");
   c.fillStyle = bg;
   c.fillRect(0, 0, w, h);
 
-  // Outer ornate frame with glowing gold trim
-  drawRoundedPill(24, 24, w - 48, h - 48, 44, null, "rgba(232, 179, 60, 0.45)", 6, "rgba(232, 179, 60, 0.25)", 18);
-  drawRoundedPill(38, 38, w - 76, h - 76, 36, null, "rgba(232, 179, 60, 0.20)", 2);
+  // Outer frame with golden kintsugi glow & precision hairline seams
+  drawRoundedPill(24, 24, w - 48, h - 48, 40, null, "rgba(229, 169, 60, 0.50)", 5, "rgba(229, 169, 60, 0.28)", 20);
+  drawRoundedPill(38, 38, w - 76, h - 76, 32, null, "rgba(229, 169, 60, 0.22)", 2);
 
-  // 2. Top Header Pill (styled like .interact-prompt)
-  var headW = 1240, headH = 76, headX = (w - headW) / 2, headY = 48;
+  // 2. Top Header Bar (Tamahagane Kintsugi Console)
+  var headW = 1320, headH = 80, headX = (w - headW) / 2, headY = 46;
   var headGrd = c.createLinearGradient(headX, headY, headX, headY + headH);
-  headGrd.addColorStop(0, "rgba(36, 22, 14, 0.98)");
-  headGrd.addColorStop(1, "rgba(18, 10, 6, 0.99)");
-  drawRoundedPill(headX, headY, headW, headH, 999, headGrd, "#e8b33c", 3.5, "rgba(232, 179, 60, 0.40)", 16);
+  headGrd.addColorStop(0, "rgba(38, 26, 16, 0.98)");
+  headGrd.addColorStop(1, "rgba(16, 10, 6, 0.99)");
+  drawRoundedPill(headX, headY, headW, headH, 999, headGrd, "#e5a93c", 3.5, "rgba(229, 169, 60, 0.45)", 18);
 
-  var headKeyGrd = c.createLinearGradient(headX + 16, headY + 12, headX + 16, headY + headH - 12);
-  headKeyGrd.addColorStop(0, "#d48a20");
+  var headKeyGrd = c.createLinearGradient(headX + 16, headY + 14, headX + 16, headY + headH - 14);
+  headKeyGrd.addColorStop(0, "#e5a93c");
   headKeyGrd.addColorStop(1, "#874906");
-  drawRoundedPill(headX + 16, headY + 12, 60, headH - 24, 12, headKeyGrd, "#ffd56a", 2);
-  drawCrispText("⚔️", headX + 46, headY + 49, "900 28px system-ui, sans-serif", "#ffffff", "center");
-  var headTitle = isEn ? "FORGETAX · MASTER SMITH CONSOLE" : "FORGETAX · BẢNG THÔNG SỐ RÈN KIẾM";
-  drawCrispText(headTitle, headX + 96, headY + 52, "900 36px system-ui, -apple-system, sans-serif", "#ffd56a", "left", 6);
+  drawRoundedPill(headX + 16, headY + 14, 62, headH - 28, 14, headKeyGrd, "#ffe082", 2);
+  drawFittedText("⚔️", headX + 47, headY + 52, 48, "system-ui, sans-serif", 28, "900", "#ffffff", "center");
+
+  var headTitle = isEn ? "FORGETAX · ANVIL SWORD INSPECTION CONSOLE" : "FORGETAX · BẢNG THÔNG SỐ RÈN KIẾM";
+  drawFittedText(headTitle, headX + 98, headY + 54, headW - 120, "system-ui, -apple-system, sans-serif", 34, "900", "#ffe082", "left", 6);
 
   // 3. Grid Coordinates for 4 Main Cards (2 Columns x 2 Rows)
   var cardW = 926, cardH = 450;
+  var cardInnerW = cardW - 72; // 854px max width for inner text elements
   var col1_X = 66, col2_X = 1056;
   var row1_Y = 160, row2_Y = 646;
 
   var cardGrd = c.createLinearGradient(0, row1_Y, 0, row1_Y + cardH);
-  cardGrd.addColorStop(0, "rgba(34, 22, 14, 0.97)");
-  cardGrd.addColorStop(1, "rgba(14, 8, 4, 0.99)");
+  cardGrd.addColorStop(0, "rgba(32, 22, 16, 0.98)");
+  cardGrd.addColorStop(1, "rgba(14, 9, 6, 0.99)");
 
   var cardGrd2 = c.createLinearGradient(0, row2_Y, 0, row2_Y + cardH);
-  cardGrd2.addColorStop(0, "rgba(34, 22, 14, 0.97)");
-  cardGrd2.addColorStop(1, "rgba(14, 8, 4, 0.99)");
+  cardGrd2.addColorStop(0, "rgba(32, 22, 16, 0.98)");
+  cardGrd2.addColorStop(1, "rgba(14, 9, 6, 0.99)");
 
   var goldKeyGrd = c.createLinearGradient(0, 0, 0, 54);
-  goldKeyGrd.addColorStop(0, "#d48a20");
+  goldKeyGrd.addColorStop(0, "#e5a93c");
   goldKeyGrd.addColorStop(1, "#874906");
 
-  // ==================== CARD 1: CẤP ĐỘ KIẾM (LEVEL) ====================
-  drawRoundedPill(col1_X, row1_Y, cardW, cardH, 42, cardGrd, "#e8b33c", 5, "rgba(232, 179, 60, 0.35)", 20);
-  drawRoundedPill(col1_X + 36, row1_Y + 36, 88, 54, 14, goldKeyGrd, "#ffd56a", 2.5);
-  drawCrispText("LV", col1_X + 80, row1_Y + 74, "900 30px system-ui, sans-serif", "#fff9ea", "center", 4);
-  drawCrispText(isEn ? "BLADE LEVEL" : "CẤP ĐỘ KIẾM", col1_X + 144, row1_Y + 76, "900 40px system-ui, sans-serif", "#d8c29d", "left", 6);
+  // ==================== CARD 1: CẤP ĐỘ KIẾM (BLADE LEVEL) ====================
+  drawRoundedPill(col1_X, row1_Y, cardW, cardH, 38, cardGrd, "#e5a93c", 4.5, "rgba(229, 169, 60, 0.35)", 18);
+  drawRoundedPill(col1_X + 36, row1_Y + 36, 88, 54, 14, goldKeyGrd, "#ffe082", 2.5);
+  drawFittedText("LV", col1_X + 80, row1_Y + 74, 70, "system-ui, sans-serif", 30, "900", "#fff9ea", "center", 4);
+  drawFittedText(isEn ? "BLADE LEVEL" : "CẤP ĐỘ KIẾM", col1_X + 144, row1_Y + 76, 500, "system-ui, sans-serif", 40, "900", "#e8cfad", "left", 6);
+  // Tech corner crosshair
+  drawFittedText("+ ANVIL.01", col1_X + cardW - 36, row1_Y + 74, 200, "monospace, sans-serif", 20, "700", "rgba(229,169,60,0.6)", "right");
 
   var hue = Math.round((sSkin.hue || 0.1) * 360);
-  var skinColor = "hsl(" + hue + ", 94%, 82%)";
-  drawCrispText("Lv." + sLv, col1_X + 36, row1_Y + 235, "900 136px system-ui, sans-serif", skinColor, "left", 18);
-  drawCrispText(sShapeName + " · " + (sSkin.name || ""), col1_X + 36, row1_Y + 322, "900 48px system-ui, sans-serif", "#fff4db", "left", 10);
+  var skinColor = "hsl(" + hue + ", 95%, 82%)";
+  drawFittedText("Lv." + sLv, col1_X + 36, row1_Y + 230, cardInnerW, "system-ui, sans-serif", 132, "900", skinColor, "left", 18);
+  drawFittedText(sShapeName + " · " + (sSkin.name || ""), col1_X + 36, row1_Y + 320, cardInnerW, "system-ui, sans-serif", 46, "900", "#fff4db", "left", 10);
   var nextDesc = (sLv >= 100) ? (isEn ? "★ MAX LEVEL (FINAL FORM)" : "★ CỰC HẠN VŨ KHÍ TỐI THƯỢNG")
                               : (isEn ? ("Next: Lv." + (sLv+1) + " → " + modelNameForLevel(sLv + 1)) : ("Mục tiêu: Lv." + (sLv+1) + " → " + modelNameForLevel(sLv + 1)));
-  drawCrispText(nextDesc, col1_X + 36, row1_Y + 392, "800 36px system-ui, sans-serif", "#d4a359", "left", 8);
+  drawFittedText(nextDesc, col1_X + 36, row1_Y + 392, cardInnerW, "system-ui, sans-serif", 35, "800", "#d4a359", "left", 8);
 
   // ==================== CARD 2: GIÁ TRỊ (VÀNG) ====================
-  drawRoundedPill(col2_X, row1_Y, cardW, cardH, 42, cardGrd, "#ffd56a", 5, "rgba(255, 213, 106, 0.40)", 22);
+  drawRoundedPill(col2_X, row1_Y, cardW, cardH, 38, cardGrd, "#ffd56a", 4.5, "rgba(255, 213, 106, 0.40)", 20);
   drawRoundedPill(col2_X + 36, row1_Y + 36, 88, 54, 14, goldKeyGrd, "#ffd56a", 2.5);
-  drawCrispText("🪙", col2_X + 80, row1_Y + 74, "900 28px system-ui, sans-serif", "#fff9ea", "center");
-  drawCrispText(isEn ? "SWORD VALUE" : "GIÁ TRỊ KIẾM", col2_X + 144, row1_Y + 76, "900 40px system-ui, sans-serif", "#ffd56a", "left", 6);
-  drawCrispText(formatBoardGold(sVal) + " " + (isEn ? "GOLD" : "VÀNG"), col2_X + 36, row1_Y + 235, "900 132px system-ui, sans-serif", "#ffe066", "left", 18);
-  drawCrispText(isEn ? "Press [B] to bank gold into vault" : "Bấm phím [B] để chốt vàng vào kho", col2_X + 36, row1_Y + 322, "900 46px system-ui, sans-serif", "#fff4db", "left", 10);
-  var vaultInfo = (isEn ? "Vault reserve: " : "Vàng kho đang có: ") + formatBoardGold(G ? G.gold : 0) + (isEn ? " gold" : " vàng");
-  drawCrispText(vaultInfo, col2_X + 36, row1_Y + 392, "800 36px system-ui, sans-serif", "#ffd56a", "left", 8);
+  drawFittedText("🪙", col2_X + 80, row1_Y + 74, 70, "system-ui, sans-serif", 28, "900", "#fff9ea", "center");
+  drawFittedText(isEn ? "SWORD VALUE" : "GIÁ TRỊ KIẾM", col2_X + 144, row1_Y + 76, 500, "system-ui, sans-serif", 40, "900", "#ffd56a", "left", 6);
+  // Tech corner crosshair
+  drawFittedText("TRIB.GATE +", col2_X + cardW - 36, row1_Y + 74, 200, "monospace, sans-serif", 20, "700", "rgba(255,213,106,0.6)", "right");
 
-  // ==================== CARD 3: TỈ LỆ THÀNH CÔNG / THẤT BẠI ====================
+  drawFittedText(formatBoardGold(sVal) + " " + (isEn ? "GOLD" : "VÀNG"), col2_X + 36, row1_Y + 230, cardInnerW, "system-ui, sans-serif", 128, "900", "#ffe066", "left", 18);
+  drawFittedText(isEn ? "Press [B] to bank gold into vault" : "Bấm phím [B] để chốt vàng vào kho", col2_X + 36, row1_Y + 320, cardInnerW, "system-ui, sans-serif", 44, "900", "#fff4db", "left", 10);
+  var vaultInfo = (isEn ? "Vault reserve: " : "Vàng kho đang có: ") + formatBoardGold(G ? G.gold : 0) + (isEn ? " gold" : " vàng");
+  drawFittedText(vaultInfo, col2_X + 36, row1_Y + 392, cardInnerW, "system-ui, sans-serif", 35, "800", "#ffd56a", "left", 8);
+
+  // ==================== CARD 3: TỈ LỆ THÀNH CÔNG / NGUY CƠ VỠ ====================
   var isSafeMode = (G && (G.rainbow || G.frenzy));
-  var rkBorderColor = isSafeMode ? "#5ae875" : (rk >= 0.15 ? "#ff4030" : "#e8b33c");
-  var rkShadowColor = isSafeMode ? "rgba(90, 232, 117, 0.45)" : (rk >= 0.15 ? "rgba(255, 64, 48, 0.40)" : "rgba(232, 179, 60, 0.35)");
-  drawRoundedPill(col1_X, row2_Y, cardW, cardH, 42, cardGrd2, rkBorderColor, 5, rkShadowColor, 20);
+  var rkBorderColor = isSafeMode ? "#5ae875" : (rk >= 0.15 ? "#ff4030" : "#e5a93c");
+  var rkShadowColor = isSafeMode ? "rgba(90, 232, 117, 0.45)" : (rk >= 0.15 ? "rgba(255, 64, 48, 0.40)" : "rgba(229, 169, 60, 0.35)");
+  drawRoundedPill(col1_X, row2_Y, cardW, cardH, 38, cardGrd2, rkBorderColor, 4.5, rkShadowColor, 18);
 
   var defKeyGrd = c.createLinearGradient(0, 0, 0, 54);
   if(isSafeMode){
     defKeyGrd.addColorStop(0, "#2e9f45"); defKeyGrd.addColorStop(1, "#155724");
   } else {
-    defKeyGrd.addColorStop(0, "#d48a20"); defKeyGrd.addColorStop(1, "#874906");
+    defKeyGrd.addColorStop(0, "#e5a93c"); defKeyGrd.addColorStop(1, "#874906");
   }
   drawRoundedPill(col1_X + 36, row2_Y + 36, 88, 54, 14, defKeyGrd, isSafeMode ? "#7df094" : "#ffd56a", 2.5);
-  drawCrispText("🛡️", col1_X + 80, row2_Y + 74, "900 28px system-ui, sans-serif", "#fff9ea", "center");
-  drawCrispText(isEn ? "FORGE SUCCESS & BREAK RATE" : "TỈ LỆ THÀNH CÔNG & NGUY CƠ VỠ", col1_X + 144, row2_Y + 76, "900 40px system-ui, sans-serif", isSafeMode ? "#7df094" : "#d8c29d", "left", 6);
+  drawFittedText("🛡️", col1_X + 80, row2_Y + 74, 70, "system-ui, sans-serif", 28, "900", "#fff9ea", "center");
+  drawFittedText(isEn ? "FORGE SUCCESS & BREAK RISK" : "TỈ LỆ THÀNH CÔNG & NGUY CƠ VỠ", col1_X + 144, row2_Y + 76, 500, "system-ui, sans-serif", 38, "900", isSafeMode ? "#7df094" : "#e8cfad", "left", 6);
+  // Tech corner crosshair
+  drawFittedText("+ MATRIX.64", col1_X + cardW - 36, row2_Y + 74, 200, "monospace, sans-serif", 20, "700", isSafeMode ? "rgba(90,232,117,0.6)" : "rgba(229,169,60,0.6)", "right");
 
   if(isSafeMode){
-    drawCrispText(isEn ? "100% SUCCESS" : "100% THÀNH CÔNG", col1_X + 36, row2_Y + 205, "900 110px system-ui, sans-serif", "#5ae875", "left", 16);
+    drawFittedText(isEn ? "100% SUCCESS" : "100% THÀNH CÔNG", col1_X + 36, row2_Y + 205, cardInnerW, "system-ui, sans-serif", 98, "900", "#5ae875", "left", 16);
     var safeTag = G.rainbow ? (isEn ? "🌈 RAINBOW IMMUNITY · 0% BREAK RISK (×3.5 VALUE)" : "🌈 CẦU VỒNG BẤT TỬ · 0% NGUY CƠ VỠ (×3.5 VÀNG)")
                             : (isEn ? "★ FRENZY ARMED · 0% BREAK RISK (×2.2 VALUE)" : "★ CUỒNG NỘ BẢO HỘ · 0% NGUY CƠ VỠ (×2.2 VÀNG)");
-    drawCrispText(safeTag, col1_X + 36, row2_Y + 295, "900 42px system-ui, sans-serif", "#d5ffda", "left", 10);
-    var sbX = col1_X + 36, sbY = row2_Y + 330, sbW = cardW - 72, sbH = 34;
-    drawRoundedPill(sbX, sbY, sbW, sbH, 12, "rgba(10, 30, 14, 0.95)", "rgba(90, 232, 117, 0.60)", 2.5);
-    drawRoundedPill(sbX + 2, sbY + 2, sbW - 4, sbH - 4, 10, "#3cb35a");
-    drawCrispText(isEn ? "Next strike is 100% guaranteed safe — Strike hammer now!" : "Nhát gõ tới bảo đảm 100% an toàn không vỡ — Gõ búa ngay!", col1_X + 36, row2_Y + 412, "800 32px system-ui, sans-serif", "#a7f3d0", "left", 7);
+    drawFittedText(safeTag, col1_X + 36, row2_Y + 295, cardInnerW, "system-ui, sans-serif", 40, "900", "#d5ffda", "left", 10);
+    drawSegmentedBar(col1_X + 36, row2_Y + 330, cardInnerW, 36, 1.0, 10, "#2e9f45", "#5ae875", "rgba(10, 30, 14, 0.95)", "rgba(90, 232, 117, 0.65)");
+    var safeSub = isEn ? "Blade is totally indestructible right now!" : "Thần kiếm đang được bảo hộ tuyệt đối không thể vỡ!";
+    drawFittedText(safeSub, col1_X + 36, row2_Y + 412, cardInnerW, "system-ui, sans-serif", 32, "800", "#a7f3d0", "left", 7);
   } else {
-    var succRate = Math.max(0.1, Math.min(99.9, (1 - rk) * 100));
-    var failRate = Math.max(0.1, rk * 100);
-    var succText = (succRate >= 99.85 ? "99.9%" : succRate.toFixed(1) + "%");
-    var failText = (failRate <= 0.15 ? "0.1%" : failRate.toFixed(1) + "%");
+    var successRate = Math.max(0, Math.min(100, (1 - rk) * 100));
+    var successText = "✔ " + (successRate >= 99.9 ? "99.9" : successRate.toFixed(1)) + "% " + (isEn ? "SUCCESS" : "THÀNH CÔNG");
+    drawFittedText(successText, col1_X + 36, row2_Y + 205, cardInnerW, "system-ui, sans-serif", 82, "900", "#4ade80", "left", 14);
 
-    drawCrispText("✔ " + succText + (isEn ? " SUCCESS" : " THÀNH CÔNG"), col1_X + 36, row2_Y + 200, "900 94px system-ui, sans-serif", "#4ade80", "left", 14);
-    var failColor = rk >= 0.15 ? "#ff4030" : (rk >= 0.07 ? "#ff9f1c" : "#fca5a5");
-    drawCrispText("⚠ " + failText + (isEn ? " SHATTER RISK" : " NGUY CƠ VỠ"), col1_X + 36, row2_Y + 290, "900 68px system-ui, sans-serif", failColor, "left", 10);
+    var rkPct = (rk * 100).toFixed(1);
+    var breakText = "⚠️ " + rkPct + "% " + (isEn ? "BREAK RISK" : "NGUY CƠ VỠ");
+    var breakColor = rk >= 0.15 ? "#ff5252" : (rk >= 0.08 ? "#ff9800" : "#ffcc80");
+    drawFittedText(breakText, col1_X + 36, row2_Y + 295, cardInnerW, "system-ui, sans-serif", 44, "900", breakColor, "left", 10);
 
-    var mbX = col1_X + 36, mbY = row2_Y + 328, mbW = cardW - 72, mbH = 34;
-    drawRoundedPill(mbX, mbY, mbW, mbH, 12, "rgba(8, 5, 3, 0.95)", "rgba(232, 179, 60, 0.45)", 2.5);
-    var sRatio = Math.max(0.05, Math.min(0.98, succRate / 100));
-    var swW = Math.round((mbW - 4) * sRatio);
-    var failW = (mbW - 4) - swW;
-    drawRoundedPill(mbX + 2, mbY + 2, swW, mbH - 4, 10, "#3cb35a");
-    if(failW > 4){
-      drawRoundedPill(mbX + 2 + swW, mbY + 2, failW, mbH - 4, 10, failColor);
-    }
-    var hNote = isEn ? ("Heat: " + sHeat + "% (Heat ≥60% halves break risk) · Strikes: " + (G ? G.hits : 0) + "/99")
+    drawSegmentedBar(col1_X + 36, row2_Y + 330, cardInnerW, 36, 1 - rk, 10, "#10b981", "#4ade80", "rgba(12, 8, 6, 0.95)", "rgba(74, 222, 128, 0.50)");
+
+    var hNote = isEn ? ("Heat: " + sHeat + "% (Heat ≥60% cuts risk by 50%) · Hammered: " + (G ? G.hits : 0) + "/99 hits")
                      : ("Nhiệt kiếm: " + sHeat + "% (Nhiệt ≥60% giảm 50% nguy cơ vỡ) · Đã gõ: " + (G ? G.hits : 0) + "/99 nhát");
-    drawCrispText(hNote, col1_X + 36, row2_Y + 412, "800 32px system-ui, sans-serif", "#e2d1bb", "left", 7);
+    drawFittedText(hNote, col1_X + 36, row2_Y + 412, cardInnerW, "system-ui, sans-serif", 31, "800", "#e2d1bb", "left", 7);
   }
 
-  // ==================== CARD 4: % ĐẠT CỐNG (QUOTA PROGRESS) ====================
+  // ==================== CARD 4: % ĐẠT CỐNG (TRIBUTE QUOTA) ====================
   var totalGoldAvailable = (G ? (G.gold || 0) : 0) + (G && G.hits > 0 ? (G.swordVal || 0) : 0);
   var tgt = (G && G.target) ? G.target : 120;
   var quotaPct = Math.round((totalGoldAvailable / tgt) * 100);
@@ -4348,44 +4393,37 @@ function updateSwordTableDisplay(){
 
   var qBorderColor = isEnough ? "#4ade80" : "#ffd56a";
   var qShadowColor = isEnough ? "rgba(74, 222, 128, 0.45)" : "rgba(255, 213, 106, 0.40)";
-  drawRoundedPill(col2_X, row2_Y, cardW, cardH, 42, cardGrd2, qBorderColor, 5, qShadowColor, 20);
+  drawRoundedPill(col2_X, row2_Y, cardW, cardH, 38, cardGrd2, qBorderColor, 4.5, qShadowColor, 18);
 
   var qKeyGrd = c.createLinearGradient(0, 0, 0, 54);
   if(isEnough){
     qKeyGrd.addColorStop(0, "#2e9f45"); qKeyGrd.addColorStop(1, "#155724");
   } else {
-    qKeyGrd.addColorStop(0, "#d48a20"); qKeyGrd.addColorStop(1, "#874906");
+    qKeyGrd.addColorStop(0, "#e5a93c"); qKeyGrd.addColorStop(1, "#874906");
   }
   drawRoundedPill(col2_X + 36, row2_Y + 36, 88, 54, 14, qKeyGrd, isEnough ? "#7df094" : "#ffd56a", 2.5);
-  drawCrispText(isEnough ? "🔔" : "🎯", col2_X + 80, row2_Y + 74, "900 28px system-ui, sans-serif", "#fff9ea", "center");
-  drawCrispText(isEn ? "TRIBUTE QUOTA PROGRESS" : "TIẾN ĐỘ NỘP CỐNG QUA VÒNG", col2_X + 144, row2_Y + 76, "900 40px system-ui, sans-serif", isEnough ? "#7df094" : "#ffd56a", "left", 6);
+  drawFittedText(isEnough ? "🔔" : "🎯", col2_X + 80, row2_Y + 74, 70, "system-ui, sans-serif", 28, "900", "#fff9ea", "center");
+  drawFittedText(isEn ? "TRIBUTE QUOTA PROGRESS" : "TIẾN ĐỘ NỘP CỐNG QUA VÒNG", col2_X + 144, row2_Y + 76, 500, "system-ui, sans-serif", 38, "900", isEnough ? "#7df094" : "#ffd56a", "left", 6);
+  // Tech corner crosshair
+  drawFittedText("MOLTEN.FORGE +", col2_X + cardW - 36, row2_Y + 74, 200, "monospace, sans-serif", 20, "700", isEnough ? "rgba(74,222,128,0.6)" : "rgba(255,213,106,0.6)", "right");
 
   if(isEnough){
-    drawCrispText(quotaPct + (isEn ? "% TRIBUTE READY 🔔" : "% ĐỦ CỐNG QUA VÒNG 🔔"), col2_X + 36, row2_Y + 205, "900 96px system-ui, sans-serif", "#4ade80", "left", 16);
+    var qTopReady = quotaPct + (isEn ? "% TRIBUTE READY 🔔" : "% ĐỦ CỐNG QUA VÒNG 🔔");
+    drawFittedText(qTopReady, col2_X + 36, row2_Y + 205, cardInnerW, "system-ui, sans-serif", 82, "900", "#4ade80", "left", 14);
     var qSub = (isEn ? "Have " : "Hiện có ") + formatBoardGold(totalGoldAvailable) + " / " + formatBoardGold(tgt) + (isEn ? " gold · Ring bell to advance!" : " Vàng · Rung chuông để qua vòng!");
-    drawCrispText(qSub, col2_X + 36, row2_Y + 295, "900 42px system-ui, sans-serif", "#d1fae5", "left", 10);
+    drawFittedText(qSub, col2_X + 36, row2_Y + 295, cardInnerW, "system-ui, sans-serif", 38, "900", "#d1fae5", "left", 10);
   } else {
-    drawCrispText(quotaPct + (isEn ? "% TRIBUTE REACHED" : "% ĐẠT CHỈ TIÊU CỐNG"), col2_X + 36, row2_Y + 205, "900 96px system-ui, sans-serif", "#ffbe3b", "left", 16);
+    var qTopNotReady = quotaPct + (isEn ? "% TRIBUTE REACHED" : "% ĐẠT CHỈ TIÊU CỐNG");
+    drawFittedText(qTopNotReady, col2_X + 36, row2_Y + 205, cardInnerW, "system-ui, sans-serif", 82, "900", "#ffbe3b", "left", 14);
     var qSub2 = (isEn ? "Have " : "Hiện có ") + formatBoardGold(totalGoldAvailable) + " / " + formatBoardGold(tgt) + (isEn ? " gold · Need " : " Vàng · Cần thêm ") + formatBoardGold(Math.max(0, tgt - totalGoldAvailable)) + (isEn ? " gold" : " Vàng");
-    drawCrispText(qSub2, col2_X + 36, row2_Y + 295, "900 42px system-ui, sans-serif", "#fff4db", "left", 10);
+    drawFittedText(qSub2, col2_X + 36, row2_Y + 295, cardInnerW, "system-ui, sans-serif", 38, "900", "#fff4db", "left", 10);
   }
 
-  var qbX = col2_X + 36, qbY = row2_Y + 328, qbW = cardW - 72, qbH = 34;
-  drawRoundedPill(qbX, qbY, qbW, qbH, 12, "rgba(8, 5, 3, 0.95)", isEnough ? "rgba(74, 222, 128, 0.60)" : "rgba(232, 179, 60, 0.45)", 2.5);
   var fillRatio = Math.max(0, Math.min(1, totalGoldAvailable / tgt));
-  var qfW = Math.round((qbW - 4) * fillRatio);
-  if(qfW > 4){
-    var qfGrd = c.createLinearGradient(qbX + 2, 0, qbX + 2 + qfW, 0);
-    if(isEnough){
-      qfGrd.addColorStop(0, "#2e9f45"); qfGrd.addColorStop(1, "#5ae875");
-    } else {
-      qfGrd.addColorStop(0, "#d48a20"); qfGrd.addColorStop(1, "#ffd56a");
-    }
-    drawRoundedPill(qbX + 2, qbY + 2, qfW, qbH - 4, 10, qfGrd);
-  }
+  drawSegmentedBar(col2_X + 36, row2_Y + 330, cardInnerW, 36, fillRatio, 10, isEnough ? "#2e9f45" : "#e5a93c", isEnough ? "#5ae875" : "#ffd56a", "rgba(10, 8, 6, 0.95)", isEnough ? "rgba(74, 222, 128, 0.60)" : "rgba(229, 169, 60, 0.45)");
 
   var roundNote = (isEn ? "Round " : "Vòng ") + (G ? G.round : 1) + (isEn ? " · Turns remaining: " : " · Lượt còn lại: ") + (G ? G.turns : 30) + (isEn ? " turns" : " lượt rèn");
-  drawCrispText(roundNote, col2_X + 36, row2_Y + 412, "800 32px system-ui, sans-serif", "#ffd56a", "left", 7);
+  drawFittedText(roundNote, col2_X + 36, row2_Y + 412, cardInnerW, "system-ui, sans-serif", 31, "800", "#ffd56a", "left", 7);
 
   c.shadowBlur = 0;
   if(swordTableTexture){ swordTableTexture.needsUpdate = true; }
