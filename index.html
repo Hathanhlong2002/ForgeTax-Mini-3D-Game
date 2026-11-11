@@ -960,6 +960,255 @@
   canvas#scene{cursor:grab;}
   canvas#scene:active{cursor:grabbing;}
 
+
+  /* === EPIC RPG MAIN MENU === */
+  #startOverlay {
+    background: radial-gradient(circle at 50% 45%, rgba(20,12,6,0.85) 0%, rgba(8,5,3,0.96) 80%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .main-menu-frame {
+    position: relative;
+    width: 92%;
+    max-width: 680px;
+    max-height: 92vh;
+    overflow-y: auto;
+    background: linear-gradient(180deg, rgba(28,20,14,0.96) 0%, rgba(16,10,7,0.98) 100%);
+    border: 2px solid rgba(232,179,60,0.45);
+    border-radius: 16px;
+    padding: 24px 28px 20px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.85), 0 0 32px rgba(232,130,40,0.18), inset 0 1px 0 rgba(255,220,130,0.25);
+    color: #f0e6d6;
+    animation: menuFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes menuFadeIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .main-menu-frame::-webkit-scrollbar { width: 5px; }
+  .main-menu-frame::-webkit-scrollbar-thumb { background: rgba(232,179,60,0.3); border-radius: 4px; }
+
+  .menu-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(232,179,60,0.2);
+  }
+  .menu-crest-img {
+    width: 76px;
+    height: 76px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 12px rgba(255,140,20,0.4));
+  }
+  .menu-title-wrap {
+    flex: 1;
+    text-align: left;
+  }
+  .menu-title {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    margin: 0;
+    line-height: 1.1;
+    background: linear-gradient(180deg, #fff7dc 0%, #e8b33c 60%, #b87a1a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 12px rgba(232,179,60,0.3);
+  }
+  .menu-subtitle {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2.5px;
+    color: #ff9d3b;
+    margin-top: 2px;
+  }
+  .menu-tagline {
+    font-size: 12px;
+    color: #b5a490;
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+
+  /* Mode selection cards */
+  .menu-modes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .mode-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    background: linear-gradient(90deg, rgba(46,31,18,0.85) 0%, rgba(26,17,10,0.92) 100%);
+    border: 1.5px solid rgba(232,179,60,0.35);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.2, 0.8, 0.3, 1);
+    outline: none;
+    overflow: hidden;
+  }
+  .mode-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,200,80,0.8);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 16px rgba(232,179,60,0.25);
+    background: linear-gradient(90deg, rgba(62,40,22,0.95) 0%, rgba(35,22,12,0.98) 100%);
+  }
+  .mode-card:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  }
+  .mode-card.mode-endless {
+    border-color: rgba(220,90,40,0.35);
+    background: linear-gradient(90deg, rgba(42,20,16,0.85) 0%, rgba(24,12,10,0.92) 100%);
+  }
+  .mode-card.mode-endless:hover {
+    border-color: rgba(255,110,50,0.8);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 16px rgba(255,90,30,0.3);
+    background: linear-gradient(90deg, rgba(58,26,20,0.95) 0%, rgba(32,15,12,0.98) 100%);
+  }
+  .mode-icon {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+  }
+  .mode-info {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+  }
+  .mode-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    color: #e8b33c;
+    background: rgba(232,179,60,0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 3px;
+    border: 1px solid rgba(232,179,60,0.3);
+  }
+  .mode-badge.badge-red {
+    color: #ff6f43;
+    background: rgba(255,75,30,0.15);
+    border-color: rgba(255,75,30,0.35);
+  }
+  .mode-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff4db;
+    letter-spacing: 0.5px;
+  }
+  .mode-desc {
+    font-size: 12px;
+    color: #a89886;
+    line-height: 1.35;
+    margin-top: 2px;
+  }
+  .mode-action-btn {
+    padding: 10px 18px;
+    background: linear-gradient(180deg, #d48a20 0%, #9e5b0c 100%);
+    border: 1px solid #ffd478;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    white-space: nowrap;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+    transition: transform 0.15s;
+  }
+  .mode-card:hover .mode-action-btn {
+    filter: brightness(1.15);
+  }
+  .mode-action-btn.btn-amber {
+    background: linear-gradient(180deg, #b83a15 0%, #7e1e05 100%);
+    border-color: #ff8b65;
+  }
+
+  /* Quick action buttons row */
+  .menu-quick-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .menu-sub-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(36,25,17,0.7);
+    border: 1px solid rgba(232,179,60,0.25);
+    border-radius: 8px;
+    color: #e2d1bc;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .menu-sub-btn:hover {
+    background: rgba(56,38,24,0.9);
+    border-color: rgba(232,179,60,0.6);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  /* Collapsible rules grid */
+  .menu-rules-panel {
+    background: rgba(18,12,8,0.8);
+    border: 1px solid rgba(232,179,60,0.2);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 8px;
+    animation: menuFadeIn 0.25s ease;
+  }
+  .rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  @media (max-width: 580px) {
+    .rules-grid { grid-template-columns: 1fr; }
+    .menu-header { flex-direction: column; text-align: center; }
+    .menu-title-wrap { text-align: center; }
+    .mode-card { flex-direction: column; text-align: center; }
+    .mode-info { text-align: center; }
+    .mode-action-btn { width: 100%; text-align: center; }
+  }
+  .rule-box {
+    display: flex;
+    gap: 10px;
+    background: rgba(30,20,14,0.5);
+    border-radius: 6px;
+    padding: 8px 10px;
+    align-items: flex-start;
+  }
+  .rule-icon {
+    font-size: 16px;
+    line-height: 1;
+  }
+  .rule-txt {
+    font-size: 11px;
+    color: #bfaea0;
+    line-height: 1.4;
+  }
+  .rule-txt b {
+    color: #f1cf88;
+  }
+
 </style>
 </head>
 <body>
@@ -1116,30 +1365,70 @@
 <div id="floatLayer"></div>
 
 <div class="overlay" id="startOverlay">
-  <div class="card start-card">
-    <div class="card-scroll">
-      <h1>⚔️ ForgeTax Mini 3D</h1>
-      <p class="card-lead"><b>Lò rèn của samurai — Rồng Khói đang chiếm lò và đòi cống mỗi vòng.</b></p>
-      <div class="rules rules-core">
-        <div>🔥 <b>Nung trước, gõ sau:</b> kiếm càng nóng đỏ, mỗi nhát càng lời và càng khó vỡ — giữ nhiệt ≥60% là nguy cơ vỡ giảm một nửa. Nguy cơ chỉ tăng rất nhẹ theo level nên leo tới Lv.60–70 là chuyện thường, Lv.100 dành cho thợ giữ nhiệt giỏi nhất.</div>
-        <div>★ Gõ 10 nhát không vỡ → <b>FRENZY</b>: nhát tới ×2.2 và không thể vỡ.</div>
-        <div>🌈 <b>COMBO CẦU VỒNG (hiếm!):</b> chỉ <b>4%</b> sau mỗi nhát gõ thành công. Nhát gõ kế tiếp <b>100% không vỡ</b> và tăng giá <b>×3.5</b>, chỉ áp dụng đúng <b>1 nhát</b>.</div>
-        <div>🔔 Đủ cống trong kho thì rung chuông qua vòng. Hết 30 lượt mà chưa đủ cống — Rồng Khói phun lửa phá hủy lò nung: phải gõ nguội kiếm vàng sửa lò (60 vàng × vòng) mới nung lại được. <b>Trễ cống 3 lần trong một ván (kiên nhẫn rồng 0/3) thì mất như ForgeTax gốc.</b> Chốt kiếm / giá treo khi <b>tiềm năng cống</b> đã đủ — đừng tham gõ thêm.</div>
+  <div class="main-menu-frame">
+    <!-- Header -->
+    <div class="menu-header">
+      <img src="assets/ui/menu_crest.svg" alt="Crest" class="menu-crest-img">
+      <div class="menu-title-wrap">
+        <h1 class="menu-title">FORGETAX</h1>
+        <div class="menu-subtitle">LÒ RÈN HUYỀN THOẠI 3D</div>
+        <div class="menu-tagline">Rèn kiếm samurai · Nung nhiệt thượng thừa · Vượt cống Rồng Khói</div>
       </div>
-      <details class="more-rules">
-        <summary>Xem thêm — giá treo, nâng cấp &amp; 100 cấp kiếm</summary>
-        <div class="rules">
-          <div>🗡 <b>Giá treo kiếm (3 ô):</b> treo thanh đang rèn dở lên giá để rèn thanh khác — giá trị, số nhát, nhiệt, level và Frenzy được giữ nguyên. Bấm vào ô treo hoặc chạm kiếm trên giá trong lò để lấy xuống rèn tiếp.</div>
-          <div>⬆ <b>Nâng cấp đồ rèn:</b> dùng vàng trong kho nâng <b>búa / đe / lò</b> (4 cấp mỗi món) — gõ lời hơn, khó vỡ hơn, giữ nhiệt lâu hơn, mô hình trong lò xịn dần theo cấp.</div>
-          <div>⚔ <b>100 CẤP KIẾM:</b> mỗi nhát gõ thành công lên đúng 1 LEVEL (1 → 100), giá mỗi nhát tăng +2% mỗi cấp. <b>Mỗi level là một MODEL 3D RIÊNG</b> — đủ 100 model thật: kiếm, katana, scimitar, rapier, mã tấu, dao găm… Từ Lv.11 có VFX nguyên tố leo 7 tier ôm quanh lưỡi; <b>Lv.90–100 là 11 kiếm Thrixel endgame</b> kèm linh thú phát sáng sau lưng kiếm.</div>
-          <div>🔍 <b>Ngắm kiếm:</b> bấm nút <b>NGẮM KIẾM</b> ở mép phải (hoặc phím <b>V</b>) để camera áp sát, xem trọn cán — chắn tay — lưỡi — mũi; gõ búa / nung / chốt là tự quay về góc lò.</div>
-        </div>
-      </details>
     </div>
-    <div class="card-footer">
-      <button id="btnGalleryStart" type="button">🖼 Xem trước hình 100 level kiếm</button>
-      <button id="btnStart" class="primary" data-mode="contract">📜 HỢP ĐỒNG<span class="sub">12 vòng · trễ cống 3 lần = thua</span></button>
-      <button id="btnStartEndless" class="primary" data-mode="endless" style="margin-top:8px;background:linear-gradient(180deg,#3a2a10,#251808)">♾ VÔ TẬN<span class="sub">cống +20%/vòng · không hạn hợp đồng</span></button>
+
+    <!-- Mode Selector Cards -->
+    <div class="menu-modes">
+      <div class="mode-card mode-contract" id="btnStart" role="button" tabindex="0" data-mode="contract">
+        <img src="assets/ui/mode_contract.svg" alt="Hợp Đồng" class="mode-icon">
+        <div class="mode-info">
+          <div class="mode-badge">CHIẾN DỊCH CHÍNH</div>
+          <div class="mode-name">HỢP ĐỒNG 12 VÒNG</div>
+          <div class="mode-desc">Thử thách sinh tử: Nộp đủ cống thuế rồng trong 12 vòng. Trễ cống 3 lần lò rèn sụp đổ!</div>
+        </div>
+        <div class="mode-action-btn">VÀO LÒ RÈN ⚔️</div>
+      </div>
+
+      <div class="mode-card mode-endless" id="btnStartEndless" role="button" tabindex="0" data-mode="endless">
+        <img src="assets/ui/mode_endless.svg" alt="Vô Tận" class="mode-icon">
+        <div class="mode-info">
+          <div class="mode-badge badge-red">CHẾ ĐỘ CAO THỦ</div>
+          <div class="mode-name">RÈN VÔ TẬN ♾️</div>
+          <div class="mode-desc">Không giới hạn hợp đồng. Cống tăng +20% mỗi vòng, xem ai chạm mốc Kiếm Thần Lv.100!</div>
+        </div>
+        <div class="mode-action-btn btn-amber">THỬ THÁCH 🔥</div>
+      </div>
+    </div>
+
+    <!-- Quick action buttons -->
+    <div class="menu-quick-row">
+      <button id="btnGalleryStart" type="button" class="menu-sub-btn">
+        <span>🖼️</span> BỘ SƯU TẬP 100 KIẾM
+      </button>
+      <button id="btnMenuRules" type="button" class="menu-sub-btn">
+        <span>📜</span> BÍ KÍP THỢ RÈN
+      </button>
+    </div>
+
+    <!-- Collapsible Rules Panel -->
+    <div class="menu-rules-panel" id="menuRulesPanel" style="display:none;">
+      <div class="rules-grid">
+        <div class="rule-box">
+          <div class="rule-icon">🔥</div>
+          <div class="rule-txt"><b>Nung trước, gõ sau:</b> Nhiệt ≥60% giảm 50% nguy cơ vỡ. Giữ nhiệt đỏ để gõ giá trị cao và an toàn.</div>
+        </div>
+        <div class="rule-box">
+          <div class="rule-icon">⚡</div>
+          <div class="rule-txt"><b>Frenzy &amp; Cầu vồng:</b> Gõ 10 nhát kích hoạt Frenzy (×2.2). 4% cơ hội kích Rainbow Combo (100% bền + ×3.5 giá)!</div>
+        </div>
+        <div class="rule-box">
+          <div class="rule-icon">🗡️</div>
+          <div class="rule-txt"><b>Giá treo &amp; Nâng cấp:</b> Cất kiếm đang rèn lên 3 ô giá treo. Nâng cấp búa, đe, lò trong kho để tăng tiến sức mạnh.</div>
+        </div>
+        <div class="rule-box">
+          <div class="rule-icon">🔔</div>
+          <div class="rule-txt"><b>Rung chuông &amp; Trả cống:</b> Đủ cống trong kho thì rung chuông qua vòng. Tránh để hết lượt làm Rồng thổi lò!</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -3281,6 +3570,28 @@ function beginRun(mode){
 }
 $('btnStart').addEventListener('click', function(){ beginRun('contract'); });
 var _bse=$('btnStartEndless'); if(_bse) _bse.addEventListener('click', function(){ beginRun('endless'); });
+
+var _bmr = $('btnMenuRules');
+if (_bmr) {
+  _bmr.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (typeof audio === 'function') audio();
+    var p = $('menuRulesPanel');
+    if (p) p.style.display = (p.style.display === 'none' || !p.style.display) ? 'block' : 'none';
+  });
+}
+['btnStart', 'btnStartEndless'].forEach(function(id){
+  var el = $(id);
+  if (el) {
+    el.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        el.click();
+      }
+    });
+  }
+});
+
 $('btnAgain').addEventListener('click', function(){
   $('endOverlay').style.display='none';
   closeSheets();
