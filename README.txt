@@ -20,6 +20,8 @@ CẤU TRÚC GÓI
 - index.html ......... toàn bộ game (giao diện + logic + thư viện 3D
                        đã nhúng; model Lv.1–89 nhúng sẵn trong trang)
 - assets/models/ ..... 11 model Thrixel endgame Lv.90–100 (lv90.glb … lv100.glb)
+                       + smoke-dragon-head.glb (Rồng Khói — hiện ở hang khi đạt Lv.100)
+- assets/cutscenes/ .. ForgeTax-Cutscene-60s-TrieuHoiLinhThu.mp4 (phim tri ân ~60s khi rèn Lv.100)
 - assets/posters/ .... 11 poster linh thú Lv.90–100 (lv90.jpg … lv100.jpg)
 - assets/spirits/ .... 11 ảnh linh thú nền đen Lv.90–100 (lv90.webp … lv100.webp)
 
