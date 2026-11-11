@@ -1698,13 +1698,13 @@ if(window.IntersectionObserver){ try{ new IntersectionObserver(function(es){ if(
 var IS_COARSE = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
 var IS_MOBILE = IS_COARSE || Math.min(window.innerWidth||999, window.innerHeight||999) < 820 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
 var IS_LOW = IS_MOBILE && ((navigator.hardwareConcurrency||4) <= 4 || (navigator.deviceMemory && navigator.deviceMemory <= 4));
-var PF = IS_LOW ? 0.28 : (IS_MOBILE ? 0.42 : 0.85); /* particle scale — trimmed: same look, far fewer points to update/draw */
+var PF = IS_LOW ? 0.28 : (IS_MOBILE ? 0.38 : 0.48); /* particle scale — trimmed: same look, far fewer points to update/draw */
 if(IS_MOBILE) document.body.classList.add('is-mobile');
 if(IS_LOW) document.body.classList.add('perf-low');
-var renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:!IS_MOBILE, powerPreference:'high-performance', stencil:false, depth:true, alpha:false, preserveDrawingBuffer:false});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, IS_LOW?1: (IS_MOBILE?1.15:1.35)));
+var renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:false, powerPreference:'high-performance', stencil:false, depth:true, alpha:false, preserveDrawingBuffer:false, logarithmicDepthBuffer:false});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, IS_LOW?1: (IS_MOBILE?1.1:1.0)));
 renderer.shadowMap.enabled = !IS_LOW;
-renderer.shadowMap.type = IS_MOBILE ? THREE.BasicShadowMap : THREE.PCFShadowMap;
+renderer.shadowMap.type = THREE.BasicShadowMap;
 renderer.shadowMap.autoUpdate = false; /* PERF: shadow maps re-render ONLY when the loop flags a real change (sword/rack swap, hammer swing, heat carry, dragon event, flying shards, furnace state) — the static forge no longer pays a full shadow pass every frame on any platform */
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.02;
@@ -1858,7 +1858,7 @@ scene.add(new THREE.HemisphereLight(0xffe0b8, 0x1a120a, .35));
 var fireLight = new THREE.PointLight(0xff6a1f, 65, 13, 1.8); fireLight.position.set(-3.8, 1.25, -1.1); scene.add(fireLight);
 var keyLight = new THREE.SpotLight(0xffa54d, 55, 16, .85, .55, 1.4);
 keyLight.position.set(-0.5, 3.8, 1.2); keyLight.castShadow=!IS_LOW;
-keyLight.shadow.mapSize.set(IS_MOBILE?256:384,IS_MOBILE?256:384); keyLight.shadow.bias=-0.0004;
+keyLight.shadow.mapSize.set(256,256); keyLight.shadow.bias=-0.0004;
 scene.add(keyLight); keyLight.target.position.set(0,.95,0.1); scene.add(keyLight.target);
 var rimLight = new THREE.DirectionalLight(0x5a6f96, .45); rimLight.position.set(0,3.4,-5); scene.add(rimLight);
 var caveGlow = new THREE.PointLight(0xff9500, 0, 7, 2); caveGlow.position.set(0,1.8,-4.6); scene.add(caveGlow);
@@ -3025,7 +3025,11 @@ function applySwordSkin(){
   /* SHAPE: every 3 levels the silhouette itself is re-forged — new blade
      geometry from this shape's profile, a different guard form and a
      different pommel. Fuller / glow strips stretch to the new length. */
+  var _meshId=meshIdForLevel(lv);
+  var _glbReady=_meshId && typeof meshState!=='undefined' && meshState[_meshId]==='done' && !!meshTemplates[_meshId];
   if(sk.shapeIdx!==lastShapeIdx){
+    if(_glbReady){ lastShapeIdx=sk.shapeIdx; }
+    else{
     lastShapeIdx=sk.shapeIdx;
     var oldBladeGeo=blade.geometry;
     blade.geometry=buildBladeGeometry(sk.shape);
@@ -3049,6 +3053,7 @@ function applySwordSkin(){
       if(m.userData.bx===undefined){ m.userData.bx=m.position.x; m.userData.bsx=m.scale.x; }
       m.position.x=m.userData.bx*lenRatio; m.scale.x=m.userData.bsx*lenRatio;
     });
+    }
   }
   /* ornament sets unlock as the sword climbs: Lv.25 / 50 / 75 / 100 */
   [1,2,3,4].forEach(function(t){ swordTierMeshes[t].forEach(function(m){ m.visible = lv>=t*25; }); });
@@ -4549,18 +4554,21 @@ window.addEventListener('pointercancel', function(){ isDragging=false; });
 var HAM={x:.58, y:-.52};
 /* adaptive quality governor: if frames run slow (e.g. software WebGL on a big
    desktop canvas), step resolution down so the main thread never locks up */
-var basePR=1, qStep=(typeof IS_MOBILE!=='undefined'&&IS_MOBILE)?1:0, qAcc=0, qFrames=0, qUpTimer=0;
-if(typeof IS_LOW!=='undefined'&&IS_LOW&&qStep<2){ qStep=1; document.body.classList.add('perf-low'); }
-var QMULT=[1,.85,.7,.55,.45];
+var basePR=1, qStep=1, qAcc=0, qFrames=0, qUpTimer=0, qBootMs=performance.now();
+if(typeof IS_LOW!=='undefined'&&IS_LOW&&qStep<2){ qStep=2; }
+if(qStep>=1) document.body.classList.add('perf-low');
+var QMULT=[.92,.78,.62,.5,.42];
 /* PERF: event-driven shadow refresh — set true whenever geometry that casts
    or receives shadows changes outside the per-frame animation checks in
    animate() (model swaps, rack changes, furnace break/repair, quality step) */
 var shadowDirty=true;
 function anyShardAlive(){ for(var sai=0;sai<shards.length;sai++){ if(shards[sai].life>0) return true; } return false; }
 function applyPR(){
-  renderer.setPixelRatio(Math.max(.4, basePR*QMULT[qStep]));
-  keyLight.castShadow = qStep<4 && !(typeof IS_LOW!=='undefined'&&IS_LOW);
-  shadowDirty=true;
+  renderer.shadowMap.enabled = qStep < 1;
+  var mult = Math.max(.38, basePR * QMULT[Math.min(qStep, QMULT.length - 1)]);
+  renderer.setPixelRatio(mult);
+  keyLight.castShadow = qStep < 1 && renderer.shadowMap.enabled;
+  shadowDirty = true;
 }
 var lastW=0, lastH=0;
 function resize(){
@@ -4571,9 +4579,9 @@ function resize(){
   canvas.style.width='100%'; canvas.style.height='100%';
   var w=canvas.clientWidth||window.innerWidth, h=canvas.clientHeight||window.innerHeight;
   lastW=w; lastH=h;
-  var pxBudget = (typeof IS_LOW!=='undefined'&&IS_LOW)? 420000 : ((typeof IS_MOBILE!=='undefined'&&IS_MOBILE)? 620000 : 850000);
+  var pxBudget = (typeof IS_LOW!=='undefined'&&IS_LOW)? 380000 : ((typeof IS_MOBILE!=='undefined'&&IS_MOBILE)? 520000 : 520000);
   var prCap = Math.sqrt(pxBudget/Math.max(1,w*h));
-  basePR = Math.min(window.devicePixelRatio||1, (typeof IS_LOW!=='undefined'&&IS_LOW)?1:((typeof IS_MOBILE!=='undefined'&&IS_MOBILE)?1.25:1.5), Math.max(.55, prCap));
+  basePR = Math.min(window.devicePixelRatio||1, (typeof IS_LOW!=='undefined'&&IS_LOW)?1:((typeof IS_MOBILE!=='undefined'&&IS_MOBILE)?1.08:1.05), Math.max(.5, prCap));
   applyPR();
   renderer.setSize(w,h,false);
   canvas.style.width='100%'; canvas.style.height='100%';
@@ -4652,7 +4660,11 @@ function animate(){
        actually moves or the scene's shadow casters changed — idle frames
        (the common case: fire flicker + particles move no casters) skip the
        shadow pass entirely */
-    if(renderer.shadowMap.enabled && (shadowDirty || heatAnim || dragonAnim || hammerAnim<1 || bellSwing>0 || anyShardAlive() || (typeof skinOrbit!=='undefined' && skinOrbit && skinOrbit.visible) || (typeof anvilRunes!=='undefined' && anvilRunes && anvilRunes.visible))) renderer.shadowMap.needsUpdate=true;
+    var _needSh=shadowDirty||dragonAnim||hammerAnim<1||bellSwing>0||anyShardAlive();
+    if(heatAnim && frameNo%4===0) _needSh=true;
+    if(typeof skinOrbit!=='undefined'&&skinOrbit&&skinOrbit.visible) _needSh=true;
+    if(typeof anvilRunes!=='undefined'&&anvilRunes&&anvilRunes.visible&&frameNo%3===0) _needSh=true;
+    if(renderer.shadowMap.enabled && _needSh) renderer.shadowMap.needsUpdate=true;
     shadowDirty=false;
     var t=clock.elapsedTime;
     if(document.hidden || !canvasVisible) return; /* background tab or game scrolled off-screen: skip the render entirely, save battery/GPU */
@@ -4662,13 +4674,16 @@ function animate(){
     if(canvas.clientWidth && (canvas.clientWidth!==lastW || canvas.clientHeight!==lastH)) resize();
     /* quality governor: sample ~1s of frames, degrade or restore resolution */
     qAcc+=dt; qFrames++;
-    if(qAcc>=1){
+    var qSample = (performance.now()-qBootMs)<8000 ? 0.45 : 0.95;
+    if(qAcc>=qSample){
       var qAvg=qAcc/Math.max(1,qFrames); qAcc=0; qFrames=0;
-      if(qAvg>.03 && qStep<4){ qStep++; applyPR(); qUpTimer=0; if(qStep>=2) document.body.classList.add('perf-low'); }
-      else if(qAvg<.015 && qStep>0){ if(++qUpTimer>=3){ qStep--; applyPR(); qUpTimer=0; if(qStep===0 && !(typeof IS_LOW!=='undefined'&&IS_LOW)) document.body.classList.remove('perf-low'); } }
+      var qSlow = (performance.now()-qBootMs)<8000 ? 0.024 : 0.028;
+      var qFast = 0.014;
+      if(qAvg>qSlow && qStep<4){ qStep++; applyPR(); qUpTimer=0; if(qStep>=1) document.body.classList.add('perf-low'); }
+      else if(qAvg<qFast && qStep>1){ if(++qUpTimer>=2){ qStep--; applyPR(); qUpTimer=0; if(qStep<=1) document.body.classList.add('perf-low'); } }
       else qUpTimer=0;
     }
-    var _worldFxLite = !document.body.classList.contains('sheet-open') && !inspectOn && qStep < 3;
+    var _worldFxLite = !document.body.classList.contains('sheet-open') && !inspectOn && qStep < 2;
     if(_worldFxLite && typeof beaconRing!=='undefined' && beaconRing){
       var bTargetOp = 0;
       var isNearOk = true;
@@ -4939,7 +4954,7 @@ function animate(){
     /* welding sparks while the furnace is being repaired (~1s) */
     if(G&&G.repairing){ repairFxT-=dt; if(repairFxT<=0){ repairFxT=.14; burstSparks(-3.8,1.05,-1.15,12,1.3,1); } }
     /* embers — on mobile the ambient fields update at half rate: half the buffer uploads, visually identical */
-    var skipAmbient = (IS_MOBILE && (frameNo%2===1)) || qStep>=2;
+    var skipAmbient = (frameNo%2===1) || qStep>=1;
     var ep=embers.geometry.attributes.position.array;
     for(var i=0;i<EMBERS;i++){ var d=emberDat[i];
       d.y+=d.s*dt; d.x+=Math.sin(t*.8+d.ph)*.12*dt;
@@ -4969,7 +4984,7 @@ function animate(){
        so the shock ring, orbit auras and steam stay ON the blade in the new framing */
     var swYaw=sword.rotation.y, smx=sword.position.x+0.62*Math.cos(swYaw), smz=sword.position.z-0.62*Math.sin(swYaw), smy=sword.position.y;
     shockRing.position.set(smx, 1.26, smz);
-    if(qStep<3 && !document.body.classList.contains('sheet-open')) updateSwordFX(t, dt, smx, smy, smz); /* per-level element VFX: blade aura, light, ground cracks, spirits */
+    if(qStep<2 && G && G.started && isStationEngaged && activeStation==='anvil' && !document.body.classList.contains('sheet-open')) updateSwordFX(t, dt, smx, smy, smz); /* per-level element VFX: blade aura, light, ground cracks, spirits */
     /* screen flash + vignettes */
     _setOp(flashEl, flashLvl);
     flashLvl=Math.max(0, flashLvl-dt*(reduced?6:2.4));
@@ -5435,6 +5450,32 @@ var meshTemplates={}, meshState={}, meshQueue=[], meshPumpBusy=false, glbLoader2
    three.js re-uploads from the CPU-side data if it is ever drawn again,
    and an evicted mesh simply re-parses on its next requestMesh(). */
 var MODEL_CACHE_CAP=8;
+var mainModelCrackByLv={};
+var evictModelsTimer=0;
+function scheduleEvictUnusedModels(){
+  if(evictModelsTimer) return;
+  evictModelsTimer=setTimeout(function(){
+    evictModelsTimer=0;
+    evictUnusedModels(MODEL_CACHE_CAP);
+  }, 900);
+}
+function computeMainModelCracks(grp){
+  var bbox=new THREE.Box3().setFromObject(grp);
+  var bMinX=bbox.min.x-sword.position.x;
+  var bMaxX=bbox.max.x-sword.position.x;
+  var bladeSpan=Math.max(0.26, bMaxX-Math.max(0,bMinX));
+  var startX=Math.max(0.06, bMinX+0.08);
+  return {bladeSpan:bladeSpan, startX:startX};
+}
+function applyMainModelCracks(layout){
+  if(!layout || !cracks) return;
+  cracks.forEach(function(c,i){
+    var targetX=layout.startX+(i/3.4)*(layout.bladeSpan*0.72);
+    c.position.set(targetX,0.025,0);
+    var scX=Math.min(1.0,Math.max(0.38,layout.bladeSpan/1.15));
+    c.scale.set(scX,scX*0.85,1);
+  });
+}
 var meshLastUsed={}, meshUseClock=0;
 function touchMesh(meshId){ if(meshId) meshLastUsed[meshId]=++meshUseClock; }
 function protectedMeshIds(){
@@ -5710,7 +5751,8 @@ function buildMainModel(lv){
   if(shNew){ fxSheathGroup=shNew; modelHolder.add(shNew); }
   mainModelGroup=grp; mainModelLv=lv;
   shadowDirty=true; /* new shadow caster on the anvil */
-  evictUnusedModels(MODEL_CACHE_CAP); /* PERF: release templates/textures that fell out of use */
+  try{ mainModelCrackByLv[lv]=computeMainModelCracks(grp); }catch(e){}
+  scheduleEvictUnusedModels(); /* PERF: defer eviction — sync evict during swap caused hitches */
   return true;
 }
 function syncMainModelVisual(){
@@ -5722,7 +5764,8 @@ function syncMainModelVisual(){
   if(ready && mainModelLv!==lv) buildMainModel(lv);
   var shown = ready && !!mainModelGroup && mainModelLv===lv;
   if(!ready) requestMesh(meshId, true);
-  if(lv<SWORD_LEVEL_MAX) requestMesh(meshIdForLevel(lv+1), false); /* preload the NEXT level's model so a level-up swap never stutters */
+  if(lv<SWORD_LEVEL_MAX) requestMesh(meshIdForLevel(lv+1), false); /* preload next level GLB before the level-up frame */
+  if(lv<SWORD_LEVEL_MAX-1) requestMesh(meshIdForLevel(lv+2), false);
   if(lv>=89 && typeof fxPreloadSpirit==='function') fxPreloadSpirit(Math.min(SWORD_LEVEL_MAX, lv+1));
   if(lv>=90 && typeof fxPreloadSpirit==='function') fxPreloadSpirit(lv);
   if(mainModelGroup) mainModelGroup.visible=shown;
@@ -5733,19 +5776,11 @@ function syncMainModelVisual(){
     if(skinOrbit) skinOrbit.visible = lv>=100; /* orbiting crystals still crown the Lv.100 model */
   }
   modelHolder.scale.setScalar(1+lv*.0018); /* same gentle per-level growth as the procedural blade */
-  /* Molten stress fissure placement adjusted cleanly to the 3D blade length */
+  /* Molten stress fissure placement — bbox computed once per level on swap, not every refresh */
   if(shown && mainModelGroup){
-    var bbox = new THREE.Box3().setFromObject(mainModelGroup);
-    var bMinX = bbox.min.x - sword.position.x;
-    var bMaxX = bbox.max.x - sword.position.x;
-    var bladeSpan = Math.max(0.26, bMaxX - Math.max(0, bMinX));
-    var startX = Math.max(0.06, bMinX + 0.08);
-    cracks.forEach(function(c, i){
-      var targetX = startX + (i / 3.4) * (bladeSpan * 0.72);
-      c.position.set(targetX, 0.025, 0);
-      var scX = Math.min(1.0, Math.max(0.38, bladeSpan / 1.15));
-      c.scale.set(scX, scX * 0.85, 1);
-    });
+    var layout=mainModelCrackByLv[lv];
+    if(!layout){ try{ layout=mainModelCrackByLv[lv]=computeMainModelCracks(mainModelGroup); }catch(e){ layout=null; } }
+    if(layout) applyMainModelCracks(layout);
   } else {
     cracks.forEach(function(c, i){
       c.position.set(0.32 + i * 0.22, 0.025, 0);
@@ -6126,7 +6161,7 @@ function updateSelfHeatFX(t, hov, lv){
 function updateSwordFX(t, dt, smx, smy, smz){
   if(typeof G==='undefined' || !G) return;
   var lv=swordLevelNow(), fi=fxInfoForLevel(lv), tier=fi? fi.tier : 0;
-  var gov=(typeof qStep!=='undefined' && qStep>=2)? .55 : 1;
+  var gov=(typeof qStep!=='undefined' && qStep>=1)? .45 : 0.75;
   var swordShown=sword.visible && !G.over;
   if(fi && lv!==fxCurLv){
     var col=fxColorFor(lv);
