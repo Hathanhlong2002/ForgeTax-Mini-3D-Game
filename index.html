@@ -1636,45 +1636,48 @@ function mesh(geo, mat, x,y,z, parent, shadow){
 }
 
 /* ============================== LIGHTS ============================== */
-scene.add(new THREE.HemisphereLight(0xffe0b8, 0x1a120a, .3));
-var fireLight = new THREE.PointLight(0xff6a1f, 60, 11, 2); fireLight.position.set(-2.35, 1.15, -0.55); scene.add(fireLight);
+scene.add(new THREE.HemisphereLight(0xffe0b8, 0x1a120a, .35));
+var fireLight = new THREE.PointLight(0xff6a1f, 65, 13, 1.8); fireLight.position.set(-3.8, 1.25, -1.1); scene.add(fireLight);
 var keyLight = new THREE.SpotLight(0xffa54d, 55, 16, .85, .55, 1.4);
-keyLight.position.set(-2.6, 2.6, 1.8); keyLight.castShadow=!IS_LOW;
+keyLight.position.set(-0.5, 3.8, 1.2); keyLight.castShadow=!IS_LOW;
 keyLight.shadow.mapSize.set(IS_MOBILE?256:384,IS_MOBILE?256:384); keyLight.shadow.bias=-0.0004;
-scene.add(keyLight); keyLight.target.position.set(0,.95,0); scene.add(keyLight.target);
-var rimLight = new THREE.DirectionalLight(0x5a6f96, .55); rimLight.position.set(0,3.4,-5); scene.add(rimLight);
-var caveGlow = new THREE.PointLight(0xff9500, 0, 7, 2); caveGlow.position.set(0,1.5,-3.4); scene.add(caveGlow);
+scene.add(keyLight); keyLight.target.position.set(0,.95,0.1); scene.add(keyLight.target);
+var rimLight = new THREE.DirectionalLight(0x5a6f96, .45); rimLight.position.set(0,3.4,-5); scene.add(rimLight);
+var caveGlow = new THREE.PointLight(0xff9500, 0, 7, 2); caveGlow.position.set(0,1.8,-4.6); scene.add(caveGlow);
+var shrineLight = new THREE.PointLight(0xffb535, 20, 10, 2); shrineLight.position.set(3.8, 1.8, -2.6); scene.add(shrineLight);
 
-/* ============================== WORLD ============================== */
-var floor = mesh(new THREE.PlaneGeometry(34,34), matFloor, 0,0,0); floor.rotation.x=-Math.PI/2; floor.castShadow=false;
+/* ============================== ENCLOSED 3D ROOM ============================== */
+/* Floor & Solid Ceiling */
+var floor = mesh(new THREE.PlaneGeometry(16,14), matFloor, 0,0,0); floor.rotation.x=-Math.PI/2; floor.castShadow=false;
+var ceiling = mesh(new THREE.PlaneGeometry(16,14), matStone2, 0,4.2,0); ceiling.rotation.x=Math.PI/2; ceiling.receiveShadow=true;
 
-/* back wall + side walls */
-mesh(RB(11,.18,3.4,.05), matStone, 0,3.62,-3.1);                 // lintel beam stone
-mesh(RB(1.5,3.6,.9,.06), matStone2, -2.6,1.8,-3.1);
-mesh(RB(1.5,3.6,.9,.06), matStone2,  2.6,1.8,-3.1);
-mesh(RB(.9,3.6,.9,.06), matStone2, -4.9,1.8,-3.1);
-mesh(RB(.9,3.6,.9,.06), matStone2,  4.9,1.8,-3.1);
-mesh(new THREE.PlaneGeometry(3.9,3.55), matBlack, 0,1.78,-3.62, scene, false); // cave mouth
-var caveSideL = mesh(RB(.28,2.5,.5,.04), matStone, -1.98,1.25,-3.3); caveSideL.rotation.z=.1;
-var caveSideR = mesh(RB(.28,2.5,.5,.04), matStone,  1.98,1.25,-3.3); caveSideR.rotation.z=-.1;
-mesh(RB(.3,1.1,7,.05), matStone2, -4.6,2.9,-.4).rotation.x=0; // side hint left top
-var wallL = mesh(RB(.35,3.4,7.5,.05), matStone2, -4.75,1.7,.2); 
-var wallR = mesh(RB(.35,3.4,7.5,.05), matStone2,  4.75,1.7,.2);
-/* ceiling beams */
-[-1.6,.4,2.2].forEach(function(z){ var b=mesh(new THREE.CylinderGeometry(.09,.11,9.6,8), matWood, 0,3.55,z); b.rotation.z=Math.PI/2; });
+/* Timber Ceiling Beams & Iron Lanterns */
+[-3.6, -1.2, 1.2, 3.6].forEach(function(z){ mesh(RB(13.6,.32,.32,.04), matWood, 0,4.04,z); });
+[-3.8, 0, 3.8].forEach(function(x){ mesh(RB(.32,.28,10.4,.04), matWoodDk, x,4.18,0); });
+[[-1.8, 0], [1.8, 0]].forEach(function(pos){
+  mesh(new THREE.CylinderGeometry(.012,.012,1.3,6), matIron, pos[0], 3.4, pos[1]);
+  mesh(RB(.28,.38,.28,.04), matIron, pos[0], 2.7, pos[1]);
+  mesh(new THREE.SphereGeometry(.08,8,8), new THREE.MeshBasicMaterial({color:0xffaa33}), pos[0], 2.7, pos[1], scene, false);
+});
 
-/* dragon eyes */
+/* Back Wall (z = -4.9) + Dragon Cave Alcove */
+mesh(RB(13.6,4.2,.4,.06), matStone, 0,2.1,-5.0);
+mesh(RB(1.2,4.2,.8,.06), matStone2, -2.2,2.1,-4.7);
+mesh(RB(1.2,4.2,.8,.06), matStone2,  2.2,2.1,-4.7);
+mesh(RB(5.6,.35,.9,.05), matStone, 0,3.65,-4.7);
+mesh(new THREE.PlaneGeometry(3.6,3.4), matBlack, 0,1.75,-4.95, scene, false);
+var caveSideL = mesh(RB(.28,2.5,.5,.04), matStone, -1.98,1.25,-4.8); caveSideL.rotation.z=.1;
+var caveSideR = mesh(RB(.28,2.5,.5,.04), matStone,  1.98,1.25,-4.8); caveSideR.rotation.z=-.1;
+
+/* Dragon Eyes & Head recessed in Alcove */
 var eyeMat = new THREE.MeshStandardMaterial({color:0x1a0d00, emissive:0xffa018, emissiveIntensity:2.6, roughness:.4});
-var eyeL = mesh(new THREE.SphereGeometry(.14,20,16), eyeMat, -.52,1.86,-3.55, scene, false); eyeL.scale.set(1.25,.62,.5);
-var eyeR = mesh(new THREE.SphereGeometry(.14,20,16), eyeMat,  .52,1.86,-3.55, scene, false); eyeR.scale.set(1.25,.62,.5);
+var eyeL = mesh(new THREE.SphereGeometry(.14,20,16), eyeMat, -.52,1.86,-4.88, scene, false); eyeL.scale.set(1.25,.62,.5);
+var eyeR = mesh(new THREE.SphereGeometry(.14,20,16), eyeMat,  .52,1.86,-4.88, scene, false); eyeR.scale.set(1.25,.62,.5);
 var pupilMat = new THREE.MeshBasicMaterial({color:0x0a0500});
-var pupL = mesh(new THREE.SphereGeometry(.045,10,10), pupilMat, -.52,1.86,-3.47, scene, false); pupL.scale.set(.45,1.5,.3);
-var pupR = mesh(new THREE.SphereGeometry(.045,10,10), pupilMat,  .52,1.86,-3.47, scene, false); pupR.scale.set(.45,1.5,.3);
-/* dragon brow ridge */
-var brow = mesh(RB(1.7,.2,.3,.06), matBlack, 0,2.14,-3.5, scene, false);
-/* dragon head: parked deep inside the cave (hidden behind the cave-mouth
-   plane); it lunges forward only during the furnace-destruction event */
-var dragonHead = new THREE.Group(); dragonHead.position.set(0,1.8,-4.15); scene.add(dragonHead);
+var pupL = mesh(new THREE.SphereGeometry(.045,10,10), pupilMat, -.52,1.86,-4.80, scene, false); pupL.scale.set(.45,1.5,.3);
+var pupR = mesh(new THREE.SphereGeometry(.045,10,10), pupilMat,  .52,1.86,-4.80, scene, false); pupR.scale.set(.45,1.5,.3);
+var brow = mesh(RB(1.7,.2,.3,.06), matBlack, 0,2.14,-4.82, scene, false);
+var dragonHead = new THREE.Group(); dragonHead.position.set(0,1.8,-5.35); scene.add(dragonHead);
 var matDragon = new THREE.MeshStandardMaterial({color:0x181008, roughness:.92, metalness:.05});
 mesh(RB(1.3,.68,.9,.08), matDragon, 0,.05,-.15, dragonHead, false);
 mesh(RB(.62,.32,.72,.05), matDragon, 0,-.14,.42, dragonHead, false);
@@ -1684,36 +1687,63 @@ var hornR = mesh(new THREE.ConeGeometry(.09,.5,8), matDragon,  .48,.5,-.2, drago
 mesh(new THREE.SphereGeometry(.05,10,8), eyeMat, -.16,-.08,.8, dragonHead, false);
 mesh(new THREE.SphereGeometry(.05,10,8), eyeMat,  .16,-.08,.8, dragonHead, false);
 
-/* ---------- furnace (left) ---------- */
-var furnace = new THREE.Group(); furnace.position.set(-2.45,0,-.55); furnace.rotation.y=.5; scene.add(furnace);
+/* Front Wall (z = +4.9) + Blacksmith Castle Doors + Banners */
+mesh(RB(13.6,4.2,.4,.06), matStone, 0,2.1,5.0);
+mesh(RB(2.6,3.3,.18,.05), matWoodDk, 0,1.65,4.8);
+mesh(RB(.05,3.3,.2,.01), matIron, 0,1.65,4.82);
+[1.0, 2.5].forEach(function(y){ mesh(RB(2.5,.12,.22,.02), matIron, 0,y,4.82); });
+var matBanner = new THREE.MeshStandardMaterial({color:0x8b1a1a, roughness:.85});
+mesh(RB(.65,2.4,.04,.02), matBanner, -2.1, 2.4, 4.75);
+mesh(RB(.65,2.4,.04,.02), matBanner,  2.1, 2.4, 4.75);
+var flameMat = new THREE.MeshBasicMaterial({color:0xff7a1a, transparent:true, opacity:.85});
+[-3.6, 3.6].forEach(function(x){
+  mesh(RB(.1,.4,.2,.02), matIron, x,2.1,4.72);
+  mesh(new THREE.ConeGeometry(.08,.25,8), flameMat, x,2.38,4.65, scene, false);
+  var tl=new THREE.PointLight(0xff8833, 8, 6, 2); tl.position.set(x,2.4,4.5); scene.add(tl);
+});
+
+/* Left Wall (x = -6.2) + Chimney Breast + Tool Rack */
+mesh(RB(.4,4.2,10.6,.06), matStone2, -6.35,2.1,0);
+mesh(RB(1.0,4.2,2.8,.05), matStone, -5.9,2.1,-1.2);
+mesh(RB(.12,.1,2.4,.02), matWoodDk, -6.1,1.8,1.2);
+[-.8,-.3,.3,.8].forEach(function(zOff){ mesh(RB(.04,.6,.04,.01), matIron, -6.04,1.55,1.2+zOff); });
+
+/* Right Wall (x = +6.2) + Armory Plaque + Treasure Chest */
+mesh(RB(.4,4.2,10.6,.06), matStone2, 6.35,2.1,0);
+mesh(RB(.08,3.2,4.2,.04), matWoodDk, 6.15,1.9,1.5);
+mesh(RB(.06,.8,.8,.02), matWood, 6.12,2.5,-0.6);
+var k1=mesh(RB(.03,1.2,.04,.01), matSteel, 6.08,2.5,-0.6); k1.rotation.z=.7;
+var k2=mesh(RB(.03,1.2,.04,.01), matSteel, 6.08,2.5,-0.6); k2.rotation.z=-.7;
+var chest=new THREE.Group(); chest.position.set(5.1,0,3.0); chest.rotation.y=-Math.PI*.45; scene.add(chest);
+mesh(RB(.9,.5,.6,.03), matWoodDk, 0,.25,0, chest);
+mesh(RB(.92,.18,.62,.02), matGold, 0,.52,0, chest);
+mesh(RB(.12,.15,.04,.01), matIron, 0,.38,.31, chest);
+
+/* ---------- ZONE 1: SMELTING HEARTH & FURNACE (Left Wall) ---------- */
+var furnace = new THREE.Group(); furnace.position.set(-4.5,0,-1.2); furnace.rotation.y=.55; scene.add(furnace);
 mesh(RB(1.7,.35,1.35,.05), matStone2, 0,.17,0, furnace);
 mesh(RB(1.55,1.15,1.2,.06), matStone, 0,.92,0, furnace);
 mesh(RB(1.3,.55,1.0,.06), matStone2, 0,1.76,0, furnace);
 mesh(new THREE.CylinderGeometry(.21,.27,1.15,10), matStone2, 0,2.6,0, furnace);
+mesh(new THREE.CylinderGeometry(.24,.24,1.6,10), matStone2, 0,3.3,0, furnace); /* chimney extension to ceiling */
 var fireMouth = mesh(new THREE.CircleGeometry(.44,24), new THREE.MeshBasicMaterial({color:0x1c0a02}), 0,.86,.61, furnace, false); fireMouth.scale.y=1.2;
 var fireCoreMat = new THREE.MeshBasicMaterial({color:0xffa22e});
 var fireCore = mesh(new THREE.SphereGeometry(.3,14,10), fireCoreMat, 0,.8,.5, furnace, false); fireCore.scale.set(1.15,.8,.5);
 var fireInnerMat = new THREE.MeshBasicMaterial({color:0xffe9a0});
 var fireInner = mesh(new THREE.SphereGeometry(.16,12,10), fireInnerMat, 0,.78,.56, furnace, false); fireInner.scale.set(1.1,.85,.5);
 mesh(RB(1.0,.1,.3,.03), matStone, 0,.34,.72, furnace); // hearth ledge
-/* logs in furnace */
 [[-.18,.52,.52,.5],[.15,.5,.5,-.4],[0,.63,.5,.1]].forEach(function(L){ var lg=mesh(new THREE.CylinderGeometry(.055,.06,.5,7), matWoodDk, L[0],L[1],L[2], furnace); lg.rotation.set(Math.PI/2.3,0,L[3]); });
-/* flame cones */
-var flameMat = new THREE.MeshBasicMaterial({color:0xff7a1a, transparent:true, opacity:.85});
 var flames=[];
 for(var fi=0; fi<4; fi++){ var fl=mesh(new THREE.ConeGeometry(.11-fi*.014,.5+fi*.09,8), flameMat, rnd(-.16,.16),1.06,.52, furnace, false); fl.userData.ph=rnd(0,6.28); flames.push(fl); }
-/* charred shell shown only while the furnace is dragon-broken: soot-black
-   plates over the body + mouth, so a dead furnace reads instantly */
 var sootGroup = new THREE.Group(); furnace.add(sootGroup);
 var sootMat = new THREE.MeshBasicMaterial({color:0x070505, transparent:true, opacity:.62, depthWrite:false});
 mesh(new THREE.PlaneGeometry(1.62,1.5), sootMat, 0,.95,.635, sootGroup, false);
 mesh(new THREE.PlaneGeometry(1.4,.62), sootMat, 0,1.78,.53, sootGroup, false);
 var sootTop = mesh(RB(1.36,.14,1.06,.03), matBlack, 0,2.08,0, sootGroup, false);
 sootGroup.visible=false;
-/* coal pile beside furnace */
-for(var ci=0; ci<9; ci++){ var cm=mesh(new THREE.IcosahedronGeometry(rnd(.07,.13),0), matCoal, -1.55+rnd(-.25,.25), .07, .55+rnd(-.25,.25)); cm.rotation.set(rnd(0,3),rnd(0,3),0); }
+for(var ci=0; ci<12; ci++){ var cm=mesh(new THREE.IcosahedronGeometry(rnd(.07,.14),0), matCoal, -3.8+rnd(-.3,.3), .07, -.2+rnd(-.3,.3)); cm.rotation.set(rnd(0,3),rnd(0,3),0); }
 
-/* ---------- anvil + stump (center) ---------- */
+/* ---------- ZONE 2: CENTRAL ANVIL STATION (Center) ---------- */
 mesh(new THREE.CylinderGeometry(.56,.66,.52,14), matWood, 0,.26,.1);
 for(var bi=0; bi<3; bi++){ var band=mesh(new THREE.TorusGeometry(.6,.022,8,28), matIron, 0,.12+bi*.17,.1); band.rotation.x=Math.PI/2; }
 var anvil = new THREE.Group(); anvil.position.set(0,.52,.1); scene.add(anvil);
@@ -1722,8 +1752,7 @@ mesh(RB(.46,.3,.36,.03), matSteelDk, 0,.3,0, anvil);
 mesh(RB(1.42,.2,.56,.03), matSteel, 0,.55,0, anvil);
 var horn = mesh(new THREE.ConeGeometry(.15,.62,14), matSteel, .98,.55,0, anvil); horn.rotation.z=-Math.PI/2.25;
 mesh(RB(.3,.22,.56,.03), matSteel, -.82,.55,0, anvil);
-/* quench bucket */
-var bucket = new THREE.Group(); bucket.position.set(-1.05,0,.95); scene.add(bucket);
+var bucket = new THREE.Group(); bucket.position.set(-1.1,0,.85); scene.add(bucket);
 mesh(new THREE.CylinderGeometry(.26,.2,.5,14,1,true), matWoodDk, 0,.25,0, bucket);
 mesh(new THREE.CylinderGeometry(.2,.2,.02,14), matWoodDk, 0,.02,0, bucket);
 var water = mesh(new THREE.CircleGeometry(.235,18), new THREE.MeshPhysicalMaterial({color:0x39586b, roughness:.08, metalness:0, transparent:true, opacity:.9}), 0,.46,0, bucket, false); water.rotation.x=-Math.PI/2;
@@ -1917,8 +1946,11 @@ var tongArmL=mesh(new THREE.BoxGeometry(.88,.022,.028), matIron, -.68,.11,.105, 
 var tongArmR=mesh(new THREE.BoxGeometry(.88,.022,.028), matIron, -.68,.11,-.105, tongs); tongArmR.rotation.set(0,.14,.13);
 var tongRing=mesh(new THREE.TorusGeometry(.055,.011,6,14), matSteelDk, -1.1,.17,0, tongs, false); tongRing.rotation.y=Math.PI/2;
 
-/* ---------- bell + stand (right) ---------- */
-var bellStand = new THREE.Group(); bellStand.position.set(2.3,0,-.35); bellStand.rotation.y=-.35; scene.add(bellStand);
+/* ---------- ZONE 3: DRAGON BELL SHRINE (Right-Back) ---------- */
+mesh(RB(2.2,.2,2.0,.05), matStone2, 3.8,.1,-2.8);
+var tribBowl=mesh(new THREE.CylinderGeometry(.32,.2,.18,12), matBrass, 3.0,.28,-2.2);
+mesh(new THREE.SphereGeometry(.26,10,6), matGold, 3.0,.35,-2.2, scene, false);
+var bellStand = new THREE.Group(); bellStand.position.set(3.8,0,-2.8); bellStand.rotation.y=-.55; scene.add(bellStand);
 var legL=mesh(RB(.11,1.85,.11,.02), matWood, -.5,.9,0, bellStand); legL.rotation.z=.22;
 var legR=mesh(RB(.11,1.85,.11,.02), matWood,  .5,.9,0, bellStand); legR.rotation.z=-.22;
 mesh(RB(1.3,.11,.13,.02), matWood, 0,1.78,0, bellStand);
@@ -1935,8 +1967,8 @@ var barrel = new THREE.Group(); barrel.position.set(-3.5,0,1.15); scene.add(barr
 mesh(new THREE.CylinderGeometry(.34,.34,.92,14), matWoodDk, 0,.46,0, barrel).scale.set(1,1,1);
 var bMid=mesh(new THREE.SphereGeometry(.345,14,10), matWoodDk, 0,.46,0, barrel); bMid.scale.set(1,1.33,1);
 [.12,.46,.8].forEach(function(y){ var t=mesh(new THREE.TorusGeometry(.355,.018,8,24), matIron, 0,y,0, barrel); t.rotation.x=Math.PI/2; });
-/* weapon rack right-back — FUNCTIONAL sword rack: 3 slots, click a hung sword to take it down */
-var rack = new THREE.Group(); rack.position.set(3.22,0,-1.9); rack.rotation.y=-.42; rack.scale.setScalar(1.18); scene.add(rack);
+/* ---------- ZONE 4: ARMORY & WEAPON RACK (Right Wall) ---------- */
+var rack = new THREE.Group(); rack.position.set(4.5,0,1.5); rack.rotation.y=-Math.PI/2; rack.scale.setScalar(1.18); scene.add(rack);
 mesh(RB(.1,1.7,.1,.02), matWood, -.55,.85,0, rack); mesh(RB(.1,1.7,.1,.02), matWood, .55,.85,0, rack);
 mesh(RB(1.35,.09,.09,.02), matWood, 0,1.5,0, rack); mesh(RB(1.35,.09,.09,.02), matWood, 0,.45,0, rack);
 mesh(RB(1.5,.07,.3,.02), matWoodDk, 0,.04,0, rack); // rack base board
@@ -1983,25 +2015,30 @@ mesh(new THREE.BoxGeometry(.06,.55,.03), matIron, .22,.75,.08, smith);
 scene.add(smith);
 var moveKeys={w:0,a:0,s:0,d:0}, SMITH_SPEED=3.1;
 var SMITH_BOUNDS={x1:-4.1,x2:4.1,z1:-2.3,z2:3.15};
-var STATIONS={furnace:{x:-2.45,z:-.55,r:1.15}, anvil:{x:0,z:.1,r:.95}, bell:{x:2.3,z:-.35,r:1.05}, rack:{x:3.22,z:-1.9,r:1.2}};
+var STATIONS={
+  furnace:{x:-3.8,z:-1.2,r:1.45},
+  anvil:{x:0,z:.1,r:1.25},
+  bell:{x:3.6,z:-2.6,r:1.35},
+  rack:{x:4.0,z:1.5,r:1.35}
+};
 
 /* 3D First-Person Walking & Mouse Look Spatial System */
 var activeStation = 'anvil';
 document.body.classList.add('st-anvil');
 
-var playerPos = new THREE.Vector3(0, 1.85, 2.2);
-var targetPlayerPos = new THREE.Vector3(0, 1.85, 2.2);
-var camYaw = 0, camPitch = -0.38;
-var targetYaw = 0, targetPitch = -0.38;
+var playerPos = new THREE.Vector3(0, 1.85, 2.05);
+var targetPlayerPos = new THREE.Vector3(0, 1.85, 2.05);
+var camYaw = 0, camPitch = -0.40;
+var targetYaw = 0, targetPitch = -0.40;
 var isDragging = false, lastDragX = 0, lastDragY = 0;
 var walkBob = 0;
 
 var STATION_DESTINATIONS = {
-  anvil:   { pos: new THREE.Vector3(0, 1.85, 2.15), yaw: 0, pitch: -0.42 },
-  furnace: { pos: new THREE.Vector3(-1.35, 1.85, 0.65), yaw: Math.PI * 0.45, pitch: -0.18 },
-  bell:    { pos: new THREE.Vector3(1.35, 1.85, 0.65), yaw: -Math.PI * 0.42, pitch: -0.12 },
-  rack:    { pos: new THREE.Vector3(2.1, 1.85, -0.75), yaw: -Math.PI * 0.68, pitch: -0.10 },
-  wide:    { pos: new THREE.Vector3(0, 2.45, 3.85), yaw: 0, pitch: -0.25 }
+  anvil:   { pos: new THREE.Vector3(0, 1.85, 2.05), yaw: 0, pitch: -0.40 },
+  furnace: { pos: new THREE.Vector3(-2.3, 1.85, -1.1), yaw: Math.PI * 0.48, pitch: -0.16 },
+  bell:    { pos: new THREE.Vector3(2.3, 1.85, -1.7), yaw: -Math.PI * 0.70, pitch: -0.14 },
+  rack:    { pos: new THREE.Vector3(2.6, 1.85, 1.5), yaw: -Math.PI * 0.50, pitch: -0.12 },
+  wide:    { pos: new THREE.Vector3(0, 2.65, 3.8), yaw: 0, pitch: -0.22 }
 };
 
 function setStation(st, silent){
@@ -2065,8 +2102,8 @@ function updateFPSMovement(dt){
     playerPos.x += vx * speed * dt;
     playerPos.z += vz * speed * dt;
     
-    playerPos.x = Math.max(-3.6, Math.min(3.6, playerPos.x));
-    playerPos.z = Math.max(-2.5, Math.min(3.6, playerPos.z));
+    playerPos.x = Math.max(-5.2, Math.min(5.2, playerPos.x));
+    playerPos.z = Math.max(-3.8, Math.min(3.8, playerPos.z));
     targetPlayerPos.copy(playerPos);
     
     walkBob += dt * 10;
@@ -2340,7 +2377,7 @@ function spawnBreath(x,y,z,count){
 }
 /* grey smoke column over a broken furnace (its own tiny pooled cloud) */
 var FSMOKES=IS_MOBILE?10:18, fSmoke=makePoints(FSMOKES,.5,0x8a8378,.3,false), fSmokeDat=[], fSmokePos=fSmoke.geometry.attributes.position.array;
-for(var fsi=0; fsi<FSMOKES; fsi++){ fSmokeDat.push({x:-2.55+rnd(-.22,.22), y:rnd(2.5,4.4), z:-.6+rnd(-.18,.18), s:rnd(.22,.42), ph:rnd(0,6.28)}); fSmokePos[fsi*3]=fSmokeDat[fsi].x; fSmokePos[fsi*3+1]=fSmokeDat[fsi].y; fSmokePos[fsi*3+2]=fSmokeDat[fsi].z; }
+for(var fsi=0; fsi<FSMOKES; fsi++){ fSmokeDat.push({x:-4.5+rnd(-.22,.22), y:rnd(2.5,4.3), z:-1.2+rnd(-.18,.18), s:rnd(.22,.42), ph:rnd(0,6.28)}); fSmokePos[fsi*3]=fSmokeDat[fsi].x; fSmokePos[fsi*3+1]=fSmokeDat[fsi].y; fSmokePos[fsi*3+2]=fSmokeDat[fsi].z; }
 fSmoke.visible=false;
 
 /* ============================== VFX SYSTEMS ============================== */
@@ -3239,11 +3276,11 @@ function applyFurnaceState(){
 }
 function dragonPose(k){
   /* k: 0 = head hidden in the cave, 1 = fully lunged out over the forge */
-  dragonHead.position.z = lerpN(-4.15, -3.12, k);
+  dragonHead.position.z = lerpN(-5.35, -4.1, k);
   dragonHead.position.y = lerpN(1.8, 1.68, k);
-  var ez = Math.max(-3.55, dragonHead.position.z+.34);
+  var ez = Math.max(-4.88, dragonHead.position.z+.47);
   eyeL.position.z=ez; eyeR.position.z=ez; pupL.position.z=ez+.08; pupR.position.z=ez+.08;
-  brow.position.z = Math.max(-3.5, dragonHead.position.z+.66);
+  brow.position.z = Math.max(-4.82, dragonHead.position.z+.53);
 }
 function startDragonEvent(){
   if(!G || G.over || dragonAnim) return;
@@ -3273,7 +3310,7 @@ function doRepair(){
   var cost=repairCost();
   if(G.gold<cost){ toast('Chưa đủ vàng sửa lò — cần '+cost+' vàng, còn thiếu '+(cost-G.gold)+'. Gõ nguội, chốt kiếm kiếm thêm!', 'bad'); return; }
   audio(); G.gold-=cost; G.repairing=true; repairFxT=0;
-  weldSound(); burstSparks(-2.16,.95,0,46,1.4,1); flashTo(.3);
+  weldSound(); burstSparks(-3.8,1.05,-1.15,46,1.4,1); flashTo(.3);
   toast('🔧 Đang hàn sửa lò…', 'info');
   refreshUI();
   setTimeout(function(){
@@ -3281,7 +3318,7 @@ function doRepair(){
     G.repairing=false; G.furnaceBroken=false;
     applyFurnaceState();
     clang(.7,1.15); coinSound(); flashTo(.4);
-    burstSparks(-2.16,.95,0,42,1.2,1); burstCoins(-2.16,1.1,0,14);
+    burstSparks(-3.8,1.05,-1.15,42,1.2,1); burstCoins(-3.8,1.15,-1.15,14);
     metaOnRepair();
     toast('🔥 Lò đã cháy lại! Nung kiếm bình thường — cấp lò vẫn nguyên cấp '+upLv('furnace'), 'good');
     refreshUI();
@@ -3938,8 +3975,8 @@ function animate(){
         heatAnim.t=(performance.now()-heatAnim.t0)/1000;
         var ht2=heatAnim.t/heatAnim.dur;
         var fp2 = ht2<.25? easeIO(ht2/.25) : (ht2<.68? 1 : 1-easeIO((ht2-.68)/.32));
-        sword.position.x=lerpN(heatAnim.fromX, -.85, fp2);
-        sword.position.z=lerpN(heatAnim.fromZ, -.05, fp2);
+        sword.position.x=lerpN(heatAnim.fromX, -3.6, fp2);
+        sword.position.z=lerpN(heatAnim.fromZ, -1.1, fp2);
         sword.position.y=1.175 - fp2*.13 + Math.sin(Math.min(1,fp2)*Math.PI)*.07;
         sword.rotation.y=lerpN(heatAnim.fromYaw, heatAnim.fromYaw-3.02, fp2);
         if(typeof tongs!=='undefined' && tongs) tongs.visible = ht2<.96;
@@ -3949,7 +3986,7 @@ function animate(){
           G.heat=lerpN(heatAnim.fromHeat, heatAnim.toHeat, (ht2-.25)/.43);
           heatPulse=Math.max(heatPulse,.55);
           heatAnim.fxT-=dt;
-          if(heatAnim.fxT<=0){ heatAnim.fxT=.16; burstSparks(-2.05,.95,.05,9,.75,1); }
+          if(heatAnim.fxT<=0){ heatAnim.fxT=.16; burstSparks(-3.8,1.05,-1.15,9,.75,1); }
         }
         if(ht2>.68) steamBurst=Math.max(steamBurst,.5); /* hot blade steams on the way out */
         if(ht2>=1){
@@ -4065,14 +4102,14 @@ function animate(){
         spawnBreath(0,1.6,dragonHead.position.z+1.05, IS_MOBILE?7:12);
         breath.visible=true;
         shake=Math.max(shake,.55*breathEnv);
-        if(Math.random()<.5) burstSparks(-2.16,.95,0,10,1.3,1.1);
+        if(Math.random()<.5) burstSparks(-3.8,1.05,-1.15,10,1.3,1.1);
       }
       eyeMat.emissiveIntensity=2.6+7.5*breathEnv;
       caveGlow.intensity=10+22*breathEnv; caveGlow.color.setHex(0xff4400);
       if(!dragonAnim.broke && dT>=1.15){
         dragonAnim.broke=true; G.furnaceBroken=true; applyFurnaceState();
         crackSound(); shake=1.25; flashTo(.85);
-        burstSparks(-2.16,.95,0,80,1.8,1.3);
+        burstSparks(-3.8,1.05,-1.15,80,1.8,1.3);
         floatNum('🔥 LÒ NUNG BỊ PHÁ HỦY!', 'bad');
       }
       if(!dragonAnim.banner && dT>=1.5){ dragonAnim.banner=true; if(dragonBannerEl) dragonBannerEl.classList.add('show'); }
@@ -4099,7 +4136,7 @@ function animate(){
       if(!IS_MOBILE || frameNo%2===0) fSmoke.geometry.attributes.position.needsUpdate=true;
     }
     /* welding sparks while the furnace is being repaired (~1s) */
-    if(G&&G.repairing){ repairFxT-=dt; if(repairFxT<=0){ repairFxT=.14; burstSparks(-2.16,.95,0,12,1.3,1); } }
+    if(G&&G.repairing){ repairFxT-=dt; if(repairFxT<=0){ repairFxT=.14; burstSparks(-3.8,1.05,-1.15,12,1.3,1); } }
     /* embers — on mobile the ambient fields update at half rate: half the buffer uploads, visually identical */
     var skipAmbient = IS_MOBILE && (frameNo%2===1);
     var ep=embers.geometry.attributes.position.array;
