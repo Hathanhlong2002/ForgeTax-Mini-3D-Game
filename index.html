@@ -1068,6 +1068,25 @@
   .interact-prompt:active {
     transform: translateY(1px) scale(0.98);
   }
+  .interact-prompt.locked {
+    border-color: #d13838;
+    background: linear-gradient(180deg, rgba(42, 14, 14, 0.96) 0%, rgba(20, 6, 6, 0.98) 100%);
+    box-shadow: 0 6px 26px rgba(0, 0, 0, 0.85), 0 0 18px rgba(209, 56, 56, 0.45);
+    animation: promptLockedPulse 2s infinite ease-in-out;
+  }
+  @keyframes promptLockedPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 4px 20px rgba(0,0,0,0.8), 0 0 10px rgba(209,56,56,0.3); }
+    50% { transform: scale(1.02); box-shadow: 0 6px 24px rgba(0,0,0,0.9), 0 0 18px rgba(209,56,56,0.55); }
+  }
+  .interact-prompt.locked:hover {
+    background: linear-gradient(180deg, #661818 0%, #3a0a0a 100%);
+    color: #ffb3b3;
+  }
+  .interact-prompt.locked .prompt-key {
+    background: linear-gradient(180deg, #6e1c1c 0%, #3d0c0c 100%);
+    border-color: #ff7a7a;
+    color: #ffb3b3;
+  }
   .prompt-key {
     display: inline-flex;
     align-items: center;
@@ -2243,28 +2262,166 @@ var STATION_DESTINATIONS = {
   wide:    { pos: new THREE.Vector3(0, 2.65, 3.8), yaw: 0, pitch: -0.22 }
 };
 
+function getStationStatus(st){
+  if(!G || !G.started || G.over) return { ok: false, shortMsg: 'Chưa bắt đầu', msg: 'Trò chơi chưa bắt đầu hoặc đã kết thúc!', action: 'not_started' };
+  if(G.eventLock) return { ok: false, shortMsg: 'Sự kiện rồng', msg: 'Rồng Khói đang giáng lâm — hãy hoàn thành sự kiện!', action: 'event_locked' };
+  if(G.heating) return { ok: false, shortMsg: 'Đang nung...', msg: 'Kiếm đang được kẹp nung trong lò lửa!', action: 'heating' };
+  if(G.repairing) return { ok: false, shortMsg: 'Đang sửa lò...', msg: 'Thợ rèn đang sửa chữa lò nung bị phá hủy!', action: 'repairing' };
+
+  if(st === 'furnace'){
+    if(G.furnaceBroken){
+      var cost = (typeof repairCost === 'function') ? repairCost() : (45 * (G.round || 1));
+      if(G.gold < cost){
+        return {
+          ok: false,
+          shortMsg: 'Cần ' + cost + ' vàng sửa',
+          msg: '🔥 Lò bị rồng thiêu hỏng! Cần ' + cost + ' vàng sửa lò (hiện có ' + G.gold + ' vàng). Hãy gõ kiếm nguội trên đe để kiếm vàng!',
+          action: 'repair_locked'
+        };
+      }
+      return {
+        ok: true,
+        shortMsg: 'Sửa lò (' + cost + ' vàng)',
+        msg: '🔧 Bấm [E] để sửa lò nung (' + cost + ' vàng)',
+        action: 'repair'
+      };
+    }
+    if(G.turns <= 0){
+      return {
+        ok: false,
+        shortMsg: 'Hết lượt rèn (0)',
+        msg: '🔥 Đã hết lượt rèn vòng này! Hãy nộp cống chuông hoặc qua vòng.',
+        action: 'turns_out'
+      };
+    }
+    return {
+      ok: true,
+      shortMsg: 'Nung kiếm tăng nhiệt',
+      msg: '🔥 Bấm [E] để nung kiếm tăng nhiệt độ',
+      action: 'heat'
+    };
+  }
+
+  if(st === 'bell'){
+    if(G.gold < G.target){
+      var anvilVal = (G.hits > 0) ? G.swordVal : 0;
+      var rackVal = (typeof rackGoldTotal === 'function') ? rackGoldTotal() : 0;
+      var pot = G.gold + anvilVal + rackVal;
+      if(pot >= G.target){
+        return {
+          ok: false,
+          shortMsg: 'Chốt kiếm để đủ ' + G.target + ' vàng',
+          msg: '🔔 Chưa đủ vàng mặt! Bấm [B] chốt kiếm trên đe (' + anvilVal + ' vàng) hoặc giá treo để đủ ' + G.target + ' vàng nộp cống!',
+          action: 'need_bank'
+        };
+      }
+      return {
+        ok: false,
+        shortMsg: 'Thiếu vàng (' + G.gold + '/' + G.target + ')',
+        msg: '🔔 Chưa đủ vàng nộp cống! Cần ' + G.target + ' vàng (hiện có ' + G.gold + ' vàng). Hãy gõ kiếm tích thêm vàng!',
+        action: 'need_gold'
+      };
+    }
+    return {
+      ok: true,
+      shortMsg: 'Nộp cống (' + G.target + ' vàng)',
+      msg: '🔔 Bấm [E] rung chuông nộp cống qua vòng',
+      action: 'tribute'
+    };
+  }
+
+  if(st === 'anvil'){
+    if(G.turns <= 0 && G.hits <= 0){
+      return {
+        ok: false,
+        shortMsg: 'Hết lượt rèn (0)',
+        msg: '🛠 Đã hết lượt rèn vòng này! Hãy đến chuông rồng nộp cống.',
+        action: 'turns_out'
+      };
+    }
+    if(G.turns <= 0 && G.hits > 0){
+      return {
+        ok: true,
+        shortMsg: 'Chốt kiếm (' + G.swordVal + ' vàng)',
+        msg: '💰 Bấm [E] chốt kiếm cất vàng vào kho',
+        action: 'bank'
+      };
+    }
+    return {
+      ok: true,
+      shortMsg: 'Gõ búa rèn kiếm',
+      msg: '🛠 Bấm [E] gõ búa tăng cấp kiếm',
+      action: 'hit'
+    };
+  }
+
+  if(st === 'rack'){
+    var rackCount = (G.rack ? G.rack.filter(Boolean).length : 0);
+    if(rackCount === 0 && G.hits === 0){
+      return {
+        ok: false,
+        shortMsg: 'Giá & đe đều trống',
+        msg: '🗡 Giá treo đang trống và chưa có kiếm trên đe để cất!',
+        action: 'rack_empty'
+      };
+    }
+    return {
+      ok: true,
+      shortMsg: 'Quản lý kiếm (' + rackCount + '/3)',
+      msg: '🗡 Bấm [E] quản lý kiếm trên giá',
+      action: 'rack'
+    };
+  }
+
+  return { ok: true, shortMsg: 'Tương tác', msg: 'Tương tác trạm', action: 'general' };
+}
+
+var _lastPromptNear = null, _lastPromptEngaged = null, _lastPromptStatusKey = '';
 function updateInteractPrompt(near){
   currentNearStation = near || '';
   var wrap = $('interactPromptWrap');
+  var prm = $('interactPrompt');
   var lbl = $('interactLabel');
-  if(!wrap || !lbl) return;
+  if(!wrap || !lbl || !prm) return;
+  
+  var status = near ? getStationStatus(near) : null;
+  var isOk = status ? status.ok : false;
+  var statusKey = isOk + '_' + (status ? status.shortMsg : '');
+  
+  if(near === _lastPromptNear && isStationEngaged === _lastPromptEngaged && statusKey === _lastPromptStatusKey){
+    return;
+  }
+  _lastPromptNear = near;
+  _lastPromptEngaged = isStationEngaged;
+  _lastPromptStatusKey = statusKey;
   
   if(!isStationEngaged && near){
     wrap.style.display = 'flex';
+    prm.classList.toggle('locked', !isOk);
+    var pKey = prm.querySelector('.prompt-key');
+    if(pKey) pKey.textContent = isOk ? 'E' : '🔒';
+    
     var names = {
-      anvil: 'SỬ DỤNG ĐE RÈN 🛠️ (Bấm E)',
-      furnace: 'SỬ DỤNG LÒ NUNG 🔥 (Bấm E)',
-      bell: 'RUNG CHUÔNG CỐNG 🔔 (Bấm E)',
-      rack: 'QUẢN LÝ GIÁ TREO 🗡️ (Bấm E)'
+      anvil: isOk ? (status.action === 'bank' ? 'CHỐT KIẾM VÀO KHO 💰 (Bấm E)' : 'SỬ DỤNG ĐE RÈN 🛠️ (Bấm E)') : 'ĐE RÈN [HẾT LƯỢT] 🔒',
+      furnace: isOk ? (status.action === 'repair' ? 'SỬA LÒ NUNG 🔧 (Bấm E)' : 'SỬ DỤNG LÒ NUNG 🔥 (Bấm E)') : (G && G.furnaceBroken ? 'LÒ HỎNG — THIẾU VÀNG SỬA 🔒' : 'LÒ NUNG [HẾT LƯỢT] 🔒'),
+      bell: isOk ? 'RUNG CHUÔNG NỘP CỐNG 🔔 (Bấm E)' : 'CHUÔNG CỐNG [CHƯA ĐỦ VÀNG] 🔒',
+      rack: isOk ? 'QUẢN LÝ GIÁ TREO 🗡️ (Bấm E)' : 'GIÁ TREO [CHƯA CÓ KIẾM] 🔒'
     };
-    lbl.textContent = names[near] || 'THAO TÁC TRẠM (Bấm E)';
+    lbl.textContent = names[near] || (isOk ? 'THAO TÁC TRẠM (Bấm E)' : 'CHƯA ĐỦ ĐIỀU KIỆN 🔒');
   } else {
     wrap.style.display = 'none';
   }
 }
 
-function engageStation(st){
+function engageStation(st, force){
   if(!st) st = currentNearStation || activeStation || 'anvil';
+  var status = getStationStatus(st);
+  if(!force && !status.ok){
+    toast(status.msg, 'bad');
+    if(typeof crackSound === 'function') crackSound();
+    shakeStationSprite(st);
+    return false;
+  }
   isStationEngaged = true;
   document.body.classList.add('station-engaged');
   setStation(st, false);
@@ -2284,6 +2441,7 @@ function engageStation(st){
     toast('🗡 Giá Treo — [T] Treo/Lấy kiếm, [Q/WASD] Rời trạm', 'info');
   }
   refreshUI();
+  return true;
 }
 
 function disengageStation(silent){
@@ -2366,14 +2524,6 @@ function updateFPSMovement(dt){
   camYaw += (targetYaw - camYaw) * Math.min(1, dt * 16);
   camPitch += (targetPitch - camPitch) * Math.min(1, dt * 16);
   
-  camera.position.x = playerPos.x;
-  camera.position.y = playerPos.y + Math.sin(walkBob) * 0.045;
-  camera.position.z = playerPos.z;
-  
-  camera.rotation.order = 'YXZ';
-  camera.rotation.y = camYaw;
-  camera.rotation.x = camPitch;
-  
   var near = playerStationNear();
   updateInteractPrompt(near);
 }
@@ -2394,7 +2544,7 @@ function resetSmith(){
   playerPos.set(0, 1.85, 2.2);
   targetPlayerPos.copy(playerPos);
   camYaw = 0; camPitch = -0.38; targetYaw = 0; targetPitch = -0.38;
-  engageStation('anvil');
+  engageStation('anvil', true);
   shadowDirty=true;
 }
 function updateSmith(dt){
@@ -2408,6 +2558,172 @@ beaconRing.rotation.x = -Math.PI / 2;
 beaconRing.position.set(0, 0.02, 0);
 beaconRing.visible = false;
 scene.add(beaconRing);
+
+/* 3D Floating Station [E] Interaction Badges */
+var stationBadges = {};
+var BADGE_CONFIG = {
+  anvil:   { x: 0,    y: 1.48, z: 0.35,  title: 'ĐE RÈN KIẾM',    icon: '🛠️', defaultAction: 'Gõ búa tăng cấp' },
+  furnace: { x: -3.1, y: 1.62, z: -1.15, title: 'LÒ NUNG LỬA',    icon: '🔥', defaultAction: 'Nung kiếm tăng nhiệt' },
+  bell:    { x: 3.1,  y: 1.95, z: -2.25, title: 'CHUÔNG CỐNG RỒNG', icon: '🔔', defaultAction: 'Nộp cống qua vòng' },
+  rack:    { x: 3.4,  y: 1.72, z: 1.5,   title: 'GIÁ TREO KIẾM',   icon: '🗡️', defaultAction: 'Quản lý kiếm trên giá' }
+};
+
+function createStationBadge(stKey){
+  var canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 140;
+  var texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+
+  var mat = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    opacity: 0,
+    depthTest: false
+  });
+  var sprite = new THREE.Sprite(mat);
+  var cfg = BADGE_CONFIG[stKey];
+  sprite.position.set(cfg.x, cfg.y, cfg.z);
+  sprite.scale.set(1.15, 0.315, 1);
+  sprite.visible = false;
+  sprite.userData = {
+    canvas: canvas,
+    texture: texture,
+    baseY: cfg.y,
+    shake: 0,
+    lastStateKey: '',
+    stKey: stKey
+  };
+  scene.add(sprite);
+  return sprite;
+}
+
+for(var bk in BADGE_CONFIG){
+  stationBadges[bk] = createStationBadge(bk);
+}
+
+function shakeStationSprite(stKey){
+  var sp = stationBadges[stKey];
+  if(sp) sp.userData.shake = 0.28;
+}
+
+function updateStationBadgeContent(sprite, status){
+  var stKey = sprite.userData.stKey;
+  var isOk = status ? status.ok : true;
+  var shortMsg = status ? status.shortMsg : '';
+  var stateKey = isOk + '_' + shortMsg;
+  if(sprite.userData.lastStateKey === stateKey) return;
+  sprite.userData.lastStateKey = stateKey;
+
+  var canvas = sprite.userData.canvas;
+  var ctx = canvas.getContext('2d');
+  var w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  var cfg = BADGE_CONFIG[stKey];
+  var title = cfg.title;
+  var icon = cfg.icon;
+  var actionText = isOk ? ('[E] ' + (shortMsg || cfg.defaultAction)) : ('🔒 ' + (shortMsg || 'Không thể tương tác'));
+
+  // Badge container pill
+  var pad = 6;
+  var rx = pad, ry = pad, rw = w - pad * 2, rh = h - pad * 2, r = 24;
+
+  ctx.save();
+  ctx.beginPath();
+  if(typeof ctx.roundRect === 'function'){
+    ctx.roundRect(rx, ry, rw, rh, r);
+  } else {
+    ctx.rect(rx, ry, rw, rh);
+  }
+
+  if(isOk){
+    var bgGrad = ctx.createLinearGradient(0, 0, w, h);
+    bgGrad.addColorStop(0, 'rgba(26, 17, 10, 0.94)');
+    bgGrad.addColorStop(1, 'rgba(12, 8, 4, 0.98)');
+    ctx.fillStyle = bgGrad;
+    ctx.fill();
+    ctx.lineWidth = 3.5;
+    ctx.strokeStyle = '#e8b33c';
+    ctx.shadowColor = 'rgba(232, 179, 60, 0.75)';
+    ctx.shadowBlur = 16;
+    ctx.stroke();
+  } else {
+    var bgGradLocked = ctx.createLinearGradient(0, 0, w, h);
+    bgGradLocked.addColorStop(0, 'rgba(38, 12, 12, 0.94)');
+    bgGradLocked.addColorStop(1, 'rgba(18, 6, 6, 0.98)');
+    ctx.fillStyle = bgGradLocked;
+    ctx.fill();
+    ctx.lineWidth = 3.5;
+    ctx.strokeStyle = '#e84c3d';
+    ctx.shadowColor = 'rgba(232, 76, 61, 0.75)';
+    ctx.shadowBlur = 16;
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Keycap button [E] or [🔒]
+  var kw = 64, kh = 64;
+  var kx = rx + 22, ky = ry + (rh - kh) / 2;
+  ctx.save();
+  ctx.beginPath();
+  if(typeof ctx.roundRect === 'function'){
+    ctx.roundRect(kx, ky, kw, kh, 14);
+  } else {
+    ctx.rect(kx, ky, kw, kh);
+  }
+
+  if(isOk){
+    var keyGrad = ctx.createLinearGradient(kx, ky, kx, ky + kh);
+    keyGrad.addColorStop(0, '#ffe596');
+    keyGrad.addColorStop(1, '#d48a20');
+    ctx.fillStyle = keyGrad;
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#fff5d8';
+    ctx.stroke();
+
+    ctx.fillStyle = '#221104';
+    ctx.font = '900 36px "Cinzel", "Segoe UI", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('E', kx + kw / 2, ky + kh / 2 + 1);
+  } else {
+    var lockGrad = ctx.createLinearGradient(kx, ky, kx, ky + kh);
+    lockGrad.addColorStop(0, '#661b1b');
+    lockGrad.addColorStop(1, '#330808');
+    ctx.fillStyle = lockGrad;
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#ff6b6b';
+    ctx.stroke();
+
+    ctx.fillStyle = '#ff9e9e';
+    ctx.font = '700 30px "Cinzel", "Segoe UI", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🔒', kx + kw / 2, ky + kh / 2);
+  }
+  ctx.restore();
+
+  // Typography
+  var tx = kx + kw + 18;
+  ctx.save();
+  ctx.font = '800 24px "Cinzel", "Segoe UI", sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = isOk ? '#fff3d6' : '#ffb3b3';
+  ctx.fillText(icon + '  ' + title, tx, ry + 22);
+
+  ctx.font = '600 20px "Segoe UI", sans-serif';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = isOk ? '#e8b33c' : '#ff7a7a';
+  ctx.fillText(actionText, tx, ry + 56);
+  ctx.restore();
+
+  sprite.userData.texture.needsUpdate = true;
+}
 
 /* crates */
 var crate1=mesh(RB(.62,.62,.62,.03), matWoodDk, 3.35,.31,1.3); crate1.rotation.y=.4;
@@ -3909,11 +4225,38 @@ var _bht=$('btnHudToggle'); if(_bht) _bht.addEventListener('click', function(e){
 var _bhe=$('btnHudExpand'); if(_bhe) _bhe.addEventListener('click', function(){ audio(); META.hudCollapsed=false; metaSave(); applyHudChrome(); refreshUI(); });
 var _bum=$('btnUiMode'); if(_bum) _bum.addEventListener('click', function(e){ e.stopPropagation(); audio(); toggleUiCompact(); });
 var _bcr=$('btnCoachReplay'); if(_bcr) _bcr.addEventListener('click', function(){ audio(); coachReplay(); });
-$('btnHeat').addEventListener('click', doHeat);
+$('btnHeat').addEventListener('click', function(){
+  var stF = getStationStatus('furnace');
+  if(!stF.ok){
+    toast(stF.msg, 'bad');
+    if(typeof crackSound === 'function') crackSound();
+    shakeStationSprite('furnace');
+    return;
+  }
+  doHeat();
+});
 $('btnRepair').addEventListener('click', doRepair);
-$('btnHit').addEventListener('click', doHit);
+$('btnHit').addEventListener('click', function(){
+  var stA = getStationStatus('anvil');
+  if(!stA.ok){
+    toast(stA.msg, 'bad');
+    if(typeof crackSound === 'function') crackSound();
+    shakeStationSprite('anvil');
+    return;
+  }
+  doHit();
+});
 $('btnBank').addEventListener('click', doBank);
-$('btnTribute').addEventListener('click', doTribute);
+$('btnTribute').addEventListener('click', function(){
+  var stB = getStationStatus('bell');
+  if(!stB.ok){
+    toast(stB.msg, 'bad');
+    if(typeof crackSound === 'function') crackSound();
+    shakeStationSprite('bell');
+    return;
+  }
+  doTribute();
+});
 $('btnHang').addEventListener('click', function(){ hangSword(); });
 var _bip = $('interactPrompt'); if(_bip) _bip.addEventListener('click', function(){ engageStation(currentNearStation); });
 var _bls = $('btnLeaveStation'); if(_bls) _bls.addEventListener('click', function(){ disengageStation(); });
@@ -3959,10 +4302,31 @@ window.addEventListener('keydown', function(e){
   if(e.code==='KeyE'){
     e.preventDefault();
     if(!isStationEngaged){
-      if(currentNearStation) engageStation(currentNearStation);
+      if(!currentNearStation) return;
+      var stNear = getStationStatus(currentNearStation);
+      if(!stNear.ok){
+        toast(stNear.msg, 'bad');
+        if(typeof crackSound === 'function') crackSound();
+        shakeStationSprite(currentNearStation);
+        return;
+      }
+      engageStation(currentNearStation);
     } else {
-      if(activeStation==='anvil') doHit();
-      else if(activeStation==='furnace') doHeat();
+      var actSt = getStationStatus(activeStation);
+      if(!actSt.ok){
+        toast(actSt.msg, 'bad');
+        if(typeof crackSound === 'function') crackSound();
+        shakeStationSprite(activeStation);
+        return;
+      }
+      if(activeStation==='anvil'){
+        if(G.turns <= 0 && G.hits > 0) doBank();
+        else doHit();
+      }
+      else if(activeStation==='furnace'){
+        if(G.furnaceBroken) doRepair();
+        else doHeat();
+      }
       else if(activeStation==='bell') doTribute();
       else if(activeStation==='rack') hangSword();
     }
@@ -3978,12 +4342,33 @@ window.addEventListener('keydown', function(e){
     if(!G.started){ $('btnStart').click(); }
     else {
       if(!isStationEngaged){
-        if(currentNearStation) engageStation(currentNearStation);
+        if(!currentNearStation) return;
+        var stNear = getStationStatus(currentNearStation);
+        if(!stNear.ok){
+          toast(stNear.msg, 'bad');
+          if(typeof crackSound === 'function') crackSound();
+          shakeStationSprite(currentNearStation);
+          return;
+        }
+        engageStation(currentNearStation);
       } else {
-        if(activeStation==='furnace') doHeat();
+        var actSt = getStationStatus(activeStation);
+        if(!actSt.ok){
+          toast(actSt.msg, 'bad');
+          if(typeof crackSound === 'function') crackSound();
+          shakeStationSprite(activeStation);
+          return;
+        }
+        if(activeStation==='furnace'){
+          if(G.furnaceBroken) doRepair();
+          else doHeat();
+        }
         else if(activeStation==='bell') doTribute();
         else if(activeStation==='rack') hangSword();
-        else doHit();
+        else {
+          if(G.turns <= 0 && G.hits > 0) doBank();
+          else doHit();
+        }
       }
     }
   }
@@ -4000,7 +4385,9 @@ window.addEventListener('keyup', function(e){
 document.querySelectorAll('.st-tab').forEach(function(b){
   b.addEventListener('click', function(){
     audio();
-    setStation(b.getAttribute('data-st'));
+    var st = b.getAttribute('data-st');
+    if(st === 'wide'){ disengageStation(); return; }
+    engageStation(st);
   });
 });
 
@@ -4042,6 +4429,24 @@ window.addEventListener('pointerup', function(e){
   if(Math.hypot(e.clientX-downX, e.clientY-downY)>10 || Date.now()-downT>380) return;
   ptr.x=(e.clientX/window.innerWidth)*2-1; ptr.y=-(e.clientY/window.innerHeight)*2+1;
   ray.setFromCamera(ptr, camera);
+
+  // Check 3D Badge clicks first
+  if(typeof stationBadges !== 'undefined'){
+    var badgeHits = [];
+    for(var bk in stationBadges){
+      var sp = stationBadges[bk];
+      if(sp && sp.visible){
+        var bh = ray.intersectObject(sp);
+        if(bh.length) badgeHits.push({ st: bk, dist: bh[0].distance });
+      }
+    }
+    if(badgeHits.length){
+      badgeHits.sort(function(a,b){ return a.dist - b.dist; });
+      engageStation(badgeHits[0].st);
+      return;
+    }
+  }
+
   var hitsF=ray.intersectObject(furnace, true);
   var hitsB=ray.intersectObject(bellStand, true);
   var hitsA=ray.intersectObjects([anvil, sword], true);
@@ -4049,21 +4454,49 @@ window.addEventListener('pointerup', function(e){
   var dF=hitsF.length?hitsF[0].distance:1e9, dB=hitsB.length?hitsB[0].distance:1e9, dA=hitsA.length?hitsA[0].distance:1e9, dR=hitsR.length?hitsR[0].distance:1e9;
   var m=Math.min(dF,dB,dA,dR); if(m>50) return;
   if(m===dR){
-    if(activeStation!=='rack') setStation('rack');
+    if(activeStation!=='rack') engageStation('rack');
     var slotIdx=hitsR[0].object.userData.slotIndex;
     if(typeof slotIdx==='number') clickRackSlot(slotIdx);
     else hangSword();
     return;
   }
   if(m===dF){
-    if(activeStation!=='furnace') setStation('furnace');
-    doHeat();
+    if(activeStation!=='furnace') engageStation('furnace');
+    else {
+      var stF = getStationStatus('furnace');
+      if(stF.ok){
+        if(G && G.furnaceBroken) doRepair();
+        else doHeat();
+      } else {
+        toast(stF.msg, 'bad');
+        if(typeof crackSound === 'function') crackSound();
+        shakeStationSprite('furnace');
+      }
+    }
   } else if(m===dB){
-    if(activeStation!=='bell') setStation('bell');
-    doTribute();
+    if(activeStation!=='bell') engageStation('bell');
+    else {
+      var stB = getStationStatus('bell');
+      if(stB.ok) doTribute();
+      else {
+        toast(stB.msg, 'bad');
+        if(typeof crackSound === 'function') crackSound();
+        shakeStationSprite('bell');
+      }
+    }
   } else if(m===dA){
-    if(activeStation!=='anvil') setStation('anvil');
-    doHit();
+    if(activeStation!=='anvil') engageStation('anvil');
+    else {
+      var stA = getStationStatus('anvil');
+      if(stA.ok){
+        if(G && G.turns <= 0 && G.hits > 0) doBank();
+        else doHit();
+      } else {
+        toast(stA.msg, 'bad');
+        if(typeof crackSound === 'function') crackSound();
+        shakeStationSprite('anvil');
+      }
+    }
   }
 });
 window.addEventListener('pointercancel', function(){ isDragging=false; });
@@ -4190,18 +4623,44 @@ function animate(){
       else if(qAvg<.015 && qStep>0){ if(++qUpTimer>=3){ qStep--; applyPR(); qUpTimer=0; if(qStep===0 && !(typeof IS_LOW!=='undefined'&&IS_LOW)) document.body.classList.remove('perf-low'); } }
       else qUpTimer=0;
     }
-    if(typeof updateSmith==='function') updateSmith(dt);
     if(typeof beaconRing!=='undefined' && beaconRing){
       var bTargetOp = 0;
+      var isNearOk = true;
       if(!isStationEngaged && currentNearStation && STATIONS[currentNearStation]){
         var stObj = STATIONS[currentNearStation];
         beaconRing.position.x += (stObj.x - beaconRing.position.x) * Math.min(1, dt * 12);
         beaconRing.position.z += (stObj.z - beaconRing.position.z) * Math.min(1, dt * 12);
-        bTargetOp = 0.55 + Math.sin(t * 3.8) * 0.22;
+        var curSt = getStationStatus(currentNearStation);
+        isNearOk = curSt ? curSt.ok : true;
+        bTargetOp = (isNearOk ? 0.55 : 0.40) + Math.sin(t * 3.8) * 0.18;
+        beaconMat.color.setHex(isNearOk ? 0xffb84d : 0xe84c3d);
         beaconRing.rotation.z += dt * 0.65;
       }
       beaconMat.opacity += (bTargetOp - beaconMat.opacity) * Math.min(1, dt * 8);
       beaconRing.visible = beaconMat.opacity > 0.01;
+    }
+    if(typeof stationBadges !== 'undefined'){
+      for(var bk in stationBadges){
+        var sp = stationBadges[bk];
+        var shouldShow = (!isStationEngaged && currentNearStation === bk && !inspectOn && G && G.started && !G.over);
+        var spTargetOp = shouldShow ? 1.0 : 0.0;
+        if(shouldShow){
+          var bStatus = getStationStatus(bk);
+          updateStationBadgeContent(sp, bStatus);
+        }
+        sp.material.opacity += (spTargetOp - sp.material.opacity) * Math.min(1, dt * 9);
+        sp.visible = sp.material.opacity > 0.01;
+        if(sp.visible){
+          var shk = 0;
+          if(sp.userData.shake > 0){
+            sp.userData.shake = Math.max(0, sp.userData.shake - dt * 2.8);
+            shk = (Math.random() - 0.5) * sp.userData.shake * 0.2;
+          }
+          var bob = Math.sin(t * 3.4) * 0.025;
+          sp.position.y = sp.userData.baseY + bob;
+          sp.position.x = BADGE_CONFIG[bk].x + shk;
+        }
+      }
     }
     smithFollow+=(1-smithFollow)*Math.min(1,dt*5);
     if(!G||!G.started||G.over||inspectOn) smithFollow=Math.max(0,smithFollow-dt*6);
