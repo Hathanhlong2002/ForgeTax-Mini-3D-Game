@@ -600,14 +600,22 @@
   .gal-bigsword{height:80px;margin-top:var(--sp-2);padding:var(--sp-2);border-radius:var(--r-m);display:flex;align-items:center;justify-content:center;}
   .gal-bigsword svg{height:56px;width:auto;max-width:100%;}
   /* endgame detail: the level's spirit poster IS the visual (Lv.90–100) */
-  .gal-bigsword.has-poster{height:300px;padding:0;overflow:hidden;position:relative;}
-  .gal-bigsword.has-poster .gal-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 32%;display:block;}
-  @media (max-width:640px){ .gal-bigsword.has-poster{height:230px;} }
-  /* detail preview for VFX levels (Lv.11–89): the snapshot carries the
-     level's element aura, so the preview gets room to show it */
-  .gal-bigsword.has-fx{height:150px;}
+  .gal-bigsword.has-poster{min-height:200px;height:auto;max-height:min(56vh,520px);padding:8px;overflow:visible;position:relative;display:flex;align-items:center;justify-content:center;}
+  .gal-bigsword.has-poster .gal-poster{position:relative;width:100%;height:auto;max-height:min(52vh,500px);object-fit:contain;object-position:center;display:block;border-radius:8px;}
+  .gal-bigsword.has-fx{min-height:140px;height:auto;max-height:280px;padding:10px;}
+  .gal-bigsword.has-fx svg,.gal-bigsword.has-fx img{max-height:260px;width:100%;object-fit:contain;}
+  @media (max-width:640px){ .gal-bigsword.has-poster{max-height:min(48vh,380px);} .gal-bigsword.has-poster .gal-poster{max-height:min(46vh,360px);} }
+  .gal-zoom-row{display:flex;justify-content:center;margin-top:8px;gap:8px;}
+  .gal-zoom-btn{font-size:12px;font-weight:800;padding:7px 14px;border-radius:999px;border:1px solid rgba(232,179,60,.45);background:rgba(20,12,4,.9);color:#ffe8b8;cursor:pointer;pointer-events:auto;}
+  .gal-zoom-btn:hover{border-color:#ffd56a;color:#fff;}
+  .gal-attr-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px;}
+  .gal-attr-table th,.gal-attr-table td{padding:6px 8px;text-align:left;border-bottom:1px solid rgba(232,179,60,.12);vertical-align:top;}
+  .gal-attr-table th{width:38%;font-weight:700;color:#a89478;}
+  .gal-attr-table td{font-weight:800;color:#fff4db;line-height:1.35;}
+  .gal-stats-grid{grid-template-columns:repeat(3,1fr);}
+  @media (max-width:720px){ .gal-stats-grid{grid-template-columns:1fr 1fr;} }
+  /* detail preview for VFX levels (Lv.11–89): sized via .gal-bigsword.has-fx above */
   .gal-bigsword.has-fx img{border-radius:6px;}
-  @media (max-width:640px){ .gal-bigsword.has-fx{height:118px;} }
   /* endgame CARDS (Lv.90–100): the card image IS the hero poster — sword
      wrapped in its element effect with the level's spirit beast looming
      behind it. The poster is portrait, so the visual area goes tall and
@@ -1936,6 +1944,11 @@
     gap: 10px;
     margin-top: 12px;
   }
+    .gal-fullview{position:fixed;inset:0;z-index:96;background:rgba(4,2,1,.94);display:none;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));box-sizing:border-box;}
+  .gal-fullview.open{display:flex;}
+  .gal-fullview img{max-width:min(1200px,100%);max-height:100%;object-fit:contain;border-radius:10px;box-shadow:0 16px 48px rgba(0,0,0,.65);}
+  .gal-fullview-close{position:absolute;top:max(12px,env(safe-area-inset-top));right:12px;z-index:2;width:44px;height:44px;border-radius:50%;border:1px solid rgba(232,179,60,.5);background:rgba(30,18,8,.95);color:#ffe8b8;font-size:18px;cursor:pointer;}
+
   .gal-stat-box {
     background: rgba(14, 9, 6, 0.7);
     border: 1px solid rgba(232, 179, 60, 0.22);
@@ -2235,21 +2248,9 @@
     display: none !important;
   }
 
-  /* --- Station Navigation Dock --- */
+  /* --- Station Navigation Dock (Hidden - player walks in 3D) --- */
   #stationNav {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 4px !important;
-    max-width: 420px !important;
-    width: 100% !important;
-    margin: 6px auto 0 !important;
-    padding: 3px 6px !important;
-    background: rgba(14, 10, 7, 0.75) !important;
-    border: 1px solid rgba(232, 179, 60, 0.25) !important;
-    border-radius: 99px !important;
-    box-sizing: border-box !important;
-    pointer-events: auto !important;
+    display: none !important;
   }
   .st-tab {
     flex: 1 1 0 !important;
@@ -2754,8 +2755,7 @@
     margin: 8px auto 0 !important;
   }
   #stationNav {
-    order: 3 !important;
-    margin-top: 10px !important;
+    display: none !important;
   }
   #keyHints {
     order: 4 !important;
@@ -3309,6 +3309,10 @@
   </div>
 </div>
 
+<div id="galFullView" class="gal-fullview" aria-hidden="true" role="dialog" aria-label="Ảnh kiếm đầy đủ">
+  <button type="button" id="galFullViewClose" class="gal-fullview-close" aria-label="Đóng">✕</button>
+  <img id="galFullViewImg" alt="Ảnh kiếm phóng to" />
+</div>
 <div id="galleryOverlay" role="dialog" aria-label="Bộ sưu tập 100 cấp kiếm">
   <div class="gal-shell" id="galShell">
     <div class="gal-top">
@@ -7234,6 +7238,38 @@ function galOrnaments(lv){
   if(lv>=100) out.push('Pha lê lửa bay quanh + hào quang + lưỡi cầu vồng');
   return out.length? out.join(' · ') : 'Chưa mở trang sức — mở đầu tiên ở Lv.25';
 }
+function galleryBreakRiskPct(lv){
+  lv=clampLv(lv);
+  var r=(typeof BREAK_A!=='undefined'?BREAK_A:.0008)+(typeof BREAK_B!=='undefined'?BREAK_B:.0023)*(lv-1);
+  r*=100;
+  return r<0.095? r.toFixed(2)+'%' : (Math.round(r*10)/10)+'%';
+}
+function openGalFullView(lv){
+  lv=clampLv(lv);
+  var isEn=(typeof CURRENT_LANG!=='undefined'&&CURRENT_LANG==='en');
+  var box=$('galFullView'), img=$('galFullViewImg');
+  if(!box||!img) return;
+  var src=null;
+  if(lv>=90 && typeof endgamePosterSrc==='function') src=endgamePosterSrc(lv);
+  else if(typeof galImgs!=='undefined' && galImgs[lv]) src=galImgs[lv];
+  else {
+    var p=document.querySelector('.gal-bigsword .gal-poster');
+    if(p&&p.src) src=p.src;
+    else if(typeof galImgs!=='undefined'&&galImgs[lv]) src=galImgs[lv];
+  }
+  if(!src){ if(typeof toast==='function') toast(isEn?'Image not ready yet.':'Ảnh chưa sẵn sàng — chờ gallery render.','info'); return; }
+  img.src=src;
+  box.classList.add('open');
+  box.setAttribute('aria-hidden','false');
+}
+function closeGalFullView(){
+  var box=$('galFullView'); if(!box) return;
+  box.classList.remove('open');
+  box.setAttribute('aria-hidden','true');
+}
+window.openGalFullView=openGalFullView;
+window.closeGalFullView=closeGalFullView;
+
 function selectGalLevel(lv, scrollCard){
   galSelected=clampLv(lv);
   var sk=skinForLevel(galSelected);
@@ -7257,8 +7293,24 @@ function selectGalLevel(lv, scrollCard){
     var statusBadge = (galSelected === cur)
       ? '<span class="gdh-status is-cur">' + (isEn ? '⚔️ CURRENTLY EQUIPPED' : '⚔️ ĐANG RÈN TRÊN ĐE') + '</span>'
       : (galSelected < cur
-          ? '<span class="gdh-status is-done">' + (isEn ? '✓ Mastered' : '✓ Đã từng đạt được') + '</span>'
-          : '<span class="gdh-status is-locked">' + (isEn ? ('🔒 Needs ' + (galSelected - cur) + ' more strikes') : ('🔒 Cần ' + (galSelected - cur) + ' nhát gõ thành công')) + '</span>');
+          ? '<span class="gdh-status is-done">' + (isEn ? '✓ Already reached this level' : '✓ Đã từng đạt Lv.'+galSelected) + '</span>'
+          : '<span class="gdh-status is-locked">' + (isEn ? ('🔒 Reach Lv.'+galSelected+' (you are Lv.'+cur+')') : ('🔒 Cần đạt Lv.'+galSelected+' (hiện Lv.'+cur+')')) + '</span>');
+    var mapsTxt=(typeof mapsSummaryForLevel==='function')? mapsSummaryForLevel(galSelected) : '—';
+    var meshId=meshIdForLevel(galSelected);
+    var riskRef=galleryBreakRiskPct(galSelected);
+    var sil=sk.shapeName||sk.shapeBase||'—';
+    var attrs=[
+      [isEn?'Strike value bonus':'Bonus giá mỗi nhát', '+'+Math.round((sk.valueBonus-1)*100)+'%'],
+      [isEn?'Break risk (cold, ref.)':'Nguy cơ vỡ (ước, lạnh)', riskRef],
+      [isEn?'Element / VFX tier':'Nguyên tố · tier', fxText],
+      [isEn?'Silhouette':'Dáng lưỡi', sil],
+      [isEn?'3D materials':'Chất liệu 3D', mapsTxt||'—'],
+      [isEn?'Mesh id':'ID model', meshId||'—'],
+      [isEn?'Ornaments unlocked':'Trang sức mở khóa', galOrnaments(galSelected)],
+      [isEn?'Blade radiance':'Hào quang', Math.round(sk.glow*100)+'%']
+    ];
+    var attrRows='';
+    attrs.forEach(function(row){ attrRows+='<tr><th scope="row">'+row[0]+'</th><td'+(row[0].indexOf('Nguyên')>=0||row[0].indexOf('Element')>=0?' style="color:'+fxColor+'"':'')+'>'+row[1]+'</td></tr>'; });
 
     detail.innerHTML =
       '<div class="gal-detail-card">' +
@@ -7266,7 +7318,7 @@ function selectGalLevel(lv, scrollCard){
           '<div class="gdh-title-wrap">' +
             '<div class="gdh-tier-badge" style="color:' + rarityTier.color + ';border-color:' + rarityTier.color + '">★ ' + rarityTier.name + '</div>' +
             '<h3 class="gdh-name">' + modelNameForLevel(galSelected) + '</h3>' +
-            '<div class="gdh-sub">' + (isEn?'Level ':'Cấp ') + sk.level + ' / 100 · ' + (isEn?'Family: ':'Dòng Kiếm: ') + sk.name + ' (' + (sk.family + 1) + '/10)</div>' +
+            '<div class="gdh-sub">' + (isEn?'Level ':'Cấp ') + sk.level + ' / 100 · ' + (isEn?'Skin: ':'Dòng: ') + sk.familyName + ' · ' + SKIN_VARIANTS[sk.sub] + ' (' + (sk.family + 1) + '/10)</div>' +
           '</div>' +
           '<div class="gdh-status-wrap">' + statusBadge + '</div>' +
         '</div>' +
@@ -7274,13 +7326,14 @@ function selectGalLevel(lv, scrollCard){
           '<div class="gal-bigsword' + (galSelected>=90 && endgamePosterSrc(galSelected)?' has-poster':(galSelected>=11 && galSelected<90?' has-fx':'')) + '">' +
             (galSelected>=90 && endgamePosterSrc(galSelected) ? '<img class="gal-poster" src="' + endgamePosterSrc(galSelected) + '" alt="Poster linh thú Lv.' + galSelected + '">' : swordSVG(galSelected,true)) +
           '</div>' +
+          '<div class="gal-zoom-row"><button type="button" class="gal-zoom-btn" onclick="openGalFullView('+galSelected+')">' + (isEn?'🔍 Full artwork':'🔍 Xem ảnh đầy đủ') + '</button></div>' +
         '</div>' +
         '<div class="gal-stats-grid">' +
-          '<div class="gal-stat-box"><span class="gsb-lbl">⚔️ ' + (isEn?'Value Per Strike':'Giá Mỗi Nhát Gõ') + '</span><b class="gsb-val">+ ' + Math.round((sk.valueBonus - 1) * 100) + '%</b><small class="gsb-sub">' + (isEn?'Multiplies gold value':'Tăng lũy tiến sức mạnh') + '</small></div>' +
-          '<div class="gal-stat-box"><span class="gsb-lbl">✨ ' + (isEn?'Blade Radiance':'Độ Tỏa Sáng') + '</span><b class="gsb-val">' + Math.round(sk.glow * 100) + '%</b><small class="gsb-sub">' + (isEn?'Blade luminescence':'Hào quang thân kiếm') + '</small></div>' +
-          '<div class="gal-stat-box"><span class="gsb-lbl">🔥 ' + (isEn?'Elemental Essence':'Nguyên Tố') + '</span><b class="gsb-val" style="color:' + fxColor + '">' + fxText + '</b><small class="gsb-sub">' + (isEn?'Aura presence':'Linh khí bao quanh') + '</small></div>' +
-          '<div class="gal-stat-box"><span class="gsb-lbl">💍 ' + (isEn?'Ancient Relic Seal':'Cổ Vật Trấn Giữ') + '</span><b class="gsb-val" style="font-size:13px;line-height:1.3">' + galOrnaments(galSelected) + '</b><small class="gsb-sub">' + (isEn?'Passive ornament':'Khắc ấn bổ trợ') + '</small></div>' +
+          '<div class="gal-stat-box"><span class="gsb-lbl">⚔️ ' + (isEn?'Value bonus':'Bonus giá') + '</span><b class="gsb-val">+' + Math.round((sk.valueBonus - 1) * 100) + '%</b><small class="gsb-sub">' + (isEn?'Per successful hit':'Mỗi nhát thành công') + '</small></div>' +
+          '<div class="gal-stat-box"><span class="gsb-lbl">⚠ ' + (isEn?'Break risk':'Nguy cơ vỡ') + '</span><b class="gsb-val">' + riskRef + '</b><small class="gsb-sub">' + (isEn?'Before heat/relics':'Trước nhiệt & relic') + '</small></div>' +
+          '<div class="gal-stat-box"><span class="gsb-lbl">🔥 ' + (isEn?'Element':'Nguyên tố') + '</span><b class="gsb-val" style="color:' + fxColor + '">' + fxText + '</b><small class="gsb-sub">' + (isEn?'Lv.11+ VFX':'VFX từ Lv.11') + '</small></div>' +
         '</div>' +
+        '<table class="gal-attr-table" role="table"><tbody>' + attrRows + '</tbody></table>' +
       '</div>';
   }
   document.querySelectorAll('.sword-card').forEach(function(c){
@@ -7371,7 +7424,9 @@ function closeGallery(){ var ov=document.getElementById('galleryOverlay'); if(ov
   var b=document.getElementById(id); if(b) b.addEventListener('click', function(){ if(typeof audio==='function') audio(); openGallery(); });
 });
 var galCloseBtn=document.getElementById('btnGalleryClose'); if(galCloseBtn) galCloseBtn.addEventListener('click', closeGallery);
-window.addEventListener('keydown', function(e){ if(e.code==='Escape'){ closeGallery(); if(typeof closeSheets==='function') closeSheets(); } });
+var _gfc=$('galFullViewClose'); if(_gfc) _gfc.addEventListener('click', closeGalFullView);
+var _gfv=$('galFullView'); if(_gfv) _gfv.addEventListener('click', function(e){ if(e.target===_gfv) closeGalFullView(); });
+window.addEventListener('keydown', function(e){ if(e.code==='Escape'){ if($('galFullView')&&$('galFullView').classList.contains('open')){ closeGalFullView(); e.stopPropagation(); return; } closeGallery(); if(typeof closeSheets==='function') closeSheets(); } });
 
 /* ================= REAL SWORD MODELS — 100 LEVELS, ONE 3D MODEL PER LEVEL =================
    SWORDS ONLY: every level 1..100 wears its OWN real blade model (sword /
