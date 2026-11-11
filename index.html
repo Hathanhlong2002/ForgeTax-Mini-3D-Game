@@ -931,6 +931,10 @@
   /* ===== 3D Spatial Navigation & Clean UI ===== */
   .top-quick-tools{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-left:auto;}
   .tool-btn{background:rgba(26,18,12,.88);border:1px solid rgba(232,179,60,.4);border-radius:6px;padding:6px 11px;font-size:12px;font-weight:700;color:var(--ink);min-width:0;box-shadow:none;transition:all .15s;}
+  .tool-btn.lang-btn{background:rgba(38,24,14,0.92);border:1px solid rgba(232,179,60,0.6);color:#ffd56a;font-weight:800;letter-spacing:.04em;padding:6px 12px;}
+  .tool-btn.lang-btn:hover{background:rgba(64,40,24,0.98);border-color:#ffe699;box-shadow:0 0 10px rgba(255,213,106,.4);transform:translateY(-1px);}
+  .menu-sub-btn.lang-toggle{border-color:rgba(232,179,60,0.45);color:#ffd56a;background:rgba(45,30,18,0.85);}
+  .menu-sub-btn.lang-toggle:hover{border-color:#ffd56a;background:rgba(70,48,28,0.95);color:#fff;}
   .tool-btn:hover{border-color:var(--gold-2);color:#fff;background:rgba(50,34,22,.95);transform:translateY(-1px);}
 
   .station-nav{display:flex;gap:6px;justify-content:center;margin-bottom:8px;pointer-events:auto;flex-wrap:wrap;}
@@ -1430,21 +1434,22 @@
   <div class="hud-top">
     <div class="hud-expand-only"><button type="button" id="btnHudExpand">▼ Mở HUD (vòng / cống / nhiệm vụ)</button></div>
     <div class="topbar">
-      <div class="plate"><span class="lbl">🔄 Vòng</span><span class="val" id="uiRound">1</span></div>
-      <div class="plate"><span class="lbl">🪙 Vàng kho</span><span class="val" id="uiGold">0</span></div>
-      <div class="plate"><span class="lbl">⏳ Lượt</span><span class="val" id="uiTurns">30</span></div>
-      <div class="plate" id="tributePlate"><span class="lbl">🔔 Cống</span><span class="val"><span id="uiTribNow">0</span> <small>/ <span id="uiTribTarget">120</span> vàng</small></span><div class="bar"><i id="tribFill"></i></div><small class="trib-pot" id="uiTribPot" title="Kho + kiếm trên đe + giá treo">Tiềm năng: 0</small></div>
-      <div class="plate" id="angerPlate"><span class="lbl">🐉 Kiên nhẫn</span><span class="val" id="uiDragonAnger">0/3</span></div>
-      <div class="plate"><span class="lbl">🏆 Kỷ lục</span><span class="val" id="uiBest">—</span></div>
-      <button class="plate" id="btnAch" type="button" title="Thành tích & kỷ lục"><span class="lbl">🏅 Thành tích</span><span class="val" id="uiAchCount">0/15</span></button>
+      <div class="plate"><span class="lbl" id="lblRound">🔄 Vòng</span><span class="val" id="uiRound">1</span></div>
+      <div class="plate"><span class="lbl" id="lblGold">🪙 Vàng kho</span><span class="val" id="uiGold">0</span></div>
+      <div class="plate"><span class="lbl" id="lblTurns">⏳ Lượt</span><span class="val" id="uiTurns">30</span></div>
+      <div class="plate" id="tributePlate"><span class="lbl" id="lblTribute">🔔 Cống</span><span class="val"><span id="uiTribNow">0</span> <small id="lblTribUnit">/ <span id="uiTribTarget">120</span> vàng</small></span><div class="bar"><i id="tribFill"></i></div><small class="trib-pot" id="uiTribPot" title="Kho + kiếm trên đe + giá treo">Tiềm năng: 0</small></div>
+      <div class="plate" id="angerPlate"><span class="lbl" id="lblAnger">🐉 Kiên nhẫn</span><span class="val" id="uiDragonAnger">0/3</span></div>
+      <div class="plate"><span class="lbl" id="lblBest">🏆 Kỷ lục</span><span class="val" id="uiBest">—</span></div>
+      <button class="plate" id="btnAch" type="button" title="Thành tích & kỷ lục"><span class="lbl" id="lblAch">🏅 Thành tích</span><span class="val" id="uiAchCount">0/15</span></button>
       <div class="top-quick-tools">
-        <button class="tool-btn" id="btnShop" type="button" title="Máy Relic (3 ô/vòng)">⚙️ Relic</button>
-        <button class="tool-btn" id="btnUpg" type="button" title="Nâng cấp đe, búa, lò">⬆ Nâng Cấp</button>
-        <button class="tool-btn" id="btnGallery" type="button" title="Xem 100 level kiếm">🖼 Sưu Tập</button>
-        <button class="tool-btn" id="btnHelp" type="button" title="Hướng dẫn & kỷ lục">? Trợ Giúp</button>
+        <button class="tool-btn" id="btnShop" type="button" title="Máy Relic (3 ô/vòng)">⚙️ <span id="btnShopTxt">Relic</span></button>
+        <button class="tool-btn" id="btnUpg" type="button" title="Nâng cấp đe, búa, lò">⬆ <span id="btnUpgTxt">Nâng Cấp</span></button>
+        <button class="tool-btn" id="btnGallery" type="button" title="Xem 100 level kiếm">🖼 <span id="btnGalleryTxt">Sưu Tập</span></button>
+        <button class="tool-btn" id="btnHelp" type="button" title="Hướng dẫn & kỷ lục">? <span id="btnHelpTxt">Trợ Giúp</span></button>
+        <button class="tool-btn lang-btn" id="btnLangTop" type="button" title="Chuyển ngôn ngữ / Switch Language">🌐 <span id="topLangTxt">EN</span></button>
       </div>
     </div>
-    <div id="missionBar"><span class="mb-title">🎯 Vòng <span id="uiMissionRound">1</span></span><span id="btnGhostHint" class="mb-ghost" title="Thương nhân ma mỗi vòng 3,6,9…"></span><span id="missionList"></span><button type="button" id="btnHudToggle" class="hud-toggle" title="Thu gọn thanh trên">▴</button><button type="button" id="btnUiMode" class="hud-toggle" title="Chế độ hiển thị">◎</button></div>
+    <div id="missionBar"><span class="mb-title" id="lblMissionBar">🎯 <span id="lblMissionTxt">Vòng</span> <span id="uiMissionRound">1</span></span><span id="btnGhostHint" class="mb-ghost" title="Thương nhân ma mỗi vòng 3,6,9…"></span><span id="missionList"></span><button type="button" id="btnHudToggle" class="hud-toggle" title="Thu gọn thanh trên">▴</button><button type="button" id="btnUiMode" class="hud-toggle" title="Chế độ hiển thị">◎</button></div>
     <div id="workflowRibbon" class="workflow-ribbon" role="status" aria-live="polite"></div>
   </div>
 
@@ -1452,24 +1457,24 @@
     <div id="swordPlate" class="skin-t0">
       <div class="sw-main">
         <span id="uiSwordLevel">Lv.1 · Thép Thô</span>
-        <span class="sw-val">🪙 <span id="uiSwordVal">25</span> <small>vàng</small></span>
+        <span class="sw-val">🪙 <span id="uiSwordVal">25</span> <small id="lblValUnit">vàng</small></span>
       </div>
-      <div class="sw-shape"><span class="shp-ic">⚔️</span><span>Model: <b id="uiSwordShape">Kiếm Sắt Tập Luyện</b></span><span class="sw-shapenext" id="uiSwordShapeNext">Lv.2 → model khác hẳn</span></div>
+      <div class="sw-shape"><span class="shp-ic">⚔️</span><span><span id="lblSwordShape">Model:</span> <b id="uiSwordShape">Kiếm Sắt Tập Luyện</b></span><span class="sw-shapenext" id="uiSwordShapeNext">Lv.2 → model khác hẳn</span></div>
       <div class="sw-meters">
-        <div class="sw-meter"><div class="sw-mrow"><span class="sw-mlbl">🔥 Nhiệt</span><span class="sw-mval" id="uiHeatPct">20%</span></div><div class="bar"><i id="heatFill" style="transform:scaleX(.2)"></i></div></div>
-        <div class="sw-meter"><div class="sw-mrow"><span class="sw-mlbl">⚠ Nguy cơ vỡ</span><span class="sw-mval" id="uiRiskPct">3%</span></div><div class="bar"><i id="riskFill" style="transform:scaleX(.03)"></i></div></div>
-        <div class="sw-meter"><div class="sw-mrow"><span class="sw-mlbl">🔨 Nhát đã gõ</span><span class="sw-mval" id="uiHits">0 / 99</span></div><div class="bar"><i id="hitFill" style="transform:scaleX(0);background:linear-gradient(90deg,#8a6a2a,#e8b33c)"></i></div></div>
+        <div class="sw-meter"><div class="sw-mrow"><span class="sw-mlbl" id="lblHeat">🔥 Nhiệt</span><span class="sw-mval" id="uiHeatPct">20%</span></div><div class="bar"><i id="heatFill" style="transform:scaleX(.2)"></i></div></div>
+        <div class="sw-meter"><div class="sw-mrow"><span class="sw-mlbl" id="lblRisk">⚠ Nguy cơ vỡ</span><span class="sw-mval" id="uiRiskPct">3%</span></div><div class="bar"><i id="riskFill" style="transform:scaleX(.03)"></i></div></div>
+        <div class="sw-meter"><div class="sw-mrow"><span class="sw-mlbl" id="lblHits">🔨 Nhát đã gõ</span><span class="sw-mval" id="uiHits">0 / 99</span></div><div class="bar"><i id="hitFill" style="transform:scaleX(0);background:linear-gradient(90deg,#8a6a2a,#e8b33c)"></i></div></div>
       </div>
       <div id="frenzyTag">★ FRENZY — NHÁT TỚI ×2.2 · KHÔNG THỂ VỠ</div>
       <div id="rainbowTag">🌈 CẦU VỒNG — NHÁT TỚI ×3.5 · 100% KHÔNG VỠ · CHỈ 1 NHÁT</div>
     </div>
     <div id="movePad" class="move-pad" aria-label="Di chuyển thợ rèn"><button type="button" data-mv="w" aria-label="Tiến">▲</button><div class="move-mid"><button type="button" data-mv="a" aria-label="Trái">◀</button><button type="button" data-mv="d" aria-label="Phải">▶</button></div><button type="button" data-mv="s" aria-label="Lùi">▼</button></div>
     <div id="stationNav" class="station-nav" role="tablist" aria-label="Trạm làm việc trong xưởng rèn">
-      <button type="button" data-st="anvil" class="st-tab active" title="Bàn đe rèn kiếm (Phím 1)"><span class="st-num">[1]</span><span class="st-ic">🛠</span> Đe Rèn</button>
-      <button type="button" data-st="furnace" class="st-tab" title="Lò nung lửa đỏ (Phím 2)"><span class="st-num">[2]</span><span class="st-ic">🔥</span> Lò Nung</button>
-      <button type="button" data-st="bell" class="st-tab" title="Chuông cống & Hang rồng (Phím 3)"><span class="st-num">[3]</span><span class="st-ic">🔔</span> Chuông Cống</button>
-      <button type="button" data-st="rack" class="st-tab" title="Giá treo kiếm trên tường (Phím 4)"><span class="st-num">[4]</span><span class="st-ic">🗡</span> Giá Treo</button>
-      <button type="button" data-st="wide" class="st-tab" title="Tự do đi bộ / Toàn cảnh (Phím 5)"><span class="st-num">[5]</span><span class="st-ic">👁</span> Tự Do</button>
+      <button type="button" data-st="anvil" class="st-tab active" title="Bàn đe rèn kiếm (Phím 1)"><span class="st-num">[1]</span><span class="st-ic">🛠</span> <span class="st-name">Đe Rèn</span></button>
+      <button type="button" data-st="furnace" class="st-tab" title="Lò nung lửa đỏ (Phím 2)"><span class="st-num">[2]</span><span class="st-ic">🔥</span> <span class="st-name">Lò Nung</span></button>
+      <button type="button" data-st="bell" class="st-tab" title="Chuông cống & Hang rồng (Phím 3)"><span class="st-num">[3]</span><span class="st-ic">🔔</span> <span class="st-name">Chuông Cống</span></button>
+      <button type="button" data-st="rack" class="st-tab" title="Giá treo kiếm trên tường (Phím 4)"><span class="st-num">[4]</span><span class="st-ic">🗡</span> <span class="st-name">Giá Treo</span></button>
+      <button type="button" data-st="wide" class="st-tab" title="Tự do đi bộ / Toàn cảnh (Phím 5)"><span class="st-num">[5]</span><span class="st-ic">👁</span> <span class="st-name">Tự Do</span></button>
     </div>
     <div id="interactPromptWrap" class="interact-prompt-wrap" style="display:none;">
       <div id="interactPrompt" class="interact-prompt" role="button" tabindex="0">
@@ -1485,7 +1490,7 @@
       <button id="btnBank">📥 CHỐT KIẾM<span class="sub">B · cất vàng vào kho, lấy kiếm mới</span></button>
       <button id="btnHang">🗡 TREO KIẾM<span class="sub">T · lên giá treo (0/3)</span></button>
       <button id="btnTribute" class="goldbtn" disabled>🔔 NỘP CỐNG<span class="sub">đủ vàng mới rung chuông được</span></button>
-      <button id="btnLeaveStation" type="button" class="leave-station-btn" title="Rời trạm quay lại đi bộ tự do (Phím Q / WASD)"><span class="prompt-key" style="background:#5a3520;color:#fff;border-color:rgba(232,179,60,.5);">Q</span> RỜI TRẠM</button>
+      <button id="btnLeaveStation" type="button" class="leave-station-btn" title="Rời trạm quay lại đi bộ tự do (Phím Q / WASD)"><span class="prompt-key" style="background:#5a3520;color:#fff;border-color:rgba(232,179,60,.5);">Q</span> <span id="btnLeaveTxt">RỜI TRẠM</span></button>
     </div>
     <p id="keyHints" class="key-hints" aria-hidden="true">Phím: <kbd>WASD</kbd> đi bộ · <kbd>E</kbd> tương tác trạm · <kbd>Q</kbd> rời trạm · <kbd>Space</kbd> hành động · <kbd>1-5</kbd> trạm</p>
   </div>
@@ -1589,8 +1594,8 @@
       <img src="assets/ui/menu_crest.svg" alt="Crest" class="menu-crest-img">
       <div class="menu-title-wrap">
         <h1 class="menu-title">FORGETAX</h1>
-        <div class="menu-subtitle">LÒ RÈN HUYỀN THOẠI 3D</div>
-        <div class="menu-tagline">Rèn kiếm samurai · Nung nhiệt thượng thừa · Vượt cống Rồng Khói</div>
+        <div class="menu-subtitle" id="menuSubtitle">LÒ RÈN HUYỀN THOẠI 3D</div>
+        <div class="menu-tagline" id="menuTagline">Rèn kiếm samurai · Nung nhiệt thượng thừa · Vượt cống Rồng Khói</div>
       </div>
     </div>
 
@@ -1599,31 +1604,34 @@
       <div class="mode-card mode-contract" id="btnStart" role="button" tabindex="0" data-mode="contract">
         <img src="assets/ui/mode_contract.svg" alt="Hợp Đồng" class="mode-icon">
         <div class="mode-info">
-          <div class="mode-badge">CHIẾN DỊCH CHÍNH</div>
-          <div class="mode-name">HỢP ĐỒNG 12 VÒNG</div>
-          <div class="mode-desc">Thử thách sinh tử: Nộp đủ cống thuế rồng trong 12 vòng. Trễ cống 3 lần lò rèn sụp đổ!</div>
+          <div class="mode-badge" id="modeContractBadge">CHIẾN DỊCH CHÍNH</div>
+          <div class="mode-name" id="modeContractName">HỢP ĐỒNG 12 VÒNG</div>
+          <div class="mode-desc" id="modeContractDesc">Thử thách sinh tử: Nộp đủ cống thuế rồng trong 12 vòng. Trễ cống 3 lần lò rèn sụp đổ!</div>
         </div>
-        <div class="mode-action-btn">VÀO LÒ RÈN ⚔️</div>
+        <div class="mode-action-btn" id="modeContractBtn">VÀO LÒ RÈN ⚔️</div>
       </div>
 
       <div class="mode-card mode-endless" id="btnStartEndless" role="button" tabindex="0" data-mode="endless">
         <img src="assets/ui/mode_endless.svg" alt="Vô Tận" class="mode-icon">
         <div class="mode-info">
-          <div class="mode-badge badge-red">CHẾ ĐỘ CAO THỦ</div>
-          <div class="mode-name">RÈN VÔ TẬN ♾️</div>
-          <div class="mode-desc">Không giới hạn hợp đồng. Cống tăng +20% mỗi vòng, xem ai chạm mốc Kiếm Thần Lv.100!</div>
+          <div class="mode-badge badge-red" id="modeEndlessBadge">CHẾ ĐỘ CAO THỦ</div>
+          <div class="mode-name" id="modeEndlessName">RÈN VÔ TẬN ♾️</div>
+          <div class="mode-desc" id="modeEndlessDesc">Không giới hạn hợp đồng. Cống tăng +20% mỗi vòng, xem ai chạm mốc Kiếm Thần Lv.100!</div>
         </div>
-        <div class="mode-action-btn btn-amber">THỬ THÁCH 🔥</div>
+        <div class="mode-action-btn btn-amber" id="modeEndlessBtn">THỬ THÁCH 🔥</div>
       </div>
     </div>
 
     <!-- Quick action buttons -->
     <div class="menu-quick-row">
       <button id="btnGalleryStart" type="button" class="menu-sub-btn">
-        <span>🖼️</span> BỘ SƯU TẬP 100 KIẾM
+        <span>🖼️</span> <span id="menuGalTxt">BỘ SƯU TẬP 100 KIẾM</span>
       </button>
       <button id="btnMenuRules" type="button" class="menu-sub-btn">
-        <span>📜</span> BÍ KÍP THỢ RÈN
+        <span>📜</span> <span id="menuRulesTxt">BÍ KÍP THỢ RÈN</span>
+      </button>
+      <button id="btnMenuLang" type="button" class="menu-sub-btn lang-toggle" title="Chuyển ngôn ngữ / Switch Language">
+        <span>🌐</span> <span id="menuLangTxt">ENGLISH</span>
       </button>
     </div>
 
@@ -1632,19 +1640,19 @@
       <div class="rules-grid">
         <div class="rule-box">
           <div class="rule-icon">🔥</div>
-          <div class="rule-txt"><b>Nung trước, gõ sau:</b> Nhiệt ≥60% giảm 50% nguy cơ vỡ. Giữ nhiệt đỏ để gõ giá trị cao và an toàn.</div>
+          <div class="rule-txt" id="menuRule1"><b>Nung trước, gõ sau:</b> Nhiệt ≥60% giảm 50% nguy cơ vỡ. Giữ nhiệt đỏ để gõ giá trị cao và an toàn.</div>
         </div>
         <div class="rule-box">
           <div class="rule-icon">⚡</div>
-          <div class="rule-txt"><b>Frenzy &amp; Cầu vồng:</b> Gõ 10 nhát kích hoạt Frenzy (×2.2). 4% cơ hội kích Rainbow Combo (100% bền + ×3.5 giá)!</div>
+          <div class="rule-txt" id="menuRule2"><b>Frenzy &amp; Cầu vồng:</b> Gõ 10 nhát kích hoạt Frenzy (×2.2). 4% cơ hội kích Rainbow Combo (100% bền + ×3.5 giá)!</div>
         </div>
         <div class="rule-box">
           <div class="rule-icon">🗡️</div>
-          <div class="rule-txt"><b>Giá treo &amp; Nâng cấp:</b> Cất kiếm đang rèn lên 3 ô giá treo. Nâng cấp búa, đe, lò trong kho để tăng tiến sức mạnh.</div>
+          <div class="rule-txt" id="menuRule3"><b>Giá treo &amp; Nâng cấp:</b> Cất kiếm đang rèn lên 3 ô giá treo. Nâng cấp búa, đe, lò trong kho để tăng tiến sức mạnh.</div>
         </div>
         <div class="rule-box">
           <div class="rule-icon">🔔</div>
-          <div class="rule-txt"><b>Rung chuông &amp; Trả cống:</b> Đủ cống trong kho thì rung chuông qua vòng. Tránh để hết lượt làm Rồng thổi lò!</div>
+          <div class="rule-txt" id="menuRule4"><b>Rung chuông &amp; Trả cống:</b> Đủ cống trong kho thì rung chuông qua vòng. Tránh để hết lượt làm Rồng thổi lò!</div>
         </div>
       </div>
     </div>
@@ -2348,6 +2356,208 @@ var targetYaw = 0, targetPitch = -0.40;
 var isDragging = false, lastDragX = 0, lastDragY = 0;
 var walkBob = 0;
 
+/* ============================== MULTI-LANGUAGE SYSTEM (VI / EN) ============================== */
+var CURRENT_LANG = (function(){
+  try {
+    return localStorage.getItem('forgetax_lang') || (typeof META!=='undefined' && META && META.lang) || 'vi';
+  } catch(e){ return 'vi'; }
+})();
+
+function setLanguage(lang){
+  CURRENT_LANG = (lang === 'en') ? 'en' : 'vi';
+  try {
+    localStorage.setItem('forgetax_lang', CURRENT_LANG);
+    if(typeof META !== 'undefined' && META){
+      META.lang = CURRENT_LANG;
+      if(typeof metaSave === 'function') metaSave();
+    }
+  } catch(e){}
+  applyLanguageUI();
+}
+
+function toggleLanguage(){
+  setLanguage(CURRENT_LANG === 'vi' ? 'en' : 'vi');
+}
+
+function applyLanguageUI(){
+  var isEn = (CURRENT_LANG === 'en');
+  
+  // Top quick tools & plates
+  var lRound = $('lblRound'), lGold = $('lblGold'), lTurns = $('lblTurns'), lTrib = $('lblTribute'), lAnger = $('lblAnger'), lBest = $('lblBest'), lAch = $('lblAch');
+  if(lRound) lRound.textContent = isEn ? '🔄 Round' : '🔄 Vòng';
+  if(lGold) lGold.textContent = isEn ? '🪙 Vault Gold' : '🪙 Vàng kho';
+  if(lTurns) lTurns.textContent = isEn ? '⏳ Turns' : '⏳ Lượt';
+  if(lTrib) lTrib.textContent = isEn ? '🔔 Tribute' : '🔔 Cống';
+  if(lAnger) lAnger.textContent = isEn ? '🐉 Patience' : '🐉 Kiên nhẫn';
+  if(lBest) lBest.textContent = isEn ? '🏆 Best' : '🏆 Kỷ lục';
+  if(lAch) lAch.textContent = isEn ? '🏅 Badges' : '🏅 Thành tích';
+
+  var sTxt = $('btnShopTxt'), uTxt = $('btnUpgTxt'), gTxt = $('btnGalleryTxt'), hTxt = $('btnHelpTxt'), tLang = $('topLangTxt');
+  if(sTxt) sTxt.textContent = isEn ? 'Relics' : 'Relic';
+  if(uTxt) uTxt.textContent = isEn ? 'Upgrades' : 'Nâng Cấp';
+  if(gTxt) gTxt.textContent = isEn ? 'Gallery' : 'Sưu Tập';
+  if(hTxt) hTxt.textContent = isEn ? 'Help' : 'Trợ Giúp';
+  if(tLang) tLang.textContent = isEn ? 'VI' : 'EN';
+  var btnLangTop = $('btnLangTop');
+  if(btnLangTop) btnLangTop.title = isEn ? 'Chuyển sang Tiếng Việt' : 'Switch to English';
+
+  var btnView = $('btnView');
+  if(btnView) {
+    btnView.textContent = isEn ? '🔍 INSPECT' : '🔍 NGẮM';
+    btnView.title = isEn ? 'Inspect sword (Key V)' : 'Ngắm kiếm (phím V)';
+  }
+
+  var btnExpand = $('btnHudExpand');
+  if(btnExpand) btnExpand.textContent = isEn ? '▼ Open HUD (round / tribute / quests)' : '▼ Mở HUD (vòng / cống / nhiệm vụ)';
+
+  var lMisBar = $('lblMissionTxt');
+  if(lMisBar) lMisBar.textContent = isEn ? 'Round' : 'Vòng';
+
+  // Station navigation tabs
+  var tabNames = {
+    anvil: isEn ? 'Anvil' : 'Đe Rèn',
+    furnace: isEn ? 'Furnace' : 'Lò Nung',
+    bell: isEn ? 'Dragon Bell' : 'Chuông Cống',
+    rack: isEn ? 'Sword Rack' : 'Giá Treo',
+    wide: isEn ? 'Free Roam' : 'Tự Do'
+  };
+  var tabTitles = {
+    anvil: isEn ? 'Forging Anvil (Key 1)' : 'Bàn đe rèn kiếm (Phím 1)',
+    furnace: isEn ? 'Blast Furnace (Key 2)' : 'Lò nung lửa đỏ (Phím 2)',
+    bell: isEn ? 'Dragon Bell & Cave (Key 3)' : 'Chuông cống & Hang rồng (Phím 3)',
+    rack: isEn ? 'Sword Rack on wall (Key 4)' : 'Giá treo kiếm trên tường (Phím 4)',
+    wide: isEn ? 'Free Roam / Overview (Key 5)' : 'Tự do đi bộ / Toàn cảnh (Phím 5)'
+  };
+  document.querySelectorAll('#stationNav .st-tab').forEach(function(tb){
+    var st = tb.getAttribute('data-st');
+    if(st && tabNames[st]){
+      var sn = tb.querySelector('.st-name');
+      if(sn) sn.textContent = tabNames[st];
+      if(tabTitles[st]) tb.title = tabTitles[st];
+    }
+  });
+
+  // Action buttons
+  var bHeat = $('btnHeat');
+  if(bHeat){
+    var bHeatMain = bHeat.childNodes[0];
+    if(bHeatMain && bHeatMain.nodeType === 3) bHeatMain.nodeValue = isEn ? '🔥 HEAT BLADE' : '🔥 NUNG KIẾM';
+  }
+  var bHit = $('btnHit');
+  if(bHit){
+    var bHitMain = bHit.childNodes[0];
+    if(bHitMain && bHitMain.nodeType === 3) bHitMain.nodeValue = isEn ? '🔨 STRIKE HAMMER' : '🔨 GÕ BÚA';
+  }
+  var bBank = $('btnBank');
+  if(bBank){
+    var bBankMain = bBank.childNodes[0];
+    if(bBankMain && bBankMain.nodeType === 3) bBankMain.nodeValue = isEn ? '📥 BANK BLADE' : '📥 CHỐT KIẾM';
+    var bBankSub = bBank.querySelector('.sub');
+    if(bBankSub) bBankSub.textContent = isEn ? 'B · stash gold to vault, grab new blade' : 'B · cất vàng vào kho, lấy kiếm mới';
+  }
+  var bHang = $('btnHang');
+  if(bHang){
+    var bHangMain = bHang.childNodes[0];
+    if(bHangMain && bHangMain.nodeType === 3) bHangMain.nodeValue = isEn ? '🗡 HANG BLADE' : '🗡 TREO KIẾM';
+  }
+  var bTrib = $('btnTribute');
+  if(bTrib){
+    var bTribMain = bTrib.childNodes[0];
+    if(bTribMain && bTribMain.nodeType === 3) bTribMain.nodeValue = isEn ? '🔔 PAY TRIBUTE' : '🔔 NỘP CỐNG';
+    var bTribSub = bTrib.querySelector('.sub');
+    if(bTribSub) bTribSub.textContent = isEn ? 'requires enough gold to ring bell' : 'đủ vàng mới rung chuông được';
+  }
+  var bLeave = $('btnLeaveTxt');
+  if(bLeave) bLeave.textContent = isEn ? 'LEAVE STATION' : 'RỜI TRẠM';
+  var bLeaveWrap = $('btnLeaveStation');
+  if(bLeaveWrap) bLeaveWrap.title = isEn ? 'Leave station & return to free walk (Key Q / WASD)' : 'Rời trạm quay lại đi bộ tự do (Phím Q / WASD)';
+
+  var kh = $('keyHints');
+  if(kh) kh.innerHTML = isEn
+    ? 'Keys: <kbd>WASD</kbd> walk · <kbd>E</kbd> interact · <kbd>Q</kbd> leave station · <kbd>Space</kbd> action · <kbd>1-5</kbd> stations'
+    : 'Phím: <kbd>WASD</kbd> đi bộ · <kbd>E</kbd> tương tác trạm · <kbd>Q</kbd> rời trạm · <kbd>Space</kbd> hành động · <kbd>1-5</kbd> trạm';
+
+  // Sword plate
+  var lHeat = $('lblHeat'), lRisk = $('lblRisk'), lHits = $('lblHits'), lUnit = $('lblValUnit'), lUnit2 = $('lblTribUnit');
+  if(lHeat) lHeat.textContent = isEn ? '🔥 Heat' : '🔥 Nhiệt';
+  if(lRisk) lRisk.textContent = isEn ? '⚠ Shatter Risk' : '⚠ Nguy cơ vỡ';
+  if(lHits) lHits.textContent = isEn ? '🔨 Strikes' : '🔨 Nhát đã gõ';
+  if(lUnit) lUnit.textContent = isEn ? 'gold' : 'vàng';
+  if(lUnit2 && G) lUnit2.innerHTML = '/ <span id="uiTribTarget">' + (G.target || 120) + '</span> ' + (isEn ? 'gold' : 'vàng');
+
+  var fz = $('frenzyTag');
+  if(fz) fz.textContent = isEn ? '★ FRENZY — NEXT HIT ×2.2 · UNBREAKABLE' : '★ FRENZY — NHÁT TỚI ×2.2 · KHÔNG THỂ VỠ';
+  var rb = $('rainbowTag');
+  if(rb) rb.textContent = isEn ? '🌈 RAINBOW — NEXT HIT ×3.5 · 100% SAFE · 1 HIT ONLY' : '🌈 CẦU VỒNG — NHÁT TỚI ×3.5 · 100% KHÔNG VỠ · CHỈ 1 NHÁT';
+
+  var rkLbl = document.querySelector('.racklbl');
+  if(rkLbl) rkLbl.textContent = isEn ? '🗡 Sword Rack' : '🗡 Giá treo';
+
+  // Main menu
+  var mSub = $('menuSubtitle'), mTag = $('menuTagline');
+  if(mSub) mSub.textContent = isEn ? 'LEGENDARY 3D FORGE' : 'LÒ RÈN HUYỀN THOẠI 3D';
+  if(mTag) mTag.textContent = isEn ? 'Forge legendary blades · Master the flame · Satisfy the Smoke Dragon' : 'Rèn kiếm samurai · Nung nhiệt thượng thừa · Vượt cống Rồng Khói';
+
+  var mCBadge = $('modeContractBadge'), mCName = $('modeContractName'), mCDesc = $('modeContractDesc'), mCBtn = $('modeContractBtn');
+  if(mCBadge) mCBadge.textContent = isEn ? 'CAMPAIGN' : 'CHIẾN DỊCH CHÍNH';
+  if(mCName) mCName.textContent = isEn ? '12-ROUND CONTRACT' : 'HỢP ĐỒNG 12 VÒNG';
+  if(mCDesc) mCDesc.textContent = isEn ? 'Survive 12 rounds of escalating dragon tributes. Fail 3 times and your forge crumbles!' : 'Thử thách sinh tử: Nộp đủ cống thuế rồng trong 12 vòng. Trễ cống 3 lần lò rèn sụp đổ!';
+  if(mCBtn) mCBtn.textContent = isEn ? 'ENTER FORGE ⚔️' : 'VÀO LÒ RÈN ⚔️';
+
+  var mEBadge = $('modeEndlessBadge'), mEName = $('modeEndlessName'), mEDesc = $('modeEndlessDesc'), mEBtn = $('modeEndlessBtn');
+  if(mEBadge) mEBadge.textContent = isEn ? 'ENDLESS FORGE' : 'CHẾ ĐỘ CAO THỦ';
+  if(mEName) mEName.textContent = isEn ? 'ENDLESS MODE ♾️' : 'RÈN VÔ TẬN ♾️';
+  if(mEDesc) mEDesc.textContent = isEn ? 'No contract limits. Tribute increases +20% each round. Forge your way to God Sword Lv.100!' : 'Không giới hạn hợp đồng. Cống tăng +20% mỗi vòng, xem ai chạm mốc Kiếm Thần Lv.100!';
+  if(mEBtn) mEBtn.textContent = isEn ? 'CHALLENGE 🔥' : 'THỬ THÁCH 🔥';
+
+  var mGal = $('menuGalTxt'), mRules = $('menuRulesTxt'), mLang = $('menuLangTxt');
+  if(mGal) mGal.textContent = isEn ? '100 BLADES GALLERY' : 'BỘ SƯU TẬP 100 KIẾM';
+  if(mRules) mRules.textContent = isEn ? 'BLACKSMITH GUIDE' : 'BÍ KÍP THỢ RÈN';
+  if(mLang) mLang.textContent = isEn ? 'TIẾNG VIỆT' : 'ENGLISH';
+
+  var r1 = $('menuRule1'), r2 = $('menuRule2'), r3 = $('menuRule3'), r4 = $('menuRule4');
+  if(r1) r1.innerHTML = isEn
+    ? '<b>Heat first, strike later:</b> Heat ≥60% cuts break risk by 50%. Keep blade glowing for maximum value and safety.'
+    : '<b>Nung trước, gõ sau:</b> Nhiệt ≥60% giảm 50% nguy cơ vỡ. Giữ nhiệt đỏ để gõ giá trị cao và an toàn.';
+  if(r2) r2.innerHTML = isEn
+    ? '<b>Frenzy &amp; Rainbow:</b> 10 strikes activate Frenzy (×2.2). 4% chance to trigger Rainbow Combo (100% unbreakable + ×3.5 value)!'
+    : '<b>Frenzy &amp; Cầu vồng:</b> Gõ 10 nhát kích hoạt Frenzy (×2.2). 4% cơ hội kích Rainbow Combo (100% bền + ×3.5 giá)!';
+  if(r3) r3.innerHTML = isEn
+    ? '<b>Sword Rack &amp; Upgrades:</b> Store up to 3 blades on rack. Upgrade hammer, anvil, and forge in vault to boost crafting power.'
+    : '<b>Giá treo &amp; Nâng cấp:</b> Cất kiếm đang rèn lên 3 ô giá treo. Nâng cấp búa, đe, lò trong kho để tăng tiến sức mạnh.';
+  if(r4) r4.innerHTML = isEn
+    ? '<b>Ring Bell &amp; Pay Tribute:</b> When vault gold meets target, ring the dragon bell to advance. Avoid running out of turns!'
+    : '<b>Rung chuông &amp; Trả cống:</b> Đủ cống trong kho thì rung chuông qua vòng. Tránh để hết lượt làm Rồng thổi lò!';
+
+  // 3D Badges config
+  if(typeof BADGE_CONFIG !== 'undefined'){
+    BADGE_CONFIG.anvil.title = isEn ? 'FORGING ANVIL' : 'ĐE RÈN KIẾM';
+    BADGE_CONFIG.anvil.defaultAction = isEn ? 'Hammer to level up' : 'Gõ búa tăng cấp';
+    BADGE_CONFIG.furnace.title = isEn ? 'BLAST FURNACE' : 'LÒ NUNG LỬA';
+    BADGE_CONFIG.furnace.defaultAction = isEn ? 'Heat blade to forge' : 'Nung kiếm tăng nhiệt';
+    BADGE_CONFIG.bell.title = isEn ? 'DRAGON BELL' : 'CHUÔNG CỐNG RỒNG';
+    BADGE_CONFIG.bell.defaultAction = isEn ? 'Pay tribute to advance' : 'Nộp cống qua vòng';
+    BADGE_CONFIG.rack.title = isEn ? 'SWORD RACK' : 'GIÁ TREO KIẾM';
+    BADGE_CONFIG.rack.defaultAction = isEn ? 'Manage rack swords' : 'Quản lý kiếm trên giá';
+  }
+  if(typeof invalidateStationStatusCache === 'function') invalidateStationStatusCache();
+  if(typeof stationBadges !== 'undefined'){
+    for(var bk in stationBadges){
+      if(stationBadges[bk] && stationBadges[bk].userData){
+        stationBadges[bk].userData.lastStateKey = '';
+      }
+    }
+  }
+
+  // Clear text cache so refreshUI re-renders everything in new language
+  _txtCache = {};
+  if(typeof _lastPromptNear !== 'undefined') {
+    _lastPromptNear = null; _lastPromptEngaged = null; _lastPromptStatusKey = '';
+  }
+  if(typeof refreshUI === 'function') refreshUI();
+  if(typeof updateInteractPrompt === 'function') updateInteractPrompt(currentNearStation);
+}
+
 var STATION_DESTINATIONS = {
   anvil:   { pos: new THREE.Vector3(0, 1.85, 2.05), yaw: 0, pitch: -0.40 },
   furnace: { pos: new THREE.Vector3(-2.3, 1.85, -1.1), yaw: Math.PI * 0.48, pitch: -0.16 },
@@ -2357,10 +2567,31 @@ var STATION_DESTINATIONS = {
 };
 
 function getStationStatus(st){
-  if(!G || !G.started || G.over) return { ok: false, shortMsg: 'Chưa bắt đầu', msg: 'Trò chơi chưa bắt đầu hoặc đã kết thúc!', action: 'not_started' };
-  if(G.eventLock) return { ok: false, shortMsg: 'Sự kiện rồng', msg: 'Rồng Khói đang giáng lâm — hãy hoàn thành sự kiện!', action: 'event_locked' };
-  if(G.heating) return { ok: false, shortMsg: 'Đang nung...', msg: 'Kiếm đang được kẹp nung trong lò lửa!', action: 'heating' };
-  if(G.repairing) return { ok: false, shortMsg: 'Đang sửa lò...', msg: 'Thợ rèn đang sửa chữa lò nung bị phá hủy!', action: 'repairing' };
+  var isEn = (CURRENT_LANG === 'en');
+  if(!G || !G.started || G.over) return {
+    ok: false,
+    shortMsg: isEn ? 'Not started' : 'Chưa bắt đầu',
+    msg: isEn ? 'Game has not started or already ended!' : 'Trò chơi chưa bắt đầu hoặc đã kết thúc!',
+    action: 'not_started'
+  };
+  if(G.eventLock) return {
+    ok: false,
+    shortMsg: isEn ? 'Dragon event' : 'Sự kiện rồng',
+    msg: isEn ? 'Smoke Dragon is descending — resolve the event!' : 'Rồng Khói đang giáng lâm — hãy hoàn thành sự kiện!',
+    action: 'event_locked'
+  };
+  if(G.heating) return {
+    ok: false,
+    shortMsg: isEn ? 'Heating...' : 'Đang nung...',
+    msg: isEn ? 'Blade is glowing in the furnace flames!' : 'Kiếm đang được kẹp nung trong lò lửa!',
+    action: 'heating'
+  };
+  if(G.repairing) return {
+    ok: false,
+    shortMsg: isEn ? 'Repairing...' : 'Đang sửa lò...',
+    msg: isEn ? 'Blacksmith is repairing the broken furnace!' : 'Thợ rèn đang sửa chữa lò nung bị phá hủy!',
+    action: 'repairing'
+  };
 
   if(st === 'furnace'){
     if(G.furnaceBroken){
@@ -2368,30 +2599,32 @@ function getStationStatus(st){
       if(G.gold < cost){
         return {
           ok: false,
-          shortMsg: 'Cần ' + cost + ' vàng sửa',
-          msg: '🔥 Lò bị rồng thiêu hỏng! Cần ' + cost + ' vàng sửa lò (hiện có ' + G.gold + ' vàng). Hãy gõ kiếm nguội trên đe để kiếm vàng!',
+          shortMsg: isEn ? ('Need ' + cost + 'g to repair') : ('Cần ' + cost + ' vàng sửa'),
+          msg: isEn
+            ? ('🔥 Furnace scorched by dragon! Need ' + cost + ' gold to repair (vault: ' + G.gold + 'g). Strike cold blades on the anvil to earn gold!')
+            : ('🔥 Lò bị rồng thiêu hỏng! Cần ' + cost + ' vàng sửa lò (hiện có ' + G.gold + ' vàng). Hãy gõ kiếm nguội trên đe để kiếm vàng!'),
           action: 'repair_locked'
         };
       }
       return {
         ok: true,
-        shortMsg: 'Sửa lò (' + cost + ' vàng)',
-        msg: '🔧 Bấm [E] để sửa lò nung (' + cost + ' vàng)',
+        shortMsg: isEn ? ('Repair furnace (' + cost + 'g)') : ('Sửa lò (' + cost + ' vàng)'),
+        msg: isEn ? ('🔧 Press [E] to repair blast furnace (' + cost + ' gold)') : ('🔧 Bấm [E] để sửa lò nung (' + cost + ' vàng)'),
         action: 'repair'
       };
     }
     if(G.turns <= 0){
       return {
         ok: false,
-        shortMsg: 'Hết lượt rèn (0)',
-        msg: '🔥 Đã hết lượt rèn vòng này! Hãy nộp cống chuông hoặc qua vòng.',
+        shortMsg: isEn ? 'Turns exhausted (0)' : 'Hết lượt rèn (0)',
+        msg: isEn ? '🔥 Out of turns this round! Pay tribute at the dragon bell.' : '🔥 Đã hết lượt rèn vòng này! Hãy nộp cống chuông hoặc qua vòng.',
         action: 'turns_out'
       };
     }
     return {
       ok: true,
-      shortMsg: 'Nung kiếm tăng nhiệt',
-      msg: '🔥 Bấm [E] để nung kiếm tăng nhiệt độ',
+      shortMsg: isEn ? 'Heat blade in furnace' : 'Nung kiếm tăng nhiệt',
+      msg: isEn ? '🔥 Press [E] to heat blade in furnace' : '🔥 Bấm [E] để nung kiếm tăng nhiệt độ',
       action: 'heat'
     };
   }
@@ -2404,22 +2637,26 @@ function getStationStatus(st){
       if(pot >= G.target){
         return {
           ok: false,
-          shortMsg: 'Chốt kiếm để đủ ' + G.target + ' vàng',
-          msg: '🔔 Chưa đủ vàng mặt! Bấm [B] chốt kiếm trên đe (' + anvilVal + ' vàng) hoặc giá treo để đủ ' + G.target + ' vàng nộp cống!',
+          shortMsg: isEn ? ('Bank blades to reach ' + G.target + 'g') : ('Chốt kiếm để đủ ' + G.target + ' vàng'),
+          msg: isEn
+            ? ('🔔 Not enough vault gold! Press [B] to bank anvil blade (' + anvilVal + 'g) or rack to reach ' + G.target + 'g tribute!')
+            : ('🔔 Chưa đủ vàng mặt! Bấm [B] chốt kiếm trên đe (' + anvilVal + ' vàng) hoặc giá treo để đủ ' + G.target + ' vàng nộp cống!'),
           action: 'need_bank'
         };
       }
       return {
         ok: false,
-        shortMsg: 'Thiếu vàng (' + G.gold + '/' + G.target + ')',
-        msg: '🔔 Chưa đủ vàng nộp cống! Cần ' + G.target + ' vàng (hiện có ' + G.gold + ' vàng). Hãy gõ kiếm tích thêm vàng!',
+        shortMsg: isEn ? ('Need gold (' + G.gold + '/' + G.target + ')') : ('Thiếu vàng (' + G.gold + '/' + G.target + ')'),
+        msg: isEn
+          ? ('🔔 Insufficient gold for tribute! Target: ' + G.target + 'g (have ' + G.gold + 'g). Strike blades to earn more!')
+          : ('🔔 Chưa đủ vàng nộp cống! Cần ' + G.target + ' vàng (hiện có ' + G.gold + ' vàng). Hãy gõ kiếm tích thêm vàng!'),
         action: 'need_gold'
       };
     }
     return {
       ok: true,
-      shortMsg: 'Nộp cống (' + G.target + ' vàng)',
-      msg: '🔔 Bấm [E] rung chuông nộp cống qua vòng',
+      shortMsg: isEn ? ('Pay tribute (' + G.target + 'g)') : ('Nộp cống (' + G.target + ' vàng)'),
+      msg: isEn ? '🔔 Press [E] to ring bell and pay dragon tribute' : '🔔 Bấm [E] rung chuông nộp cống qua vòng',
       action: 'tribute'
     };
   }
@@ -2428,23 +2665,23 @@ function getStationStatus(st){
     if(G.turns <= 0 && G.hits <= 0){
       return {
         ok: false,
-        shortMsg: 'Hết lượt rèn (0)',
-        msg: '🛠 Đã hết lượt rèn vòng này! Hãy đến chuông rồng nộp cống.',
+        shortMsg: isEn ? 'Turns exhausted (0)' : 'Hết lượt rèn (0)',
+        msg: isEn ? '🛠 Out of turns this round! Go to dragon bell to pay tribute.' : '🛠 Đã hết lượt rèn vòng này! Hãy đến chuông rồng nộp cống.',
         action: 'turns_out'
       };
     }
     if(G.turns <= 0 && G.hits > 0){
       return {
         ok: true,
-        shortMsg: 'Chốt kiếm (' + G.swordVal + ' vàng)',
-        msg: '💰 Bấm [E] chốt kiếm cất vàng vào kho',
+        shortMsg: isEn ? ('Bank blade (' + G.swordVal + 'g)') : ('Chốt kiếm (' + G.swordVal + ' vàng)'),
+        msg: isEn ? '💰 Press [E] to bank blade and stash gold to vault' : '💰 Bấm [E] chốt kiếm cất vàng vào kho',
         action: 'bank'
       };
     }
     return {
       ok: true,
-      shortMsg: 'Gõ búa rèn kiếm',
-      msg: '🛠 Bấm [E] gõ búa tăng cấp kiếm',
+      shortMsg: isEn ? 'Hammer blade' : 'Gõ búa rèn kiếm',
+      msg: isEn ? '🛠 Press [E] to strike hammer and level up sword' : '🛠 Bấm [E] gõ búa tăng cấp kiếm',
       action: 'hit'
     };
   }
@@ -2454,22 +2691,21 @@ function getStationStatus(st){
     if(rackCount === 0 && G.hits === 0){
       return {
         ok: false,
-        shortMsg: 'Giá & đe đều trống',
-        msg: '🗡 Giá treo đang trống và chưa có kiếm trên đe để cất!',
+        shortMsg: isEn ? 'Rack & anvil empty' : 'Giá & đe đều trống',
+        msg: isEn ? '🗡 Rack is empty and no forged sword on anvil to mount!' : '🗡 Giá treo đang trống và chưa có kiếm trên đe để cất!',
         action: 'rack_empty'
       };
     }
     return {
       ok: true,
-      shortMsg: 'Quản lý kiếm (' + rackCount + '/3)',
-      msg: '🗡 Bấm [E] quản lý kiếm trên giá',
+      shortMsg: isEn ? ('Manage rack (' + rackCount + '/3)') : ('Quản lý kiếm (' + rackCount + '/3)'),
+      msg: isEn ? '🗡 Press [E] to manage sword rack blades' : '🗡 Bấm [E] quản lý kiếm trên giá',
       action: 'rack'
     };
   }
 
-  return { ok: true, shortMsg: 'Tương tác', msg: 'Tương tác trạm', action: 'general' };
+  return { ok: true, shortMsg: isEn ? 'Station' : 'Trạm', msg: '', action: 'noop' };
 }
-
 var _stStatusCache = {}, _stStatusSig = '';
 function _stationStatusSig(){
   if(!G) return '';
@@ -2511,13 +2747,28 @@ function updateInteractPrompt(near){
     var pKey = prm.querySelector('.prompt-key');
     if(pKey) pKey.textContent = isOk ? 'E' : '🔒';
     
+    var isEn = (CURRENT_LANG === 'en');
     var names = {
-      anvil: isOk ? (status.action === 'bank' ? 'CHỐT KIẾM VÀO KHO 💰 (Bấm E)' : 'SỬ DỤNG ĐE RÈN 🛠️ (Bấm E)') : 'ĐE RÈN [HẾT LƯỢT] 🔒',
-      furnace: isOk ? (status.action === 'repair' ? 'SỬA LÒ NUNG 🔧 (Bấm E)' : 'SỬ DỤNG LÒ NUNG 🔥 (Bấm E)') : (G && G.furnaceBroken ? 'LÒ HỎNG — THIẾU VÀNG SỬA 🔒' : 'LÒ NUNG [HẾT LƯỢT] 🔒'),
-      bell: isOk ? 'RUNG CHUÔNG NỘP CỐNG 🔔 (Bấm E)' : 'CHUÔNG CỐNG [CHƯA ĐỦ VÀNG] 🔒',
-      rack: isOk ? 'QUẢN LÝ GIÁ TREO 🗡️ (Bấm E)' : 'GIÁ TREO [CHƯA CÓ KIẾM] 🔒'
+      anvil: isOk
+        ? (status.action === 'bank'
+            ? (isEn ? 'BANK BLADE TO VAULT 💰 (Press E)' : 'CHỐT KIẾM VÀO KHO 💰 (Bấm E)')
+            : (isEn ? 'USE FORGING ANVIL 🛠️ (Press E)' : 'SỬ DỤNG ĐE RÈN 🛠️ (Bấm E)'))
+        : (isEn ? 'ANVIL [OUT OF TURNS] 🔒' : 'ĐE RÈN [HẾT LƯỢT] 🔒'),
+      furnace: isOk
+        ? (status.action === 'repair'
+            ? (isEn ? 'REPAIR FURNACE 🔧 (Press E)' : 'SỬA LÒ NUNG 🔧 (Bấm E)')
+            : (isEn ? 'USE BLAST FURNACE 🔥 (Press E)' : 'SỬ DỤNG LÒ NUNG 🔥 (Bấm E)'))
+        : (G && G.furnaceBroken
+            ? (isEn ? 'FURNACE BROKEN — NEED GOLD 🔒' : 'LÒ HỎNG — THIẾU VÀNG SỬA 🔒')
+            : (isEn ? 'FURNACE [OUT OF TURNS] 🔒' : 'LÒ NUNG [HẾT LƯỢT] 🔒')),
+      bell: isOk
+        ? (isEn ? 'RING BELL & PAY TRIBUTE 🔔 (Press E)' : 'RUNG CHUÔNG NỘP CỐNG 🔔 (Bấm E)')
+        : (isEn ? 'DRAGON BELL [INSUFFICIENT GOLD] 🔒' : 'CHUÔNG CỐNG [CHƯA ĐỦ VÀNG] 🔒'),
+      rack: isOk
+        ? (isEn ? 'MANAGE SWORD RACK 🗡️ (Press E)' : 'QUẢN LÝ GIÁ TREO 🗡️ (Bấm E)')
+        : (isEn ? 'SWORD RACK [EMPTY] 🔒' : 'GIÁ TREO [CHƯA CÓ KIẾM] 🔒')
     };
-    lbl.textContent = names[near] || (isOk ? 'THAO TÁC TRẠM (Bấm E)' : 'CHƯA ĐỦ ĐIỀU KIỆN 🔒');
+    lbl.textContent = names[near] || (isOk ? (isEn ? 'INTERACT STATION (Press E)' : 'THAO TÁC TRẠM (Bấm E)') : (isEn ? 'REQUIREMENTS NOT MET 🔒' : 'CHƯA ĐỦ ĐIỀU KIỆN 🔒'));
   } else {
     wrap.style.display = 'none';
   }
@@ -2537,18 +2788,19 @@ function engageStation(st, force){
   setStation(st, false);
   updateInteractPrompt(currentNearStation);
   if(typeof audio === 'function') audio();
+  var isEn = (CURRENT_LANG === 'en');
   if(st === 'anvil'){
     if(typeof clang === 'function') clang(0.32, 1.25);
-    toast('🛠 Đe Rèn — [Space/E] Gõ búa, [B] Chốt, [Q/WASD] Rời trạm', 'info');
+    toast(isEn ? '🛠 Anvil — [Space/E] Hammer, [B] Bank, [Q/WASD] Leave station' : '🛠 Đe Rèn — [Space/E] Gõ búa, [B] Chốt, [Q/WASD] Rời trạm', 'info');
   } else if(st === 'furnace'){
     if(typeof whoosh === 'function') whoosh();
-    toast('🔥 Lò Nung — [Space/E] Nung kiếm, [Q/WASD] Rời trạm', 'info');
+    toast(isEn ? '🔥 Furnace — [Space/E] Heat blade, [Q/WASD] Leave station' : '🔥 Lò Nung — [Space/E] Nung kiếm, [Q/WASD] Rời trạm', 'info');
   } else if(st === 'bell'){
     if(typeof bellSound === 'function') bellSound();
-    toast('🔔 Chuông Cống — [Space/E] Nộp cống, [Q/WASD] Rời trạm', 'info');
+    toast(isEn ? '🔔 Dragon Bell — [Space/E] Pay tribute, [Q/WASD] Leave station' : '🔔 Chuông Cống — [Space/E] Nộp cống, [Q/WASD] Rời trạm', 'info');
   } else if(st === 'rack'){
     if(typeof clang === 'function') clang(0.25, 1.4);
-    toast('🗡 Giá Treo — [T] Treo/Lấy kiếm, [Q/WASD] Rời trạm', 'info');
+    toast(isEn ? '🗡 Sword Rack — [T] Hang/Retrieve blade, [Q/WASD] Leave station' : '🗡 Giá Treo — [T] Treo/Lấy kiếm, [Q/WASD] Rời trạm', 'info');
   }
   refreshUI();
   return true;
@@ -2564,7 +2816,7 @@ function disengageStation(silent){
   updateInteractPrompt(currentNearStation);
   if(!silent){
     if(typeof whoosh === 'function') whoosh();
-    toast('Đã rời trạm — Phím WASD để đi bộ tự do, đến gần trạm bấm [E]', 'info');
+    toast(CURRENT_LANG==='en'?'Left station — use WASD to walk freely, press [E] near station':'Đã rời trạm — Phím WASD để đi bộ tự do, đến gần trạm bấm [E]', 'info');
   }
   refreshUI();
 }
@@ -2716,10 +2968,10 @@ scene.add(beaconRing);
 /* 3D Floating Station [E] Interaction Badges */
 var stationBadges = {};
 var BADGE_CONFIG = {
-  anvil:   { x: 0,    y: 1.48, z: 0.35,  title: 'ĐE RÈN KIẾM',    icon: '🛠️', defaultAction: 'Gõ búa tăng cấp' },
-  furnace: { x: -3.1, y: 1.62, z: -1.15, title: 'LÒ NUNG LỬA',    icon: '🔥', defaultAction: 'Nung kiếm tăng nhiệt' },
-  bell:    { x: 3.1,  y: 1.95, z: -2.25, title: 'CHUÔNG CỐNG RỒNG', icon: '🔔', defaultAction: 'Nộp cống qua vòng' },
-  rack:    { x: 3.4,  y: 1.72, z: 1.5,   title: 'GIÁ TREO KIẾM',   icon: '🗡️', defaultAction: 'Quản lý kiếm trên giá' }
+  anvil:   { x: 0,    y: 1.48, z: 0.35,  title: CURRENT_LANG==='en'?'FORGING ANVIL':'ĐE RÈN KIẾM',    icon: '🛠️', defaultAction: CURRENT_LANG==='en'?'Hammer to level up':'Gõ búa tăng cấp' },
+  furnace: { x: -3.1, y: 1.62, z: -1.15, title: CURRENT_LANG==='en'?'BLAST FURNACE':'LÒ NUNG LỬA',    icon: '🔥', defaultAction: CURRENT_LANG==='en'?'Heat blade to forge':'Nung kiếm tăng nhiệt' },
+  bell:    { x: 3.1,  y: 1.95, z: -2.25, title: CURRENT_LANG==='en'?'DRAGON BELL':'CHUÔNG CỐNG RỒNG', icon: '🔔', defaultAction: CURRENT_LANG==='en'?'Pay dragon tribute':'Nộp cống qua vòng' },
+  rack:    { x: 3.4,  y: 1.72, z: 1.5,   title: CURRENT_LANG==='en'?'SWORD RACK':'GIÁ TREO KIẾM',   icon: '🗡️', defaultAction: CURRENT_LANG==='en'?'Manage rack swords':'Quản lý kiếm trên giá' }
 };
 
 function createStationBadge(stKey){
@@ -2778,7 +3030,7 @@ function updateStationBadgeContent(sprite, status){
   var cfg = BADGE_CONFIG[stKey];
   var title = cfg.title;
   var icon = cfg.icon;
-  var actionText = isOk ? ('[E] ' + (shortMsg || cfg.defaultAction)) : ('🔒 ' + (shortMsg || 'Không thể tương tác'));
+  var actionText = isOk ? ('[E] ' + (shortMsg || cfg.defaultAction)) : ('🔒 ' + (shortMsg || (CURRENT_LANG==='en'?'Requirements not met':'Không thể tương tác')));
 
   // Badge container pill
   var pad = 6;
@@ -3779,7 +4031,7 @@ function refreshUI(){
   _setText('uiTribTarget', String(G.target));
   _setBar('tribFill', G.gold/G.target);
   var _pot=tributePotential();
-  _setText('uiTribPot', 'Tiềm năng: '+_pot+( _pot>=G.target?' ✓ đủ nếu chốt hết':''));
+  _setText('uiTribPot', (CURRENT_LANG==='en'?'Potential: ':'Tiềm năng: ')+_pot+( _pot>=G.target?(CURRENT_LANG==='en'?' ✓ enough if banked':' ✓ đủ nếu chốt hết'):''));
   _setText('uiDragonAnger', (G.dragonAnger||0)+'/3');
   var _ap=_el('angerPlate'); if(_ap) _ap.classList.toggle('warn', (G.dragonAnger||0)>=2);
   _el('tributePlate').classList.toggle('ready', G.gold>=G.target);
@@ -3835,8 +4087,8 @@ function refreshUI(){
     if(shpEl) shpEl.textContent=modelNameForLevel(sLv);
     var shpNx=_el('uiSwordShapeNext');
     if(shpNx){
-      if(sLv>=SWORD_LEVEL_MAX) shpNx.textContent='model cuối cùng ★';
-      else shpNx.textContent='Lv.'+(sLv+1)+' → model khác hẳn';
+      if(sLv>=SWORD_LEVEL_MAX) shpNx.textContent=(CURRENT_LANG==='en'?'final blade model ★':'model cuối cùng ★');
+      else shpNx.textContent=(CURRENT_LANG==='en'?('Lv.'+(sLv+1)+' → unique model'):('Lv.'+(sLv+1)+' → model khác hẳn'));
     }
     if(typeof applySwordSkin==='function') applySwordSkin();
   }
@@ -3852,8 +4104,11 @@ function refreshUI(){
   /* furnace-broken HUD: NUNG stays visible but locked with the reason on
      its sub-line, and the SỬA LÒ button takes the spotlight beside it —
      price 60 × round from the gold stock, shortfall shown when short */
+  var isEn = (CURRENT_LANG === 'en');
   var _heatSub=_el('btnHeat').querySelector('.sub');
-  var _heatSubTxt = G.furnaceBroken? 'Lò đã bị phá hủy — sửa lò mới nung được' : 'H · nóng = lời hơn, khó vỡ';
+  var _heatSubTxt = G.furnaceBroken
+    ? (isEn ? 'Furnace destroyed — repair to heat blades' : 'Lò đã bị phá hủy — sửa lò mới nung được')
+    : (isEn ? 'H / E · hot = higher value, safe' : 'H / E · nóng = lời hơn, khó vỡ');
   if(_heatSub && _txtCache.heatSub!==_heatSubTxt){ _txtCache.heatSub=_heatSubTxt; _heatSub.textContent=_heatSubTxt; }
   var _repBtn=_el('btnRepair');
   if(_repBtn){
@@ -3862,16 +4117,21 @@ function refreshUI(){
     if(_txtCache.repDisp!==_repDisp){ _txtCache.repDisp=_repDisp; _repBtn.style.display=_repDisp; }
     if(_repShow){
       var _cost=repairCost(), _short=_cost-G.gold;
-      var _repHTML = G.repairing? '🔧 ĐANG SỬA LÒ…<span class="sub">đang hàn lại lò nung…</span>'
-        : (_short>0? '🔧 SỬA LÒ<span class="sub">cần '+_cost+' vàng · còn thiếu '+_short+' — gõ nguội kiếm thêm</span>'
-                    : '🔧 SỬA LÒ<span class="sub">'+_cost+' vàng (60 × vòng '+G.round+') · bấm để lò cháy lại</span>');
+      var _repHTML = G.repairing
+        ? (isEn ? '🔧 REPAIRING…<span class="sub">welding furnace…</span>' : '🔧 ĐANG SỬA LÒ…<span class="sub">đang hàn lại lò nung…</span>')
+        : (_short>0
+          ? (isEn ? ('🔧 REPAIR FORGE<span class="sub">need '+_cost+' gold · short '+_short+' — strike cold</span>') : ('🔧 SỬA LÒ<span class="sub">cần '+_cost+' vàng · còn thiếu '+_short+' — gõ nguội kiếm thêm</span>'))
+          : (isEn ? ('🔧 REPAIR FORGE<span class="sub">'+_cost+' gold (60 × round '+G.round+') · click to reignite</span>') : ('🔧 SỬA LÒ<span class="sub">'+_cost+' vàng (60 × vòng '+G.round+') · bấm để lò cháy lại</span>')));
       if(_txtCache.repHTML!==_repHTML){ _txtCache.repHTML=_repHTML; _repBtn.innerHTML=_repHTML; }
       var _repDis = _short>0 || G.eventLock || G.repairing || G.over;
       if(_repBtn.disabled!==_repDis) _repBtn.disabled=_repDis;
       _repBtn.classList.toggle('pulse', !_repDis);
     }
   }
-  var _hangSub=_el('btnHang').querySelector('.sub'); var _hangTxt = rackFull? 'giá đã đầy 3/3 ô' : ('T · lên giá treo ('+G.rack.filter(Boolean).length+'/3)');
+  var _hangSub=_el('btnHang').querySelector('.sub');
+  var _hangTxt = rackFull
+    ? (isEn ? 'rack full 3/3 slots' : 'giá đã đầy 3/3 ô')
+    : (isEn ? ('T · mount on rack ('+G.rack.filter(Boolean).length+'/3)') : ('T · lên giá treo ('+G.rack.filter(Boolean).length+'/3)'));
   if(_hangSub && _txtCache.hangSub!==_hangTxt){ _txtCache.hangSub=_hangTxt; _hangSub.textContent=_hangTxt; }
   refreshUpgradeButtons(); renderMissions();
   if(!_relicBtns) _relicBtns=document.querySelectorAll('.relic-btns button');
@@ -3888,7 +4148,7 @@ function refreshUI(){
   var gh=$('btnGhostHint');
   if(gh && G.started){
     var nxt=G.round%3===0?G.round:(G.round+(3-G.round%3));
-    var ghTxt='🧙 Ma: v.'+nxt;
+    var ghTxt=(CURRENT_LANG==='en'?'🧙 Ghost: r.':'🧙 Ma: v.')+nxt;
     if(_txtCache.ghostHint!==ghTxt){ _txtCache.ghostHint=ghTxt; gh.textContent=ghTxt; }
   }
   var _mp=$('movePad'); if(_mp) _mp.classList.toggle('show', !!(G&&G.started&&!G.over&&document.body.classList.contains('is-mobile')));
@@ -4362,6 +4622,24 @@ if (_bmr) {
     if (typeof audio === 'function') audio();
     var p = $('menuRulesPanel');
     if (p) p.style.display = (p.style.display === 'none' || !p.style.display) ? 'block' : 'none';
+  });
+}
+
+var _btl = $('btnLangTop');
+if (_btl) {
+  _btl.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (typeof audio === 'function') audio();
+    toggleLanguage();
+  });
+}
+
+var _bml = $('btnMenuLang');
+if (_bml) {
+  _bml.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (typeof audio === 'function') audio();
+    toggleLanguage();
   });
 }
 ['btnStart', 'btnStartEndless'].forEach(function(id){
@@ -6293,6 +6571,7 @@ setInterval(function(){
 }, 500);
 
 newGame();
+applyLanguageUI();
 /* first frame is kicked on the next animation frame, not synchronously:
    animate() renders a full frame in its body, and running that inside the
    initial script execution would hold DOMContentLoaded hostage to a
