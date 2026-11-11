@@ -4159,9 +4159,18 @@ function updateSwordTableDisplay(){
   var isEn = (typeof CURRENT_LANG !== "undefined" && CURRENT_LANG === "en");
   var sLv = (typeof swordLevelNow === "function") ? swordLevelNow() : (G ? (G.swordLevel || 1) : 1);
   var sSkin = (typeof skinForLevel === "function") ? skinForLevel(sLv) : { name: "Thép Thô", hue: 0.1 };
-  var sVal = (G && G.swordVal) ? G.swordVal : 25;
+  var sVal = (G && typeof G.swordVal === "number" && isFinite(G.swordVal)) ? Math.round(G.swordVal) : 25;
   var sHeat = (G && typeof G.heat === "number") ? Math.max(0, Math.min(100, Math.round(G.heat))) : 0;
-  var rk = (typeof riskNow === "function") ? riskNow() : 0.02;
+  var rk = 0.02;
+  if(G && typeof riskNow === "function"){ try{ rk = riskNow(); }catch(e){ rk = 0.02; } }
+  function formatBoardGold(n){
+    n = Math.round(Number(n) || 0);
+    if(n >= 1e12) return (n/1e12).toFixed(n % 1e12 === 0 ? 0 : 2).replace(/\.0$/,'') + (isEn ? 'T' : ' nghìn tỷ');
+    if(n >= 1e9) return (n/1e9).toFixed(n % 1e9 === 0 ? 0 : 2).replace(/\.0$/,'') + (isEn ? 'B' : ' tỷ');
+    if(n >= 1e6) return (n/1e6).toFixed(n % 1e6 === 0 ? 0 : 1).replace(/\.0$/,'') + (isEn ? 'M' : ' triệu');
+    if(n >= 1e4) return n.toLocaleString();
+    return String(n);
+  }
   var sHits = (G && typeof G.hits === "number") ? G.hits : 0;
   var sShapeName = (typeof modelNameForLevel === "function") ? modelNameForLevel(sLv) : "Kiếm Sắt";
 
@@ -4214,7 +4223,7 @@ function updateSwordTableDisplay(){
   drawCrispText(lvTitle, 72, 128, "900 96px system-ui, -apple-system, sans-serif", skinColor, "left", 14);
 
   // Gold value (Right)
-  var goldText = "🪙 " + sVal + " " + (isEn ? "GOLD" : "VÀNG");
+  var goldText = "🪙 " + formatBoardGold(sVal) + " " + (isEn ? "GOLD" : "VÀNG");
   drawCrispText(goldText, w - 72, 128, "900 102px system-ui, -apple-system, sans-serif", "#ffe566", "right", 14);
 
   // Skin line & next model tier (Sub header)
@@ -4342,7 +4351,7 @@ function updateSwordTableDisplay(){
   }
 
   c.shadowBlur = 0;
-  if(swordTableTexture){ swordTableTexture.needsUpdate = true; swordTableTexture.version++; }
+  if(swordTableTexture){ swordTableTexture.needsUpdate = true; }
 }
 
 /* ================= SWORD SHAPES — a new SILHOUETTE every 3 levels =================
@@ -5018,7 +5027,6 @@ function applyLanguageUI(){
   // Clear text cache so refreshUI re-renders everything in new language
   _txtCache = {};
   _txtCache.skinLvRendered=-1;
-  _txtCache.swordTableKey='';
   if(typeof _lastPromptNear !== 'undefined') {
     _lastPromptNear = null; _lastPromptEngaged = null; _lastPromptStatusKey = '';
   }
@@ -6781,7 +6789,6 @@ function refreshUI(){
      decay calls refreshUI ~1×/s and must not touch this node. */
   if(_txtCache.skinLvRendered!==sLv){
     _txtCache.skinLvRendered=sLv;
-    _txtCache.swordTableKey='';
     var broadTier=Math.min(4, Math.floor((sLv-1)/25));
     var _sp=_el('swordPlate');
     if(_sp){ _sp.classList.remove('skin-t0','skin-t1','skin-t2','skin-t3','skin-t4'); _sp.classList.add('skin-t'+broadTier); }
@@ -6862,10 +6869,8 @@ function refreshUI(){
   invalidateStationStatusCache();
   if(typeof updateInteractPrompt==='function') updateInteractPrompt(currentNearStation);
   if(typeof updateSwordAttrBoard==='function') updateSwordAttrBoard();
-  if(typeof updateSwordTableDisplay==='function' && typeof G!=='undefined' && G){
-    var _rkB = (G.rainbow || G.frenzy) ? 0 : riskNow();
-    var _stKey = [sLv, G.swordVal, Math.round(G.heat), G.hits, G.frenzy?1:0, G.rainbow?1:0, G.furnaceBroken?1:0, CURRENT_LANG, Math.round(_rkB*1000)].join('|');
-    if(_txtCache.swordTableKey !== _stKey){ _txtCache.swordTableKey = _stKey; updateSwordTableDisplay(); }
+  if(typeof updateSwordTableDisplay==='function'){
+    try{ updateSwordTableDisplay(); }catch(e){ if(window.console) console.warn('sword table draw', e); }
   }
   applyHudChrome(); renderWorkflowRibbon();
 }
@@ -7362,7 +7367,9 @@ function doHit(){
       if(G.swordLevel>levelBefore){
         metaOnLevel(G.swordLevel);
         var skL=skinForLevel(G.swordLevel), famChanged = skL.family!==famBefore;
-        var lvBonus = applyBladeLevelUpPricing(G.swordLevel);
+        var lvBonus = 0;
+        try{ lvBonus = applyBladeLevelUpPricing(G.swordLevel); }catch(e){ if(window.console) console.warn('level pricing', e); }
+        _txtCache.skinLvRendered = -1;
         if(lvBonus > 0){
           var upLv = G.swordLevel, upFam = skinFamilyName(skL);
           setTimeout(function(){
@@ -7393,6 +7400,7 @@ function doHit(){
             if(G && G.swordLevel>=SWORD_LEVEL_MAX && typeof playLv100Tribute==='function') playLv100Tribute();
           }, 1200);
         }
+        if(typeof updateSwordTableDisplay==='function'){ try{ updateSwordTableDisplay(); }catch(e2){} }
       }
       /* rainbow roll: 4% after a successful hit that didn't just consume rainbow and didn't just arm Frenzy */
       if(!wasRainbow && !G.rainbow && !armedFrenzy && !G.frenzy && Math.random()<RAINBOW_CHANCE){
@@ -9032,8 +9040,7 @@ function onMeshReady(meshId){
   touchMesh(meshId);
   if(typeof dropEmbeddedMeshB64==='function') dropEmbeddedMeshB64(meshId);
   syncMainModelVisual();
-  if(typeof _txtCache!=='undefined') _txtCache.swordTableKey='';
-  if(typeof refreshUI==='function') refreshUI();
+  if(typeof updateSwordTableDisplay==='function'){ try{ updateSwordTableDisplay(); }catch(e){} }
   syncRackModels();
   if(typeof bootOnMeshProgress==='function') bootOnMeshProgress(meshId);
   if(typeof bootPreloadActive==='undefined' || !bootPreloadActive){
