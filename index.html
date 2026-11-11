@@ -3041,6 +3041,381 @@
       flex-shrink: 0 !important;
     }
   }
+  /* ============================================================
+     STITCH TAMAHAGANE KINTSUGI UPGRADE MODAL (#upgradeSheet)
+     ============================================================ */
+  #upgradeSheet.sheet-stitch {
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  #upgradeSheet .stitch-panel {
+    position: relative !important;
+    width: min(1040px, 95vw) !important;
+    max-height: 90vh !important;
+    padding: 24px 28px !important;
+    background: radial-gradient(circle at 50% 10%, rgba(32, 22, 14, 0.98) 0%, rgba(14, 9, 6, 0.99) 100%) !important;
+    border: 1.5px solid rgba(232, 179, 60, 0.45) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.95), 0 0 28px rgba(229, 169, 60, 0.22), inset 0 1px 0 rgba(255, 230, 160, 0.25) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  #upgradeSheet .corner-bracket {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+  }
+  #upgradeSheet .corner-bracket.top-0.left-0 { top: 6px; left: 6px; border-top: 2px solid #ffd56a; border-left: 2px solid #ffd56a; }
+  #upgradeSheet .corner-bracket.top-0.right-0 { top: 6px; right: 6px; border-top: 2px solid #ffd56a; border-right: 2px solid #ffd56a; }
+  #upgradeSheet .corner-bracket.bottom-0.left-0 { bottom: 6px; left: 6px; border-bottom: 2px solid #ffd56a; border-left: 2px solid #ffd56a; }
+  #upgradeSheet .corner-bracket.bottom-0.right-0 { bottom: 6px; right: 6px; border-bottom: 2px solid #ffd56a; border-right: 2px solid #ffd56a; }
+
+  #upgradeSheet .kintsugi-gold-seam {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, #d48a20 20%, #ffe48a 50%, #d48a20 80%, transparent 100%);
+    box-shadow: 0 0 10px rgba(255, 213, 106, 0.7);
+  }
+
+  .stitch-sheet-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 18px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(232, 179, 60, 0.25);
+  }
+  .stitch-title-group {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+  }
+  .stitch-tag-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .stitch-tag {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #e8b33c;
+    background: rgba(232, 179, 60, 0.15);
+    border: 1px solid rgba(232, 179, 60, 0.35);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+  .stitch-dot {
+    font-size: 8px;
+    color: rgba(232, 179, 60, 0.5);
+  }
+  .stitch-subtag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: #b5a490;
+  }
+  .stitch-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0 6px;
+  }
+  .stitch-title-wrap h2 {
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    margin: 0;
+    color: #fff6e0;
+    text-shadow: 0 2px 10px rgba(232, 179, 60, 0.3);
+  }
+  .stitch-pill-badge {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #e8b33c;
+    border: 1px solid rgba(232, 179, 60, 0.4);
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(20, 14, 9, 0.7);
+  }
+  #upgradeSheet .sheet-note {
+    font-size: 12px;
+    color: #bda98e;
+    margin: 0;
+    line-height: 1.4;
+    text-align: left;
+  }
+
+  /* Header Right */
+  .stitch-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .vault-gold-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(28, 19, 12, 0.9);
+    border: 1.5px solid rgba(232, 179, 60, 0.5);
+    padding: 6px 14px;
+    border-radius: 8px;
+    box-shadow: 0 0 16px rgba(229, 169, 60, 0.2);
+  }
+  .vchip-icon {
+    font-size: 20px;
+  }
+  .vchip-info {
+    text-align: left;
+  }
+  .vchip-lbl {
+    display: block;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #b5a490;
+  }
+  .vchip-val {
+    display: block;
+    font-size: 16px;
+    font-weight: 900;
+    color: #ffd56a;
+    font-variant-numeric: tabular-nums;
+  }
+  .stitch-close-btn {
+    width: 38px !important;
+    height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(28, 19, 12, 0.8) !important;
+    border: 1px solid rgba(232, 179, 60, 0.35) !important;
+    border-radius: 8px !important;
+    color: #d4c4b0 !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+  }
+  .stitch-close-btn:hover {
+    background: rgba(48, 30, 18, 0.95) !important;
+    border-color: #ffd56a !important;
+    color: #fff !important;
+    transform: rotate(90deg) !important;
+  }
+
+  /* Upgrade Cards Grid */
+  .stitch-upgrade-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 16px !important;
+  }
+  @media (max-width: 860px) {
+    .stitch-upgrade-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .stitch-sheet-head {
+      flex-direction: column !important;
+    }
+    .stitch-header-right {
+      width: 100% !important;
+      justify-content: space-between !important;
+    }
+  }
+
+  /* Upgrade Card */
+  .upg-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(32, 22, 14, 0.95) 0%, rgba(18, 12, 8, 0.98) 100%);
+    border: 1.5px solid rgba(232, 179, 60, 0.28);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.6);
+    transition: all 0.22s ease;
+    overflow: hidden;
+  }
+  .upg-card:hover {
+    border-color: rgba(255, 200, 80, 0.7);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 16px rgba(232, 179, 60, 0.2);
+  }
+  .upg-kintsugi-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(232, 179, 60, 0.3);
+    transition: background 0.2s;
+  }
+  .upg-card:hover .upg-kintsugi-line {
+    background: #ffd56a;
+    box-shadow: 0 0 8px #ffd56a;
+  }
+  .upg-card.is-maxed {
+    border-color: rgba(255, 215, 0, 0.5);
+    background: linear-gradient(180deg, rgba(38, 28, 16, 0.95) 0%, rgba(22, 16, 10, 0.98) 100%);
+  }
+
+  /* Card Top Row */
+  .upg-card-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .upg-icon-emblem {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    background: rgba(20, 14, 9, 0.9);
+    border: 1px solid rgba(232, 179, 60, 0.4);
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(232, 179, 60, 0.15);
+  }
+  .upg-name-wrap {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+  }
+  .upg-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff4db;
+    letter-spacing: 0.5px;
+  }
+  .tier-pips-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .tier-pips-bar .pip {
+    width: 12px;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(232, 179, 60, 0.3);
+  }
+  .tier-pips-bar .pip.filled {
+    background: linear-gradient(90deg, #d48a20, #ffd56a);
+    border-color: #ffd56a;
+    box-shadow: 0 0 6px rgba(255, 213, 106, 0.6);
+  }
+  .pip-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: #bda98e;
+    margin-left: 4px;
+  }
+
+  /* Bonus Badge */
+  .upg-bonus-badge {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .bonus-hammer { background: rgba(232, 179, 60, 0.15); border: 1px solid rgba(232, 179, 60, 0.4); color: #ffd56a; }
+  .bonus-anvil { background: rgba(70, 185, 240, 0.15); border: 1px solid rgba(70, 185, 240, 0.4); color: #82d8ff; }
+  .bonus-furnace { background: rgba(255, 100, 30, 0.15); border: 1px solid rgba(255, 100, 30, 0.4); color: #ff9d66; }
+
+  /* Card Body */
+  .upg-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+    margin-bottom: 14px;
+  }
+  .upg-desc {
+    font-size: 12px;
+    color: #cbb89e;
+    line-height: 1.4;
+    margin: 0;
+  }
+  .upg-next-box {
+    background: rgba(14, 10, 6, 0.7);
+    border: 1px solid rgba(232, 179, 60, 0.2);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .upg-next-lbl {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #e8b33c;
+    margin-bottom: 2px;
+  }
+  .upg-next-txt {
+    font-size: 11px;
+    font-weight: 600;
+    color: #a4f0a0;
+    line-height: 1.3;
+  }
+  .upg-card.is-maxed .upg-next-txt {
+    color: #ffd56a;
+  }
+
+  /* Card Footer Button */
+  .upg-card-footer {
+    width: 100%;
+  }
+  .upg-action-btn {
+    width: 100% !important;
+    padding: 11px 16px !important;
+    border-radius: 8px !important;
+    font-family: var(--font-display, inherit) !important;
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+    cursor: pointer !important;
+    transition: all 0.18s ease !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
+  }
+  .upg-action-btn.btn-gold {
+    background: linear-gradient(180deg, #d48a20 0%, #9e5b0c 100%) !important;
+    border: 1.5px solid #ffd478 !important;
+    color: #fff !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 12px rgba(232, 179, 60, 0.3) !important;
+  }
+  .upg-action-btn.btn-gold:hover {
+    filter: brightness(1.15) !important;
+    transform: translateY(-1px) !important;
+  }
+  .upg-action-btn.btn-gold:active {
+    transform: translateY(1px) !important;
+  }
+  .upg-action-btn.btn-disabled {
+    background: rgba(30, 22, 15, 0.6) !important;
+    border: 1px solid rgba(232, 179, 60, 0.2) !important;
+    color: #7d6e5d !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+  }
+  .upg-action-btn.btn-maxed {
+    background: linear-gradient(180deg, #3d301b 0%, #251b0e 100%) !important;
+    border: 1.5px solid rgba(255, 215, 0, 0.5) !important;
+    color: #ffd56a !important;
+    cursor: default !important;
+  }
 </style>
 </head>
 <body class="boot-pending">
@@ -3153,11 +3528,46 @@
   </div>
 </div>
 
-<div class="sheet" id="upgradeSheet" role="dialog" aria-label="Nâng cấp đồ rèn">
-  <div class="sheet-panel">
-    <div class="sheet-head"><h3 id="upgSheetTitle">⬆ Nâng cấp đồ rèn</h3><button class="sheet-close" id="btnUpgClose" type="button">✕ Đóng</button></div>
-    <p class="sheet-note" id="upgSheetNote">Búa · đe · lò — mỗi món 4 cấp, mua bằng vàng trong kho. Cấp càng cao, mô hình trong lò càng xịn.</p>
-    <div id="upgradeRow"></div>
+<div class="sheet sheet-stitch" id="upgradeSheet" role="dialog" aria-label="Nâng cấp đồ rèn">
+  <div class="sheet-panel stitch-panel">
+    <!-- Outer mechanical corner brackets -->
+    <div class="corner-bracket top-0 left-0"></div>
+    <div class="corner-bracket top-0 right-0"></div>
+    <div class="corner-bracket bottom-0 left-0"></div>
+    <div class="corner-bracket bottom-0 right-0"></div>
+    <!-- Glowing Kintsugi Gold Fracture Seam Accent -->
+    <div class="kintsugi-gold-seam"></div>
+
+    <!-- MODAL HEADER -->
+    <div class="stitch-sheet-head">
+      <div class="stitch-title-group">
+        <div class="stitch-tag-row">
+          <span class="stitch-tag" id="upgSheetTag">03 // WORKSTATION ARSENAL</span>
+          <span class="stitch-dot">●</span>
+          <span class="stitch-subtag" id="upgSheetSubTag">SYNCED TO 3D FORGE</span>
+        </div>
+        <div class="stitch-title-wrap">
+          <h2 id="upgSheetTitle">⬆ NÂNG CẤP ĐỒ RÈN</h2>
+          <span class="stitch-pill-badge" id="upgSheetPill">TIER EVOLUTION</span>
+        </div>
+        <p class="sheet-note" id="upgSheetNote">Búa · đe · lò — mỗi món 4 cấp, mua bằng vàng trong kho. Cấp càng cao, mô hình 3D trong lò càng xịn.</p>
+      </div>
+
+      <!-- Header Right: Player Vault Gold Chip & Close Button -->
+      <div class="stitch-header-right">
+        <div class="vault-gold-chip" id="upgVaultGoldChip" title="Số vàng trong kho của bạn">
+          <span class="vchip-icon">🪙</span>
+          <div class="vchip-info">
+            <span class="vchip-lbl" id="upgVaultLbl">VÀNG KHO</span>
+            <span class="vchip-val" id="upgVaultVal">0</span>
+          </div>
+        </div>
+        <button class="sheet-close stitch-close-btn" id="btnUpgClose" type="button" aria-label="Đóng">✕</button>
+      </div>
+    </div>
+
+    <!-- UPGRADES BENTO GRID -->
+    <div id="upgradeRow" class="stitch-upgrade-grid"></div>
   </div>
 </div>
 
@@ -4556,7 +4966,12 @@ function applyLanguageUI(){
   if(shN) shN.innerHTML = isEn
     ? 'Each round the machine shows <b>3</b> relics. Buy with <b>vault gold</b> or <b>feed anvil blade</b> (loses blade — don’t waste tribute blades!). Reroll costs gold before ringing the bell.'
     : 'Mỗi vòng máy ra <b>3 ô</b> relic. Mua bằng <b>vàng kho</b> hoặc <b>đút kiếm trên đe</b> (mất luôn thanh đó — đừng phí kiếm đủ cống!). Xáo lại tốn vàng, reset trước khi rung chuông.';
-  if(upT) upT.textContent = isEn ? '⬆ Forge upgrades' : '⬆ Nâng cấp đồ rèn';
+  if(upT) upT.textContent = isEn ? '⬆ FORGE UPGRADES' : '⬆ NÂNG CẤP ĐỒ RÈN';
+  var uTag = $('upgSheetTag'), uSubTag = $('upgSheetSubTag'), uPill = $('upgSheetPill'), uVLbl = $('upgVaultLbl');
+  if(uTag) uTag.textContent = isEn ? '03 // WORKSTATION ARSENAL' : '03 // KHO NÂNG CẤP LÒ RÈN';
+  if(uSubTag) uSubTag.textContent = isEn ? 'SYNCED TO 3D FORGE' : 'ĐỒNG BỘ MÔ HÌNH 3D';
+  if(uPill) uPill.textContent = isEn ? 'TIER EVOLUTION' : 'TIẾN HÓA CẤP';
+  if(uVLbl) uVLbl.textContent = isEn ? 'VAULT GOLD' : 'VÀNG KHO';
   if(upN) upN.textContent = isEn
     ? 'Hammer · anvil · furnace — 4 tiers each, vault gold. Higher tier = fancier 3D props.'
     : 'Búa · đe · lò — mỗi món 4 cấp, mua bằng vàng trong kho. Cấp càng cao, mô hình trong lò càng xịn.';
@@ -6451,29 +6866,97 @@ function buildShop(){
 }
 /* ---------- upgrade shop UI ---------- */
 function refreshUpgradeButtons(){
-  if(!_upgBtns) _upgBtns=document.querySelectorAll('.upg button');
+  var isEn = (typeof CURRENT_LANG !== "undefined" && CURRENT_LANG === "en");
+  var vChip = $("upgVaultVal");
+  if(vChip && G) vChip.textContent = String(G.gold || 0);
+
+  if(!_upgBtns) _upgBtns = document.querySelectorAll(".upg-action-btn");
   _upgBtns.forEach(function(b){
-    var id=b.getAttribute('data-upg'); var u=null;
-    UPGRADES.forEach(function(x){ if(x.id===id) u=x; });
-    if(!u||!G) return;
-    var lv=upLv(id), maxed=lv>=u.max;
-    var nd = maxed || G.gold<u.prices[lv] || G.over || !G.started; if(b.disabled!==nd) b.disabled=nd;
-    var nt = maxed? L('★ CẤP TỐI ĐA','★ MAX TIER') : (L('⬆ Nâng lên cấp ','⬆ Upgrade to tier ')+(lv+1)+' · '+u.prices[lv]+' '+L('vàng','gold')); if(b.textContent!==nt) b.textContent=nt;
+    var id = b.getAttribute("data-upg"); var u = null;
+    UPGRADES.forEach(function(x){ if(x.id === id) u = x; });
+    if(!u || !G) return;
+    var lv = upLv(id), maxed = lv >= u.max;
+    var canAfford = (G.gold >= u.prices[lv] && !maxed);
+    var nd = maxed || !canAfford || G.over || !G.started;
+    if(b.disabled !== nd) b.disabled = nd;
+
+    b.classList.toggle("btn-maxed", maxed);
+    b.classList.toggle("btn-gold", canAfford);
+    b.classList.toggle("btn-disabled", !canAfford && !maxed);
+
+    var card = b.closest(".upg-card");
+    if(card){
+      card.classList.toggle("is-maxed", maxed);
+      card.classList.toggle("can-afford", canAfford);
+    }
+
+    var nt = maxed
+      ? (isEn ? "★ MAX TIER UNLOCKED" : "★ CẤP TỐI ĐA")
+      : (isEn ? ("⬆ UPGRADE TO TIER " + (lv + 1) + " · " + u.prices[lv] + " GOLD")
+              : ("⬆ NÂNG CẤP LÊN CẤP " + (lv + 1) + " · " + u.prices[lv] + " VÀNG"));
+    if(b.textContent !== nt) b.textContent = nt;
   });
 }
+
 function buildUpgrades(){
-  var row=$('upgradeRow'); if(!row) return; row.innerHTML='';
+  var row = $("upgradeRow"); if(!row) return; row.innerHTML = "";
+  var isEn = (typeof CURRENT_LANG !== "undefined" && CURRENT_LANG === "en");
+  var vChip = $("upgVaultVal");
+  if(vChip && G) vChip.textContent = String(G.gold || 0);
+
   UPGRADES.forEach(function(u){
-    var lv=upLv(u.id), maxed=lv>=u.max;
-    var d=document.createElement('div'); d.className='relic upg'+(maxed?' maxed':'');
-    var pips=''; for(var i=0;i<u.max;i++) pips += (i<lv? '●':'○');
-    var ul=upgLabel(u);
-    d.innerHTML='<b>'+u.icon+' '+ul.name+'<span class="pips">'+pips+'</span></b><p>'+ul.desc+'<br><i>'+(maxed? L('Đã cấp tối đa — mô hình xịn nhất trong lò!','Max tier — best props in the forge!') : (L('Cấp ','Tier ')+(lv+1)+': '+ul.next))+'</i></p>';
-    var b=document.createElement('button'); b.setAttribute('data-upg', u.id);
-    b.addEventListener('click', function(){ buyUpgrade(u.id); });
-    d.appendChild(b); row.appendChild(d);
+    var lv = upLv(u.id), maxed = lv >= u.max;
+    var ul = upgLabel(u);
+    var nextPrice = maxed ? 0 : u.prices[lv];
+    var canAfford = (G && G.gold >= nextPrice && !maxed);
+
+    var card = document.createElement("div");
+    card.className = "upg-card" + (maxed ? " is-maxed" : "") + (canAfford ? " can-afford" : "");
+
+    var pipsHtml = "";
+    for(var pi = 0; pi < u.max; pi++){
+      pipsHtml += '<span class="pip' + (pi < lv ? ' filled' : '') + '"></span>';
+    }
+
+    var bonusPill = "";
+    if(u.id === "hammer") bonusPill = "<span class='upg-bonus-badge bonus-hammer'>" + (isEn ? "+20% GOLD / HIT" : "+20% VÀNG / NHÁT") + "</span>";
+    else if(u.id === "anvil") bonusPill = "<span class='upg-bonus-badge bonus-anvil'>" + (isEn ? "-11% BREAK RISK" : "-11% NGUY CƠ VỠ") + "</span>";
+    else if(u.id === "furnace") bonusPill = "<span class='upg-bonus-badge bonus-furnace'>" + (isEn ? "+7 HEAT · 13% SLOW" : "+7 NHIỆT · NGUỘI -13%") + "</span>";
+
+    var nextBoxTitle = maxed ? (isEn ? "MAX REACHED" : "HOÀN THÀNH") : (isEn ? "NEXT 3D EVOLUTION" : "NÂNG CẤP 3D TIẾP THEO");
+    var nextBoxTxt = maxed ? (isEn ? "★ Max tier — ultimate 3D forge visual unlocked!" : "★ Đã đạt cấp tối đa — mô hình xịn nhất trong lò!")
+                           : (isEn ? ("Tier " + (lv + 1) + ": " + ul.next) : ("Cấp " + (lv + 1) + ": " + ul.next));
+
+    var btnTxt = maxed
+      ? (isEn ? "★ MAX TIER UNLOCKED" : "★ CẤP TỐI ĐA")
+      : (isEn ? ("⬆ UPGRADE TO TIER " + (lv + 1) + " · " + nextPrice + " GOLD")
+              : ("⬆ NÂNG CẤP LÊN CẤP " + (lv + 1) + " · " + nextPrice + " VÀNG"));
+
+    card.innerHTML =
+      "<div class='upg-kintsugi-line'></div>" +
+      "<div class='upg-card-top'>" +
+        "<div class='upg-icon-emblem'>" + u.icon + "</div>" +
+        "<div class='upg-name-wrap'>" +
+          "<div class='upg-name'>" + ul.name + "</div>" +
+          "<div class='tier-pips-bar'>" + pipsHtml + "<span class='pip-label'>Tier " + lv + "/" + u.max + "</span></div>" +
+        "</div>" +
+        bonusPill +
+      "</div>" +
+      "<div class='upg-card-body'>" +
+        "<p class='upg-desc'>" + ul.desc + "</p>" +
+        "<div class='upg-next-box'>" +
+          "<div class='upg-next-lbl'>" + nextBoxTitle + "</div>" +
+          "<div class='upg-next-txt'>" + nextBoxTxt + "</div>" +
+        "</div>" +
+      "</div>" +
+      "<div class='upg-card-footer'>" +
+        "<button class='upg-action-btn " + (maxed ? "btn-maxed" : (canAfford ? "btn-gold" : "btn-disabled")) + "' data-upg='" + u.id + "'>" +
+          btnTxt +
+        "</button>" +
+      "</div>";
+    row.appendChild(card);
   });
-  _upgBtns=null;
+  _upgBtns = null;
   refreshUpgradeButtons();
 }
 /* ---------- sword rack UI + 3D sync ---------- */
