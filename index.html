@@ -2270,10 +2270,19 @@ function engageStation(st){
   setStation(st, false);
   updateInteractPrompt(currentNearStation);
   if(typeof audio === 'function') audio();
-  if(st === 'anvil') toast('🛠 Đe Rèn — [Space/E] Gõ búa, [B] Chốt, [Q/WASD] Rời trạm', 'info');
-  else if(st === 'furnace') toast('🔥 Lò Nung — [Space/E] Nung kiếm, [Q/WASD] Rời trạm', 'info');
-  else if(st === 'bell') toast('🔔 Chuông Cống — [Space/E] Nộp cống, [Q/WASD] Rời trạm', 'info');
-  else if(st === 'rack') toast('🗡 Giá Treo — [T] Treo/Lấy kiếm, [Q/WASD] Rời trạm', 'info');
+  if(st === 'anvil'){
+    if(typeof clang === 'function') clang(0.32, 1.25);
+    toast('🛠 Đe Rèn — [Space/E] Gõ búa, [B] Chốt, [Q/WASD] Rời trạm', 'info');
+  } else if(st === 'furnace'){
+    if(typeof whoosh === 'function') whoosh();
+    toast('🔥 Lò Nung — [Space/E] Nung kiếm, [Q/WASD] Rời trạm', 'info');
+  } else if(st === 'bell'){
+    if(typeof bellSound === 'function') bellSound();
+    toast('🔔 Chuông Cống — [Space/E] Nộp cống, [Q/WASD] Rời trạm', 'info');
+  } else if(st === 'rack'){
+    if(typeof clang === 'function') clang(0.25, 1.4);
+    toast('🗡 Giá Treo — [T] Treo/Lấy kiếm, [Q/WASD] Rời trạm', 'info');
+  }
   refreshUI();
 }
 
@@ -2286,6 +2295,7 @@ function disengageStation(silent){
   });
   updateInteractPrompt(currentNearStation);
   if(!silent){
+    if(typeof whoosh === 'function') whoosh();
     toast('Đã rời trạm — Phím WASD để đi bộ tự do, đến gần trạm bấm [E]', 'info');
   }
   refreshUI();
@@ -2390,6 +2400,14 @@ function resetSmith(){
 function updateSmith(dt){
   updateFPSMovement(dt);
 }
+
+/* 3D Station Interaction Floor Beacon (Kintsugi Gold Rune Ring) */
+var beaconMat = new THREE.MeshBasicMaterial({color:0xffb84d, transparent:true, opacity:0, side:THREE.DoubleSide, depthWrite:false});
+var beaconRing = new THREE.Mesh(new THREE.RingGeometry(1.05, 1.25, 32), beaconMat);
+beaconRing.rotation.x = -Math.PI / 2;
+beaconRing.position.set(0, 0.02, 0);
+beaconRing.visible = false;
+scene.add(beaconRing);
 
 /* crates */
 var crate1=mesh(RB(.62,.62,.62,.03), matWoodDk, 3.35,.31,1.3); crate1.rotation.y=.4;
@@ -4173,6 +4191,18 @@ function animate(){
       else qUpTimer=0;
     }
     if(typeof updateSmith==='function') updateSmith(dt);
+    if(typeof beaconRing!=='undefined' && beaconRing){
+      var bTargetOp = 0;
+      if(!isStationEngaged && currentNearStation && STATIONS[currentNearStation]){
+        var stObj = STATIONS[currentNearStation];
+        beaconRing.position.x += (stObj.x - beaconRing.position.x) * Math.min(1, dt * 12);
+        beaconRing.position.z += (stObj.z - beaconRing.position.z) * Math.min(1, dt * 12);
+        bTargetOp = 0.55 + Math.sin(t * 3.8) * 0.22;
+        beaconRing.rotation.z += dt * 0.65;
+      }
+      beaconMat.opacity += (bTargetOp - beaconMat.opacity) * Math.min(1, dt * 8);
+      beaconRing.visible = beaconMat.opacity > 0.01;
+    }
     smithFollow+=(1-smithFollow)*Math.min(1,dt*5);
     if(!G||!G.started||G.over||inspectOn) smithFollow=Math.max(0,smithFollow-dt*6);
     var sOffX=smith?(smith.position.x-SMITH_HOME.x)*smithFollow:0, sOffZ=smith?(smith.position.z-SMITH_HOME.z)*smithFollow:0;
