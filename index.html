@@ -4122,12 +4122,14 @@ mesh(new THREE.BoxGeometry(2.17, 1.29, .01), matGold, 0, 0, -.002, displayStand)
 
 // Canvas Texture and Display Screen (native 2K UHD for extreme legibility in 3D)
 var SWORD_TABLE_W = 2048, SWORD_TABLE_H = 1152;
+var SWORD_TABLE_DPR = Math.min(2.5, Math.max(1.5, (typeof window!=='undefined' && window.devicePixelRatio)||1.5));
 var swordTableCanvas, swordTableCtx, swordTableTexture, swordTableMesh;
 function applySwordTableCanvasDpr(){
   if(!swordTableCanvas||!swordTableCtx) return;
-  swordTableCanvas.width = SWORD_TABLE_W;
-  swordTableCanvas.height = SWORD_TABLE_H;
-  swordTableCtx.setTransform(1, 0, 0, 1, 0, 0);
+  var dpr = SWORD_TABLE_DPR;
+  swordTableCanvas.width = Math.round(SWORD_TABLE_W * dpr);
+  swordTableCanvas.height = Math.round(SWORD_TABLE_H * dpr);
+  swordTableCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
   swordTableCtx.imageSmoothingEnabled = true;
   if(swordTableCtx.imageSmoothingQuality) swordTableCtx.imageSmoothingQuality = 'high';
 }
@@ -4147,8 +4149,8 @@ function applySwordTableCanvasDpr(){
     map: swordTableTexture,
     toneMapped: false
   });
-  swordTableMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.10, 1.22), screenMat);
-  swordTableMesh.position.set(0, 0, .018);
+  swordTableMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.22, 1.30), screenMat);
+  swordTableMesh.position.set(0, 0, .022);
   displayStand.add(swordTableMesh);
 })();
 
@@ -4220,17 +4222,17 @@ function updateSwordTableDisplay(){
   var skinColor = "hsl(" + hue + ", 94%, 82%)";
   var modelTitle = sShapeName || (isEn ? "Blade" : "Kiếm");
   var lvTitle = "Lv." + sLv + " · " + modelTitle + (sLv >= 100 ? (isEn ? " ★ MAX" : " ★ CỰC HẠN") : "");
-  drawCrispText(lvTitle, 72, 128, "900 96px system-ui, -apple-system, sans-serif", skinColor, "left", 14);
+  drawCrispText(lvTitle, 72, 128, "900 100px system-ui, -apple-system, BlinkMacSystemFont, sans-serif", skinColor, "left", 16);
 
   // Gold value (Right)
   var goldText = "🪙 " + formatBoardGold(sVal) + " " + (isEn ? "GOLD" : "VÀNG");
-  drawCrispText(goldText, w - 72, 128, "900 102px system-ui, -apple-system, sans-serif", "#ffe566", "right", 14);
+  drawCrispText(goldText, w - 72, 128, "900 106px system-ui, -apple-system, BlinkMacSystemFont, sans-serif", "#ffe566", "right", 16);
 
   // Skin line & next model tier (Sub header)
   var nextDesc = (sLv >= 100) ? (isEn ? "★ Final blade" : "★ Kiếm tối thượng")
                               : (isEn ? ("Lv." + (sLv+1) + " → " + modelNameForLevel(sLv + 1)) : ("Lv." + (sLv+1) + " → " + modelNameForLevel(sLv + 1)));
   var subTitle = "🎨 " + (sSkin.name || "") + "   ·   " + nextDesc;
-  drawCrispText(subTitle, 72, 202, "800 48px system-ui, -apple-system, sans-serif", "#ded0bd", "left", 8);
+  drawCrispText(subTitle, 72, 206, "800 52px system-ui, -apple-system, BlinkMacSystemFont, sans-serif", "#e8dcc8", "left", 10);
 
   // Divider line
   var divGrd = c.createLinearGradient(72, 0, w - 72, 0);
@@ -4243,11 +4245,11 @@ function updateSwordTableDisplay(){
   // 4. Meters: HEAT, SHATTER RISK, STRIKES
   function drawMeter(y, label, valText, pct, fillColor, valColor){
     // Label
-    drawCrispText(label, 72, y + 42, "900 52px system-ui, -apple-system, sans-serif", "#eedcc6", "left", 9);
+    drawCrispText(label, 72, y + 42, "900 54px system-ui, -apple-system, BlinkMacSystemFont, sans-serif", "#f2e4d0", "left", 10);
 
     // Value
     var vc = valColor || (typeof fillColor === "string" ? fillColor : "#ffd56a");
-    drawCrispText(valText, w - 72, y + 42, "900 56px system-ui, -apple-system, sans-serif", vc, "right", 10);
+    drawCrispText(valText, w - 72, y + 42, "900 58px system-ui, -apple-system, BlinkMacSystemFont, sans-serif", vc, "right", 11);
 
     // Bar track
     var bx = 72, by = y + 58, bw = w - 144, bh = 46;
@@ -7371,15 +7373,15 @@ function doHit(){
         try{ lvBonus = applyBladeLevelUpPricing(G.swordLevel); }catch(e){ if(window.console) console.warn('level pricing', e); }
         _txtCache.skinLvRendered = -1;
         if(lvBonus > 0){
-          var upLv = G.swordLevel, upFam = skinFamilyName(skL);
+          var celebratedLv = G.swordLevel, upFam = skinFamilyName(skL);
           setTimeout(function(){
-            floatNum('⬆ Lv.'+upLv+' +'+lvBonus+' '+L('vàng','gold'), 'big');
+            floatNum('⬆ Lv.'+celebratedLv+' +'+lvBonus+' '+L('vàng','gold'), 'big');
             if(famChanged){
-              toastL('⚔ Lv.'+upLv+' — dòng '+upFam+'! Giá ×1.25 (+'+lvBonus+' vàng)','⚔ Lv.'+upLv+' — '+upFam+' line! Price ×1.25 (+'+lvBonus+' gold)','good');
-            } else if((upLv-1)%10===9){
-              toastL('★ Lv.'+upLv+' — tuyệt đỉnh dòng! ×1.25 (+'+lvBonus+' vàng)','★ Lv.'+upLv+' — family apex! ×1.25 (+'+lvBonus+' gold)','good');
+              toastL('⚔ Lv.'+celebratedLv+' — dòng '+upFam+'! Giá ×1.25 (+'+lvBonus+' vàng)','⚔ Lv.'+celebratedLv+' — '+upFam+' line! Price ×1.25 (+'+lvBonus+' gold)','good');
+            } else if((celebratedLv-1)%10===9){
+              toastL('★ Lv.'+celebratedLv+' — tuyệt đỉnh dòng! ×1.25 (+'+lvBonus+' vàng)','★ Lv.'+celebratedLv+' — family apex! ×1.25 (+'+lvBonus+' gold)','good');
             } else {
-              toastL('⬆ Lv.'+upLv+' — giá kiếm ×1.25 (+'+lvBonus+' vàng)','⬆ Lv.'+upLv+' — blade price ×1.25 (+'+lvBonus+' gold)','good');
+              toastL('⬆ Lv.'+celebratedLv+' — giá kiếm ×1.25 (+'+lvBonus+' vàng)','⬆ Lv.'+celebratedLv+' — blade price ×1.25 (+'+lvBonus+' gold)','good');
             }
           }, famChanged ? 520 : 280);
         }
