@@ -2623,6 +2623,152 @@
       max-width: 340px !important;
     }
   }
+
+  /* ============================================================
+     STITCH TAMAHAGANE 3-CLUSTER POD ARCHITECTURE
+     ============================================================ */
+  .topbar {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 8px 16px 0 !important;
+    pointer-events: auto !important;
+    height: 48px !important;
+    max-width: 1380px !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+  }
+  .hud-pod {
+    display: inline-flex !important;
+    align-items: center !important;
+    height: 40px !important;
+    background: linear-gradient(180deg, rgba(28, 20, 14, 0.94) 0%, rgba(14, 10, 7, 0.96) 100%) !important;
+    border: 1px solid rgba(232, 179, 60, 0.35) !important;
+    border-radius: 12px !important;
+    padding: 2px 8px !important;
+    box-shadow: inset 0 1px 0 rgba(255, 230, 160, 0.15), 0 8px 24px rgba(0, 0, 0, 0.75) !important;
+    box-sizing: border-box !important;
+    backdrop-filter: blur(4px) !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+  }
+  .hud-pod:hover {
+    border-color: rgba(255, 213, 106, 0.5) !important;
+  }
+  .pod-cell {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 0 8px !important;
+    white-space: nowrap !important;
+  }
+  .pod-cell .lbl {
+    font-family: var(--font-display) !important;
+    font-size: 10px !important;
+    letter-spacing: .06em !important;
+    color: #e5cd9e !important;
+  }
+  .pod-cell .val {
+    font-family: var(--font-ui) !important;
+    font-size: 14.5px !important;
+    font-weight: 800 !important;
+    color: #fff6e0 !important;
+  }
+  .pod-sep {
+    width: 1px !important;
+    height: 18px !important;
+    background: linear-gradient(180deg, transparent 0%, rgba(232, 179, 60, 0.3) 50%, transparent 100%) !important;
+    margin: 0 2px !important;
+    flex-shrink: 0 !important;
+  }
+  .pod-gold .val {
+    color: #ffd56a !important;
+    text-shadow: 0 0 10px rgba(255, 200, 70, 0.4) !important;
+  }
+
+  /* Pod 2: Dragon Altar */
+  .hud-pod-dragon {
+    border-color: rgba(255, 170, 40, 0.4) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 240, 180, 0.2), 0 8px 28px rgba(0, 0, 0, 0.8), 0 0 16px rgba(212, 114, 26, 0.15) !important;
+  }
+  .hud-pod-dragon #tributePlate {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 8px 0 34px !important;
+    height: 36px !important;
+    min-width: 170px !important;
+  }
+  .hud-pod-dragon #angerPlate {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 8px !important;
+    height: 36px !important;
+  }
+
+  /* Pod 3: Tools */
+  .hud-pod-tools {
+    padding: 2px 6px !important;
+  }
+  .hud-pod-tools .tool-btn {
+    border: 1px solid rgba(232, 179, 60, 0.2) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-radius: 8px !important;
+    height: 32px !important;
+    padding: 0 9px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+  }
+  .hud-pod-tools .tool-btn:hover {
+    background: rgba(232, 179, 60, 0.18) !important;
+    border-color: #ffd56a !important;
+    color: #fff !important;
+  }
+  .pod-highlight {
+    background: linear-gradient(180deg, rgba(196, 88, 18, 0.4) 0%, rgba(138, 53, 5, 0.5) 100%) !important;
+    border-color: rgba(255, 180, 50, 0.5) !important;
+  }
+
+  /* Sword Attribute Certificate (#swordAttrBoard) */
+  #swordAttrBoard {
+    background: linear-gradient(135deg, rgba(18, 12, 8, 0.96) 0%, rgba(28, 20, 14, 0.98) 100%),
+                url('assets/ui/sword_plate_bg.jpg') center/cover no-repeat !important;
+    border: 1.5px solid rgba(232, 179, 60, 0.45) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.9), 0 0 24px rgba(232, 179, 60, 0.2) !important;
+    padding: 12px 16px !important;
+  }
+  #swordAttrBoard th {
+    font-family: var(--font-display) !important;
+    color: #d8c29d !important;
+    font-size: 11px !important;
+    letter-spacing: .04em !important;
+  }
+  #swordAttrBoard td {
+    font-family: var(--font-ui) !important;
+    font-weight: 700 !important;
+    color: #fff !important;
+    font-size: 12.5px !important;
+  }
+  #swordAttrBoard .sab-head h3 {
+    font-family: var(--font-display) !important;
+    color: #ffd56a !important;
+    letter-spacing: .06em !important;
+  }
+
+  @media (max-width: 900px) {
+    .topbar {
+      overflow-x: auto !important;
+      scrollbar-width: none !important;
+      justify-content: flex-start !important;
+      gap: 8px !important;
+      padding: 6px 8px 0 !important;
+    }
+    .hud-pod {
+      flex-shrink: 0 !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -2639,19 +2785,45 @@
   <div class="hud-top">
     <div class="hud-expand-only"><button type="button" id="btnHudExpand">▼ Mở HUD (vòng / cống / nhiệm vụ)</button></div>
     <div class="topbar">
-      <div class="plate"><span class="lbl" id="lblRound">🔄 Vòng</span><span class="val" id="uiRound">1</span></div>
-      <div class="plate"><span class="lbl" id="lblGold">🪙 Vàng kho</span><span class="val" id="uiGold">0</span></div>
-      <div class="plate"><span class="lbl" id="lblTurns">⏳ Lượt</span><span class="val" id="uiTurns">30</span></div>
-      <div class="plate" id="tributePlate"><span class="lbl" id="lblTribute">🔔 Cống</span><span class="val"><span id="uiTribNow">0</span> <small id="lblTribUnit">/ <span id="uiTribTarget">120</span> vàng</small></span><div class="bar"><i id="tribFill"></i></div><small class="trib-pot" id="uiTribPot" title="Kho + kiếm trên đe + giá treo">Tiềm năng: 0</small></div>
-      <div class="plate" id="angerPlate"><span class="lbl" id="lblAnger">🐉 Kiên nhẫn</span><span class="val" id="uiDragonAnger">0/3</span></div>
-      <div class="plate"><span class="lbl" id="lblBest">🏆 Kỷ lục</span><span class="val" id="uiBest">—</span></div>
-      <button class="plate" id="btnAch" type="button" title="Thành tích & kỷ lục"><span class="lbl" id="lblAch">🏅 Thành tích</span><span class="val" id="uiAchCount">0/15</span></button>
-      <div class="top-quick-tools">
-        <button class="tool-btn" id="btnShop" type="button" title="Máy Relic (3 ô/vòng)">⚙️ <span id="btnShopTxt">Relic</span></button>
-        <button class="tool-btn" id="btnUpg" type="button" title="Nâng cấp đe, búa, lò">⬆ <span id="btnUpgTxt">Nâng Cấp</span></button>
-        <button class="tool-btn" id="btnGallery" type="button" title="Xem 100 level kiếm">🖼 <span id="btnGalleryTxt">Sưu Tập</span></button>
-        <button class="tool-btn" id="btnHelp" type="button" title="Hướng dẫn & kỷ lục">? <span id="btnHelpTxt">Trợ Giúp</span></button>
-        <button class="tool-btn lang-btn" id="btnLangTop" type="button" title="Chuyển ngôn ngữ / Switch Language">🌐 <span id="topLangTxt">EN</span></button>
+      <!-- PHÂN KHU 1: CHỈ SỐ SINH TỒN THỢ RÈN (VÒNG - LƯỢT - VÀNG KHO) -->
+      <div class="hud-pod hud-pod-survival" title="Chỉ số sinh tồn của thợ rèn">
+        <div class="pod-cell"><span class="lbl" id="lblRound">🔄 VÒNG</span><span class="val" id="uiRound">1</span></div>
+        <div class="pod-sep"></div>
+        <div class="pod-cell"><span class="lbl" id="lblTurns">⏳ LƯỢT</span><span class="val" id="uiTurns">30</span></div>
+        <div class="pod-sep"></div>
+        <div class="pod-cell pod-gold"><span class="lbl" id="lblGold">🪙 VÀNG KHO</span><span class="val" id="uiGold">0</span></div>
+      </div>
+
+      <!-- PHÂN KHU 2: BỆ RỒNG CỐNG NẠP (MỤC TIÊU CỐNG VÀ KIÊN NHẪN LONG VƯƠNG) -->
+      <div class="hud-pod hud-pod-dragon" title="Mục tiêu nộp cống cho Rồng Hoàng Kim">
+        <div class="plate" id="tributePlate">
+          <div class="tribute-meta">
+            <span class="lbl" id="lblTribute">🔔 CỐNG NẠP</span>
+            <span class="val"><span id="uiTribNow">0</span> <small id="lblTribUnit">/ <span id="uiTribTarget">120</span> vàng</small></span>
+          </div>
+          <div class="bar"><i id="tribFill"></i></div>
+          <small class="trib-pot" id="uiTribPot" title="Kho + kiếm trên đe + giá treo">Tiềm năng: 0</small>
+        </div>
+        <div class="pod-sep"></div>
+        <div class="plate" id="angerPlate" title="Kiên nhẫn của Long Vương (hết kiên nhẫn rồng sẽ tấn công)">
+          <span class="lbl" id="lblAnger">🐉 KIÊN NHẪN</span>
+          <span class="val" id="uiDragonAnger">0/3</span>
+        </div>
+      </div>
+
+      <!-- PHÂN KHU 3: CÔNG CỤ BINH KHÍ CỤC (RELIC - NÂNG CẤP - SƯU TẬP - NGÔN NGỮ - TRỢ GIÚP) -->
+      <div class="hud-pod hud-pod-tools" title="Binh Khí Cục & Tàng Kiếm">
+        <div class="top-quick-tools">
+          <button class="tool-btn" id="btnShop" type="button" title="Máy Relic (3 ô/vòng)"><span class="tool-ic">⚙️</span> <span id="btnShopTxt">Relic</span></button>
+          <button class="tool-btn" id="btnUpg" type="button" title="Nâng cấp đe, búa, lò"><span class="tool-ic">⬆</span> <span id="btnUpgTxt">Nâng Cấp</span></button>
+          <button class="tool-btn pod-highlight" id="btnGallery" type="button" title="Xem 100 level kiếm"><span class="tool-ic">🗡</span> <span id="btnGalleryTxt">Sưu Tập</span></button>
+          <button class="tool-btn lang-btn" id="btnLangTop" type="button" title="Chuyển ngôn ngữ / Switch Language"><span class="tool-ic">🌐</span> <span id="topLangTxt">EN</span></button>
+          <button class="tool-btn" id="btnHelp" type="button" title="Hướng dẫn & kỷ lục"><span class="tool-ic">?</span> <span id="btnHelpTxt">Trợ Giúp</span></button>
+        </div>
+        <div style="display:none">
+          <div id="lblBest"></div><div id="uiBest"></div>
+          <button id="btnAch"><span id="lblAch"></span><span id="uiAchCount"></span></button>
+        </div>
       </div>
     </div>
     <div id="missionBar"><span class="mb-title" id="lblMissionBar">🎯 <span id="lblMissionTxt">Vòng</span> <span id="uiMissionRound">1</span></span><span id="btnGhostHint" class="mb-ghost" title="Thương nhân ma mỗi vòng 3,6,9…"></span><span id="missionList"></span><button type="button" id="btnHudToggle" class="hud-toggle" title="Thu gọn thanh trên">▴</button><button type="button" id="btnUiMode" class="hud-toggle" title="Chế độ hiển thị">◎</button><button type="button" id="btnSfx" class="hud-toggle" title="Âm thanh">🔊</button></div>
@@ -2722,6 +2894,17 @@
   <div class="sheet-panel">
     <div class="sheet-head"><h3>? Cách chơi &amp; cơ chế</h3><button class="sheet-close" id="btnHelpClose" type="button">✕ Đóng</button></div>
     <div class="help-body">
+      <details class="help-first-run" open>
+        <summary><b>🎓 Hướng dẫn lần đầu vào lò</b></summary>
+        <p class="sheet-note" style="margin:6px 0 8px">Overlay 4 bước + dòng phím chỉ hiện <b>lần đầu</b> chơi. Sau đó xem lại tại đây hoặc bấm «Xem lại hướng dẫn trong lò».</p>
+        <ol class="wf-steps">
+          <li><b>Bước 1:</b> NUNG (H) — nhiệt ≥60% giảm một nửa nguy cơ vỡ.</li>
+          <li><b>Bước 2:</b> Gõ 3 nhát búa (Space) — mỗi nhát lên 1 level, đổi model.</li>
+          <li><b>Bước 3:</b> 10 nhát không vỡ → FRENZY (×2.2, không vỡ).</li>
+          <li><b>Bước 4:</b> CHỐT (B) — vàng vào kho; đủ cống thì NỘP CỐNG.</li>
+        </ol>
+        <p><b>Phím:</b> <kbd>WASD</kbd> đi bộ · <kbd>E</kbd> tương tác trạm · <kbd>Q</kbd> rời trạm · <kbd>Space</kbd> hành động · <kbd>1–5</kbd> chọn trạm · <kbd>H</kbd> nung · <kbd>B</kbd> chốt · <kbd>V</kbd> ngắm kiếm</p>
+      </details>
       <details class="help-workflow" open>
         <summary><b>⚡ Quy trình chơi (1 phút)</b></summary>
         <ol class="wf-steps">
@@ -2732,7 +2915,8 @@
           <li><b>Nộp cống</b> khi kho đủ (hoặc <b>tiềm năng</b> đủ nếu chốt hết kiếm).</li>
           <li><b>Máy relic / nâng cấp</b> — đừng đút kiếm đang dùng cho cống.</li>
         </ol>
-        <button type="button" id="btnCoachReplay" class="goldbtn" style="width:100%;margin-top:8px">🎓 Xem lại hướng dẫn trong lò (4 bước)</button>
+        <p class="sheet-note" style="margin:8px 0 6px">Trên menu chỉ còn tóm tắt lần đầu; chi tiết đầy đủ ở các mục bên dưới.</p>
+        <button type="button" id="btnCoachReplay" class="goldbtn" style="width:100%;margin-top:4px">🎓 Bật lại overlay 4 bước trong lò</button>
       </details>
 
         <div>⚙️ <b>Máy Relic:</b> 3 ô ngẫu nhiên mỗi vòng — mua bằng <b>vàng kho</b> hoặc <b>đút kiếm trên đe</b> (mất blade). <b>Xáo lại</b> tốn vàng (tăng mỗi lần xáo trong vòng).</div>
@@ -5212,6 +5396,7 @@ function workflowHint(){
 }
 function renderWorkflowRibbon(){
   var el=$('workflowRibbon'); if(!el||!G) return;
+  if(META.onboarded){ el.classList.remove('show'); el.innerHTML=''; return; }
   var w=workflowHint();
   var hide=META.hudCollapsed || (!G.started||G.over);
   if(hide || !w.act){ el.classList.remove('show'); el.innerHTML=''; return; }
@@ -5236,7 +5421,8 @@ function applyHudChrome(){
 }
 function toggleHudCollapsed(){ META.hudCollapsed=!META.hudCollapsed; metaSave(); applyHudChrome(); refreshUI(); }
 function toggleUiCompact(){ META.uiCompact=!META.uiCompact; metaSave(); applyHudChrome(); toast(META.uiCompact?'◎ HUD gọn — chỉ cống + rồng + ribbon':'◎ HUD đầy đủ', 'info'); refreshUI(); }
-function coachDismiss(){ META.onboarded=true; metaSave(); coachSet(-1); toast('Đã tắt hướng dẫn — mở ? TRỢ GIÚP → xem lại', 'info'); }
+function coachDismiss(){ META.onboarded=true; metaSave(); coachSet(-1); if(typeof renderWorkflowRibbon==='function') renderWorkflowRibbon(); refreshUI();
+  toast((typeof CURRENT_LANG!=='undefined'&&CURRENT_LANG==='en')?'Guide off — open ? Help anytime.':'Đã tắt hướng dẫn — xem ? Trợ giúp bất cứ lúc nào.', 'info'); }
 function coachReplay(){ closeSheets(); coachStep=-1; META.onboarded=false; coachSet(0); toast('🎓 Hướng dẫn 4 bước — làm theo đèn sáng trên nút', 'info'); }
 window.coachDismiss=coachDismiss;
 
@@ -5260,7 +5446,8 @@ function coachOn(what){
   else if(what==='hit' && coachStep===2) coachSet(3);
   else if(what==='bank' && coachStep===3){
     META.onboarded=true; metaSave(); coachSet(-1);
-    if(G){ G.gold+=30; coinSound(); floatNum('🎁 +30 vàng khởi nghiệp', ''); toast('🎓 Đã nắm vững lò rèn! Thưởng 30 vàng khởi nghiệp.', 'good'); refreshUI(); }
+    if(G){ G.gold+=30; coinSound(); floatNum('🎁 +30 vàng khởi nghiệp', ''); toast((typeof CURRENT_LANG!=='undefined'&&CURRENT_LANG==='en')?'Tutorial done! +30 gold starter bonus.':'🎓 Xong hướng dẫn! Thưởng 30 vàng khởi nghiệp.', 'good'); refreshUI(); }
+    if(typeof renderWorkflowRibbon==='function') renderWorkflowRibbon();
   }
 }
 function metaOnGameStart(){
@@ -5298,7 +5485,7 @@ function updateSwordAttrBoard(){
   var board=$('swordAttrBoard'), body=$('swordAttrBody');
   if(!board||!body||typeof G==='undefined'||!G) return;
   var isEn=(typeof CURRENT_LANG!=='undefined'&&CURRENT_LANG==='en');
-  var show=G.started&&!G.over&&!document.body.classList.contains('sheet-open');
+  var show=G.started&&!G.over&&!document.body.classList.contains('sheet-open')&&document.body.classList.contains('inspect-mode');
   board.classList.toggle('sab-hidden', !show);
   var title=$('sabTitle'); if(title) title.textContent=isEn?'⚔ Blade stats':'⚔ Thuộc tính kiếm';
   if(!show) return;
@@ -5418,7 +5605,7 @@ function refreshUI(){
   _el('swordPlate').classList.toggle('rainbow', !!G.rainbow);
   _el('riskFill').classList.toggle('hot', rk>=.15);
   var dis = !G.started || G.over || G.turns<=0 || G.heating || G.eventLock || G.repairing;
-  var _kh=_el('keyHints'); if(_kh) _kh.style.display=(G.started&&!G.over&&!document.body.classList.contains('sheet-open'))?'block':'none';
+  var _kh=_el('keyHints'); if(_kh) _kh.style.display=(G.started&&!G.over&&!META.onboarded&&!document.body.classList.contains('sheet-open'))?'block':'none';
   _el('btnHeat').disabled = dis || G.furnaceBroken; _el('btnHit').disabled=dis;
   _el('btnBank').disabled = !G.started || G.over || G.hits===0 || G.heating || G.eventLock || G.repairing;
   var rackFull = G.rack.indexOf(null)===-1;
@@ -5745,7 +5932,7 @@ function doHit(){
         floatNum('🌈 +'+gain+' CẦU VỒNG!', '');
         bellSound(); flashTo(.65); burstCoins(-.05,1.35,.2,26);
       } else {
-        toast('+'+gain+' vàng'+(wasFrenzy?' — FRENZY!':'')+(G.swordLevel>levelBefore? ' · ⬆ Lv.'+G.swordLevel+' — '+modelNameForLevel(G.swordLevel) : ''), 'good');
+        toast('+'+gain+' vàng'+(wasFrenzy?' — FRENZY!':''), 'good');
       }
       /* a rainbow hit consumes ONLY the rainbow — a pending Frenzy survives it
          and still pays out on the following hit (never both at once) */
@@ -5758,14 +5945,10 @@ function doHit(){
       if(G.swordLevel>levelBefore){
         metaOnLevel(G.swordLevel);
         var skL=skinForLevel(G.swordLevel), famChanged = skL.family!==famBefore;
-        /* every level wears its OWN 3D model — the celebration names it,
-           e.g. "Lv.37 — Bản Kiếm Gai" */
-        floatNum('\u2b06 Lv.'+G.swordLevel+' \u2014 '+modelNameForLevel(G.swordLevel), 'info');
         fxOnLevelUp(G.swordLevel, famChanged); /* element shockwave ring + burst in the NEW level's element */
         burstSparks(-.05,1.3,.2, famChanged?55:34, famChanged?1.5:1.2, 1.1);
         if(!famChanged && G.swordLevel<SWORD_LEVEL_MAX && typeof levelUpChime==='function') levelUpChime();
         if(famChanged || G.swordLevel>=SWORD_LEVEL_MAX){
-          setTimeout(function(){ toast('\u2728 MODEL M\u1edaI! Lv.'+G.swordLevel+' \u2014 '+modelNameForLevel(G.swordLevel)+' \u2014 m\u1ed7i level m\u1ed9t model ri\u00eang, ng\u00f3 tr\u00ean \u0111e \u0111i!', 'good'); }, wasRainbow? 350 : 60);
           bellSound(); flashTo(.55); burstCoins(-.05,1.35,.2,20);
           if(G.swordLevel>=50) burstRainbow(-.05,1.3,.2,50,1.4);
         }
@@ -5938,7 +6121,12 @@ function beginRun(mode){
   G.started=true; introT=0; rollRelicOffers(); metaOnGameStart();
   if(typeof disengageStation==='function') disengageStation(true);
   var so=$('startOverlay'); if(so) so.style.display='none';
-  toast(mode==='endless'?'♾ Vô tận — cống tăng ~20%/vòng, không hạn hợp đồng.':'📜 Hợp đồng 12 vòng — trễ cống 3 lần là thua!', 'info');
+  if(!META.onboarded){
+    var isEn=(typeof CURRENT_LANG!=='undefined'&&CURRENT_LANG==='en');
+    toast(mode==='endless'
+      ?(isEn?'♾ Endless — tribute +20%/round. Tutorial shows once.':'♾ Vô tận — cống tăng ~20%/vòng. Hướng dẫn chỉ hiện lần đầu.')
+      :(isEn?'📜 Contract 12 rounds — 3 late tributes = lose. Tutorial shows once.':'📜 Hợp đồng 12 vòng — trễ cống 3 lần thua. Hướng dẫn chỉ hiện lần đầu.'), 'info');
+  }
   refreshUI();
 }
 bindClick('btnStart', function(){ beginRun('contract'); });
@@ -5949,6 +6137,10 @@ if (_bmr) {
   _bmr.addEventListener('click', function(e) {
     e.stopPropagation();
     if (typeof audio === 'function') audio();
+  if(META.onboarded){
+    toast((typeof CURRENT_LANG!=='undefined'&&CURRENT_LANG==='en')?'Rules are in ? Help after you enter the forge.':'Bí kíp nằm trong ? Trợ giúp sau khi vào lò.', 'info');
+    return;
+  }
     var p = $('menuRulesPanel');
     if (p) p.style.display = (p.style.display === 'none' || !p.style.display) ? 'block' : 'none';
   });
