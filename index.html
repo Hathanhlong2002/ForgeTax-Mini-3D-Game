@@ -957,10 +957,14 @@
   body.st-wide #btnHeat, body.st-wide #btnRepair, body.st-wide #btnHit, body.st-wide #btnBank, body.st-wide #btnTribute, body.st-wide #btnHang, body.st-wide #rackBar{display:none !important;}
   body.st-wide .actions-main::after{content:'👁 Chạm trạm 3D hoặc bấm phím 1-4 để tới trạm đó';font-size:13px;font-weight:700;color:var(--gold-2);padding:10px 18px;background:rgba(16,11,7,.85);border-radius:20px;border:1px solid rgba(232,179,60,.4);text-shadow:0 1px 4px #000;}
 
+  canvas#scene{cursor:grab;}
+  canvas#scene:active{cursor:grabbing;}
+
 </style>
 </head>
 <body>
 <canvas id="scene"></canvas>
+<button type="button" id="btnView" title="Ngắm kiếm (phím V)">🔍 NGẮM</button>
 
 <div id="hud">
   <div class="hud-top">
@@ -1016,7 +1020,7 @@
       <button id="btnHang">🗡 TREO KIẾM<span class="sub">T · lên giá treo (0/3)</span></button>
       <button id="btnTribute" class="goldbtn" disabled>🔔 NỘP CỐNG<span class="sub">đủ vàng mới rung chuông được</span></button>
     </div>
-    <p id="keyHints" class="key-hints" aria-hidden="true">Phím: <kbd>1-5</kbd> đổi trạm · <kbd>Space</kbd> hành động · <kbd>H</kbd> nung · <kbd>B</kbd> chốt · <kbd>T</kbd> treo · <kbd>V</kbd> ngắm</p>
+    <p id="keyHints" class="key-hints" aria-hidden="true">Phím: <kbd>WASD</kbd> đi bộ · <kbd>Kéo chuột</kbd> xoay nhìn 360° · <kbd>1-5</kbd> đổi trạm · <kbd>Space</kbd> hành động · <kbd>V</kbd> ngắm</p>
   </div>
 </div>
 
@@ -1692,40 +1696,26 @@ var moveKeys={w:0,a:0,s:0,d:0}, SMITH_SPEED=3.1;
 var SMITH_BOUNDS={x1:-4.1,x2:4.1,z1:-2.3,z2:3.15};
 var STATIONS={furnace:{x:-2.45,z:-.55,r:1.15}, anvil:{x:0,z:.1,r:.95}, bell:{x:2.3,z:-.35,r:1.05}, rack:{x:3.22,z:-1.9,r:1.2}};
 
-/* 3D Stations Spatial System */
+/* 3D First-Person Walking & Mouse Look Spatial System */
 var activeStation = 'anvil';
 document.body.classList.add('st-anvil');
-var stLerpPos = new THREE.Vector3();
-var stLerpLook = new THREE.Vector3();
-var stInitialized = false;
 
-function getStationTarget(st){
-  var asp = (typeof camera!=='undefined'&&camera.aspect)?camera.aspect:1;
-  if(st === 'furnace'){
-    return {
-      pos: new THREE.Vector3(-1.4, asp < 0.75 ? 2.3 : 1.9, asp < 0.75 ? 1.45 : 1.15),
-      look: new THREE.Vector3(-2.45, 1.15, -0.55)
-    };
-  } else if(st === 'bell'){
-    return {
-      pos: new THREE.Vector3(1.25, asp < 0.75 ? 2.4 : 2.05, asp < 0.75 ? 1.35 : 1.05),
-      look: new THREE.Vector3(2.3, 1.7, -0.35)
-    };
-  } else if(st === 'rack'){
-    return {
-      pos: new THREE.Vector3(2.05, asp < 0.75 ? 2.35 : 1.95, asp < 0.75 ? -0.4 : -0.65),
-      look: new THREE.Vector3(3.22, 1.5, -1.9)
-    };
-  } else if(st === 'wide'){
-    return {
-      pos: new THREE.Vector3(0, asp < 0.75 ? 4.3 : 3.4, asp < 0.75 ? 5.1 : 4.2),
-      look: new THREE.Vector3(0, 1.25, -0.6)
-    };
-  }
-  return { pos: baseCamPos, look: camLook };
-}
+var playerPos = new THREE.Vector3(0, 1.85, 2.2);
+var targetPlayerPos = new THREE.Vector3(0, 1.85, 2.2);
+var camYaw = 0, camPitch = -0.38;
+var targetYaw = 0, targetPitch = -0.38;
+var isDragging = false, lastDragX = 0, lastDragY = 0;
+var walkBob = 0;
 
-function setStation(st){
+var STATION_DESTINATIONS = {
+  anvil:   { pos: new THREE.Vector3(0, 1.85, 2.15), yaw: 0, pitch: -0.42 },
+  furnace: { pos: new THREE.Vector3(-1.35, 1.85, 0.65), yaw: Math.PI * 0.45, pitch: -0.18 },
+  bell:    { pos: new THREE.Vector3(1.35, 1.85, 0.65), yaw: -Math.PI * 0.42, pitch: -0.12 },
+  rack:    { pos: new THREE.Vector3(2.1, 1.85, -0.75), yaw: -Math.PI * 0.68, pitch: -0.10 },
+  wide:    { pos: new THREE.Vector3(0, 2.45, 3.85), yaw: 0, pitch: -0.25 }
+};
+
+function setStation(st, silent){
   if(activeStation === st) return;
   activeStation = st;
   document.body.classList.remove('st-anvil','st-furnace','st-bell','st-rack','st-wide');
@@ -1733,20 +1723,75 @@ function setStation(st){
   document.querySelectorAll('.st-tab').forEach(function(b){
     b.classList.toggle('active', b.getAttribute('data-st') === st);
   });
-  if(typeof smith !== 'undefined' && smith){
-    if(st === 'furnace'){ smith.position.set(-1.8, 0, .4); smith.rotation.y = -Math.PI*0.7; }
-    else if(st === 'bell'){ smith.position.set(1.5, 0, .3); smith.rotation.y = Math.PI*0.3; }
-    else if(st === 'rack'){ smith.position.set(2.4, 0, -1.1); smith.rotation.y = Math.PI*0.4; }
-    else if(st === 'wide'){ smith.position.set(0, 0, 2.2); smith.rotation.y = Math.PI; }
-    else { smith.position.set(0, 0, 1.1); smith.rotation.y = Math.PI; }
-    shadowDirty = true;
+  var dest = STATION_DESTINATIONS[st];
+  if(dest && !silent){
+    targetPlayerPos.copy(dest.pos);
+    targetYaw = dest.yaw;
+    targetPitch = dest.pitch;
   }
-  if(st === 'furnace') toast('🔥 Trạm Lò Nung — [Space] hoặc [H] để Nung kiếm', 'info');
-  else if(st === 'bell') toast('🔔 Trạm Chuông Cống — Rung chuông nộp cống Rồng Khói', 'info');
-  else if(st === 'rack') toast('🗡 Trạm Giá Treo — [T] để treo/lấy kiếm trên giá', 'info');
-  else if(st === 'anvil') toast('🛠 Trạm Đe Rèn — [Space] để gõ búa, [B] để chốt kiếm', 'info');
-  else if(st === 'wide') toast('👁 Toàn cảnh xưởng rèn — Chạm trạm bất kỳ để di chuyển tới', 'info');
+  if(!silent){
+    if(st === 'furnace') toast('🔥 Trạm Lò Nung — [Space] hoặc [H] để Nung kiếm', 'info');
+    else if(st === 'bell') toast('🔔 Trạm Chuông Cống — Rung chuông nộp cống Rồng Khói', 'info');
+    else if(st === 'rack') toast('🗡 Trạm Giá Treo — [T] để treo/lấy kiếm trên giá', 'info');
+    else if(st === 'anvil') toast('🛠 Trạm Đe Rèn — [Space] để gõ búa, [B] để chốt kiếm', 'info');
+    else if(st === 'wide') toast('👁 Toàn cảnh xưởng rèn — Kéo chuột xoay 360°, WASD để đi bộ', 'info');
+  }
   refreshUI();
+}
+
+function playerStationNear(){
+  var p = playerPos;
+  var best = '', bd = 1e9;
+  for(var k in STATIONS){
+    var s = STATIONS[k];
+    var d = Math.hypot(p.x - s.x, p.z - s.z);
+    if(d < s.r + 0.35 && d < bd){
+      bd = d;
+      best = k;
+    }
+  }
+  return best;
+}
+
+function updateFPSMovement(dt){
+  if(!G || !G.started || G.over || inspectOn || G.eventLock || G.heating || G.repairing) return;
+  
+  playerPos.lerp(targetPlayerPos, Math.min(1, dt * 6.5));
+  
+  var moveFwd = (moveKeys.w - moveKeys.s);
+  var moveRight = (moveKeys.d - moveKeys.a);
+  
+  if(moveFwd !== 0 || moveRight !== 0){
+    var forwardX = -Math.sin(camYaw);
+    var forwardZ = -Math.cos(camYaw);
+    var rightX = Math.cos(camYaw);
+    var rightZ = -Math.sin(camYaw);
+    
+    var vx = forwardX * moveFwd + rightX * moveRight;
+    var vz = forwardZ * moveFwd + rightZ * moveRight;
+    var len = Math.hypot(vx, vz) || 1;
+    vx /= len; vz /= len;
+    
+    var speed = 3.2;
+    playerPos.x += vx * speed * dt;
+    playerPos.z += vz * speed * dt;
+    
+    playerPos.x = Math.max(-3.6, Math.min(3.6, playerPos.x));
+    playerPos.z = Math.max(-2.5, Math.min(3.6, playerPos.z));
+    targetPlayerPos.copy(playerPos);
+    
+    walkBob += dt * 10;
+  } else {
+    walkBob *= 0.88;
+  }
+  
+  camYaw += (targetYaw - camYaw) * Math.min(1, dt * 16);
+  camPitch += (targetPitch - camPitch) * Math.min(1, dt * 16);
+  
+  var near = playerStationNear();
+  if(near && near !== activeStation){
+    setStation(near, true);
+  }
 }
 
 function setMoveKey(code,on){
@@ -1756,23 +1801,17 @@ function setMoveKey(code,on){
   else if(code==='KeyD'||code==='ArrowRight') moveKeys.d=on?1:0;
 }
 function smithStationNear(){
-  var p=smith.position, best='', bd=1e9;
-  for(var k in STATIONS){ var s=STATIONS[k], d=Math.hypot(p.x-s.x,p.z-s.z); if(d<s.r&&d<bd){ bd=d; best=k; } }
-  return best;
+  return playerStationNear();
 }
-function resetSmith(){ smith.position.set(SMITH_HOME.x,0,SMITH_HOME.z); smith.rotation.y=Math.PI*0.92; shadowDirty=true; }
+function resetSmith(){
+  playerPos.set(0, 1.85, 2.2);
+  targetPlayerPos.copy(playerPos);
+  camYaw = 0; camPitch = -0.38; targetYaw = 0; targetPitch = -0.38;
+  setStation('anvil', true);
+  shadowDirty=true;
+}
 function updateSmith(dt){
-  if(!smith||!G||!G.started||G.over||inspectOn||G.eventLock||G.heating||G.repairing) return;
-  var mx=(moveKeys.d-moveKeys.a), mz=(moveKeys.s-moveKeys.w);
-  if(mx||mz){
-    var len=Math.hypot(mx,mz)||1; mx/=len; mz/=len;
-    smith.position.x=Math.max(SMITH_BOUNDS.x1,Math.min(SMITH_BOUNDS.x2, smith.position.x+mx*SMITH_SPEED*dt));
-    smith.position.z=Math.max(SMITH_BOUNDS.z1,Math.min(SMITH_BOUNDS.z2, smith.position.z+mz*SMITH_SPEED*dt));
-    smith.rotation.y=Math.atan2(mx,mz);
-    shadowDirty=true;
-  }
-  var near=smithStationNear();
-  smith.userData.nearStation=near;
+  updateFPSMovement(dt);
 }
 
 /* crates */
@@ -3248,7 +3287,7 @@ $('btnAgain').addEventListener('click', function(){
   var _m=G&&G.runMode?G.runMode:'contract';
   newGame(); beginRun(_m);
 });
-$('btnView').addEventListener('click', function(){ audio(); setInspect(!inspectOn); applyHudChrome(); });
+var _bv=$('btnView'); if(_bv) _bv.addEventListener('click', function(){ audio(); setInspect(!inspectOn); applyHudChrome(); });
 var _bht=$('btnHudToggle'); if(_bht) _bht.addEventListener('click', function(e){ e.stopPropagation(); audio(); toggleHudCollapsed(); });
 var _bhe=$('btnHudExpand'); if(_bhe) _bhe.addEventListener('click', function(){ audio(); META.hudCollapsed=false; metaSave(); applyHudChrome(); refreshUI(); });
 var _bum=$('btnUiMode'); if(_bum) _bum.addEventListener('click', function(e){ e.stopPropagation(); audio(); toggleUiCompact(); });
@@ -3301,10 +3340,17 @@ window.addEventListener('keydown', function(e){
   if(e.code==='Space'){
     e.preventDefault();
     if(!G.started){ $('btnStart').click(); }
-    else if(activeStation === 'furnace'){ doHeat(); }
-    else if(activeStation === 'bell'){ doTribute(); }
-    else if(activeStation === 'rack'){ hangSword(); }
-    else { doHit(); }
+    else {
+      var _sn=(typeof smithStationNear==='function'&&smith)?smithStationNear():'';
+      if(_sn==='furnace') doHeat();
+      else if(_sn==='bell') doTribute();
+      else if(_sn==='rack') hangSword();
+      else if(_sn==='anvil') doHit();
+      else if(activeStation==='furnace') doHeat();
+      else if(activeStation==='bell') doTribute();
+      else if(activeStation==='rack') hangSword();
+      else doHit();
+    }
   }
   else if(e.code==='KeyV') setInspect(!inspectOn);
   else if(e.code==='KeyH'){ if(activeStation!=='furnace') setStation('furnace'); doHeat(); }
@@ -3337,14 +3383,28 @@ document.querySelectorAll('.st-tab').forEach(function(b){
 
 /* pointer look + tap-to-interact */
 var ray=new THREE.Raycaster(), ptr=new THREE.Vector2(), downX=0, downY=0, downT=0;
+canvas.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+canvas.addEventListener('pointerdown', function(e){
+  downX=e.clientX; downY=e.clientY; downT=Date.now();
+  isDragging=true;
+  lastDragX=e.clientX; lastDragY=e.clientY;
+});
 window.addEventListener('pointermove', function(e){
   lookTX=(e.clientX/window.innerWidth-.5)*2;
   lookTY=(e.clientY/window.innerHeight-.5)*2;
+  if(isDragging && !inspectOn){
+    var dx=e.clientX-lastDragX;
+    var dy=e.clientY-lastDragY;
+    lastDragX=e.clientX; lastDragY=e.clientY;
+    targetYaw -= dx * 0.0042;
+    targetPitch -= dy * 0.0035;
+    targetPitch = Math.max(-1.15, Math.min(1.15, targetPitch));
+  }
 });
-canvas.addEventListener('contextmenu', function(e){ e.preventDefault(); });
-canvas.addEventListener('pointerdown', function(e){ downX=e.clientX; downY=e.clientY; downT=Date.now(); });
-canvas.addEventListener('pointerup', function(e){
-  if(Math.hypot(e.clientX-downX, e.clientY-downY)>8 || Date.now()-downT>400) return;
+window.addEventListener('pointerup', function(e){
+  isDragging=false;
+  if(Math.hypot(e.clientX-downX, e.clientY-downY)>10 || Date.now()-downT>380) return;
   ptr.x=(e.clientX/window.innerWidth)*2-1; ptr.y=-(e.clientY/window.innerHeight)*2+1;
   ray.setFromCamera(ptr, camera);
   var hitsF=ray.intersectObject(furnace, true);
@@ -3354,23 +3414,24 @@ canvas.addEventListener('pointerup', function(e){
   var dF=hitsF.length?hitsF[0].distance:1e9, dB=hitsB.length?hitsB[0].distance:1e9, dA=hitsA.length?hitsA[0].distance:1e9, dR=hitsR.length?hitsR[0].distance:1e9;
   var m=Math.min(dF,dB,dA,dR); if(m>50) return;
   if(m===dR){
-    if(activeStation!=='rack'){ setStation('rack'); return; }
+    if(activeStation!=='rack') setStation('rack');
     var slotIdx=hitsR[0].object.userData.slotIndex;
     if(typeof slotIdx==='number') clickRackSlot(slotIdx);
     else hangSword();
     return;
   }
   if(m===dF){
-    if(activeStation!=='furnace'){ setStation('furnace'); return; }
+    if(activeStation!=='furnace') setStation('furnace');
     doHeat();
   } else if(m===dB){
-    if(activeStation!=='bell'){ setStation('bell'); return; }
+    if(activeStation!=='bell') setStation('bell');
     doTribute();
   } else if(m===dA){
-    if(activeStation!=='anvil'){ setStation('anvil'); return; }
+    if(activeStation!=='anvil') setStation('anvil');
     doHit();
   }
 });
+window.addEventListener('pointercancel', function(){ isDragging=false; });
 
 /* ============================== RESIZE ============================== */
 var HAM={x:.58, y:-.52};
@@ -3513,27 +3574,29 @@ function animate(){
     if(Math.abs(inspectBlend-(inspectOn?1:0))<.002) inspectBlend=inspectOn?1:0;
     var ib=inspectBlend, parEff=par*(1-ib);
 
-    var stTarget = getStationTarget(activeStation);
-    if(!stInitialized){
-      stLerpPos.copy(stTarget.pos);
-      stLerpLook.copy(stTarget.look);
-      stInitialized = true;
-    } else {
-      stLerpPos.lerp(stTarget.pos, Math.min(1, dt * 5.2));
-      stLerpLook.lerp(stTarget.look, Math.min(1, dt * 5.2));
-    }
+    if(typeof updateFPSMovement==='function') updateFPSMovement(dt);
 
-    _camPos.set(stLerpPos.x+sOffX*.6+lookX*.22*parEff+shx*(1-ib), stLerpPos.y-lookY*.14*parEff+shy*(1-ib)+ik*1.05*(1-ib), stLerpPos.z+sOffZ*.5+ik*2.5*(1-ib));
-    _camLook.set(stLerpLook.x+sOffX*.7, stLerpLook.y-lookY*.18*parEff, stLerpLook.z+sOffZ*.7);
+    var eyeHeight = playerPos.y + Math.sin(walkBob) * 0.035;
+    _camPos.set(playerPos.x + shx * (1 - ib), eyeHeight + shy * (1 - ib) + ik * 1.05 * (1 - ib), playerPos.z + ik * 2.5 * (1 - ib));
+    _camLook.set(
+      playerPos.x - Math.sin(camYaw) * Math.cos(camPitch) * 5,
+      eyeHeight + Math.sin(camPitch) * 5,
+      playerPos.z - Math.cos(camYaw) * Math.cos(camPitch) * 5
+    );
+
     if(ib>0){ _camPos.lerp(INSPECT_POS, ib); _camLook.lerp(INSPECT_LOOK, ib); }
     /* while the blade is being heated, the camera drifts left and follows it
        toward the furnace mouth, then settles back as it returns to the anvil */
     heatCam += ((heatAnim?1:0)-heatCam)*Math.min(1, dt*3.2);
-    if(heatCam>.002 && ib<.5 && activeStation==='anvil'){ _camPos.x-=heatCam*.5; _camPos.y-=heatCam*.12; _camPos.z+=heatCam*.05; _camLook.x-=heatCam*1.25; _camLook.y-=heatCam*.08; }
+    if(heatCam>.002 && ib<.5 && activeStation==='anvil'){
+      _camLook.x -= heatCam * 1.5;
+    }
     camera.position.copy(_camPos);
     camera.lookAt(_camLook);
-    camera.rotation.z += -lookX*.02*parEff;
-    hammer.visible = (activeStation==='anvil') && ib<.45; hammerGhost.visible = (activeStation==='anvil') && ib<.45 && !(typeof IS_LOW!=='undefined'&&IS_LOW);
+    camera.rotation.z += -lookX*.015*parEff;
+    hammer.visible = (activeStation==='anvil') && ib<.45;
+    hammerGhost.visible = (activeStation==='anvil') && ib<.45 && !(typeof IS_LOW!=='undefined'&&IS_LOW);
+    if(typeof smith!=='undefined' && smith) smith.visible = false;
     /* furnace fire — dead black when the dragon has broken the furnace */
     var furnaceAlive = !(G&&G.furnaceBroken);
     var flick=.82+Math.sin(t*11)*.1+Math.sin(t*23+1.7)*.07+heatPulse*.7;
@@ -4496,7 +4559,9 @@ function buildMainModel(lv){
 }
 function syncMainModelVisual(){
   if(typeof G==='undefined'||!G) return;
+  if(typeof meshState==='undefined' || typeof meshTemplates==='undefined') return;
   var lv=swordLevelNow(), meshId=meshIdForLevel(lv);
+  if(!meshId){ procParts.forEach(function(m){ m.visible=true; }); if(mainModelGroup) mainModelGroup.visible=false; return; }
   var ready = meshState[meshId]==='done' && !!meshTemplates[meshId];
   if(ready && mainModelLv!==lv) buildMainModel(lv);
   var shown = ready && !!mainModelGroup && mainModelLv===lv;
