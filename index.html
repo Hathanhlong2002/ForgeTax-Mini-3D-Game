@@ -731,6 +731,47 @@
   .sw-meter .bar{height:5px;margin-top:var(--sp-1);}
   #swordPlate #frenzyTag,#swordPlate #rainbowTag{margin-top:var(--sp-2);padding:var(--sp-1) var(--sp-3);border-radius:999px;font-size:var(--fs-xs);line-height:var(--lh);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
+  /* ---------- Sword attribute board (over 3D, in front of blade) ---------- */
+  #swordAttrBoard{
+    position:fixed;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:clamp(200px, 42vh, 460px);
+    z-index:11;
+    pointer-events:none;
+    width:min(340px, calc(100vw - 20px));
+    padding:10px 12px 11px;
+    border-radius:12px;
+    background:linear-gradient(165deg, rgba(14,9,6,.88) 0%, rgba(8,6,4,.82) 100%);
+    border:1px solid hsla(var(--sab-hue, 32), 70%, 55%, .45);
+    box-shadow:0 10px 28px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,220,160,.12);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    contain:layout style paint;
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  #swordAttrBoard.sab-hidden{opacity:0;transform:translateX(-50%) translateY(8px);visibility:hidden;}
+  #swordAttrBoard.sab-endgame{border-color:rgba(255,120,40,.65);box-shadow:0 0 18px rgba(255,90,20,.25),0 10px 28px rgba(0,0,0,.55);}
+  .sab-head{
+    font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;
+    color:#ffe8b8;margin-bottom:8px;padding-bottom:6px;
+    border-bottom:1px solid rgba(232,179,60,.22);
+  }
+  .sab-grid{width:100%;border-collapse:collapse;font-size:11.5px;line-height:1.35;}
+  .sab-grid th,.sab-grid td{padding:3px 0;vertical-align:top;text-align:left;}
+  .sab-grid th{width:42%;font-weight:700;color:#a89478;letter-spacing:.04em;padding-right:8px;}
+  .sab-grid td{font-weight:800;color:#fff4db;word-break:break-word;}
+  .sab-grid tr.sab-power td{color:#ffd56a;font-size:12px;text-shadow:0 0 12px rgba(255,180,40,.35);}
+  .sab-grid tr.sab-risk-hot td:last-child{color:#ff7a5a;}
+  body.ui-compact #swordAttrBoard{bottom:clamp(170px, 36vh, 380px);padding:8px 10px;}
+  body.ui-compact .sab-grid{font-size:10.5px;}
+  body.inspect-mode #swordAttrBoard{bottom:clamp(220px, 48vh, 520px);width:min(380px, calc(100vw - 16px));}
+  body.sheet-open #swordAttrBoard{display:none !important;}
+  @media (max-width:820px){
+    #swordAttrBoard{left:10px;right:10px;width:auto;transform:none;bottom:clamp(188px, 34vh, 320px);}
+    body.inspect-mode #swordAttrBoard{transform:none;}
+  }
+
   /* ---------- 3 · dock: rack strip + two uniform rows ---------- */
   #rackBar{margin-bottom:var(--sp-2);padding:var(--sp-1) var(--sp-3);}
   .rackslot{min-height:var(--target);}
@@ -2054,12 +2095,12 @@
   }
 
   /* ============================================================
-     IMPERIAL TAMAHAGANE UNIFIED PROPORTIONAL UI ARCHITECTURE
+     IMPERIAL TAMAHAGANE ZEN BLACKSMITH MINIMALIST UI ARCHITECTURE
      ============================================================ */
 
-  /* --- Topbar & HUD Layout Harmonization --- */
+  /* --- Topbar & HUD Layout Minimalism --- */
   .hud-top {
-    max-width: 1400px;
+    max-width: 1360px;
     margin: 0 auto;
     width: 100%;
     pointer-events: none;
@@ -2072,42 +2113,42 @@
     gap: 8px !important;
     padding: 8px 14px 0 !important;
     pointer-events: auto !important;
-    height: 48px !important;
+    height: 44px !important;
     box-sizing: border-box !important;
   }
   .topbar .plate {
     display: inline-flex !important;
     align-items: center !important;
-    gap: 7px !important;
-    height: 38px !important;
+    gap: 6px !important;
+    height: 36px !important;
     line-height: 1 !important;
-    padding: 0 12px !important;
+    padding: 0 10px !important;
     box-sizing: border-box !important;
     white-space: nowrap !important;
     margin: 0 !important;
+    border-radius: 8px !important;
   }
   .topbar .plate .lbl {
-    font-size: 11px !important;
-    letter-spacing: .06em !important;
+    font-size: 10.5px !important;
+    letter-spacing: .05em !important;
     color: #e5cd9e !important;
     margin: 0 !important;
   }
   .topbar .plate .val {
-    font-size: 15px !important;
+    font-size: 14px !important;
     font-weight: 800 !important;
     color: #fff6e0 !important;
     letter-spacing: .02em !important;
     margin: 0 !important;
   }
 
-  /* Dragon Tribute Altar Plate - Harmonized 38px height */
+  /* Center Dragon Tribute Plate - Clean 36px height */
   #tributePlate {
-    flex: 1 1 280px !important;
-    max-width: 320px !important;
-    min-width: 220px !important;
-    height: 38px !important;
+    flex: 0 1 260px !important;
+    min-width: 190px !important;
+    height: 36px !important;
     position: relative !important;
-    padding: 0 12px 0 42px !important;
+    padding: 0 12px 0 38px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: space-between !important;
@@ -2117,15 +2158,15 @@
   #tributePlate::before {
     content: "" !important;
     position: absolute !important;
-    left: 8px !important;
+    left: 7px !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
-    width: 24px !important;
-    height: 24px !important;
+    width: 22px !important;
+    height: 22px !important;
     border-radius: 50% !important;
     background: url('assets/ui/dragon_crest.jpg') center/cover no-repeat !important;
     border: 1.5px solid #ffd56a !important;
-    box-shadow: 0 0 8px rgba(255, 140, 30, 0.5), inset 0 0 4px rgba(255, 200, 80, 0.4) !important;
+    box-shadow: 0 0 8px rgba(255, 140, 30, 0.5) !important;
     animation: dragonAltarPulse 2.8s ease-in-out infinite alternate !important;
     pointer-events: none !important;
   }
@@ -2152,45 +2193,46 @@
     display: none !important;
   }
 
-  /* Top Quick Tools - Single sleek horizontal strip */
+  /* Hide high-noise secondary stats to declutter the screen */
+  .topbar .plate:has(#uiBest),
+  .topbar .plate#btnAch {
+    display: none !important;
+  }
+
+  /* Compact Tool Dock */
   .top-quick-tools {
     display: inline-flex !important;
     align-items: center !important;
     flex-wrap: nowrap !important;
-    gap: 5px !important;
-    height: 38px !important;
+    gap: 4px !important;
+    height: 36px !important;
     flex-shrink: 0 !important;
   }
   .tool-btn {
-    height: 38px !important;
-    padding: 0 10px !important;
+    height: 34px !important;
+    padding: 0 8px !important;
     font-size: 11px !important;
+    border-radius: 8px !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 4px !important;
+    gap: 3px !important;
     box-sizing: border-box !important;
     white-space: nowrap !important;
   }
 
-  /* --- Master Sword Plaque Background Texture --- */
-  #swordPlate {
-    max-width: 480px !important;
-    width: 100% !important;
-    margin: 0 auto !important;
-    box-sizing: border-box !important;
-    background: linear-gradient(135deg, rgba(14, 10, 7, 0.94) 0%, rgba(24, 17, 11, 0.92) 50%, rgba(12, 8, 5, 0.96) 100%),
-                url('assets/ui/sword_plate_bg.jpg') center/cover no-repeat !important;
-    border: 1.5px solid rgba(232, 179, 60, 0.45) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 230, 160, 0.25), 0 12px 32px rgba(0, 0, 0, 0.8), 0 0 24px rgba(232, 179, 60, 0.15) !important;
-    position: relative;
-    overflow: hidden;
+  /* Mission Bar - Sleek and low-profile */
+  #missionBar {
+    max-width: 820px !important;
+    margin: 4px auto 0 !important;
+    padding: 3px 12px !important;
+    background: rgba(14, 10, 7, 0.75) !important;
+    border: 1px solid rgba(232, 179, 60, 0.2) !important;
+    border-radius: 6px !important;
+    font-size: 11px !important;
+    pointer-events: auto !important;
   }
-  #swordPlate::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: radial-gradient(circle at 85% 20%, rgba(255, 160, 40, 0.12) 0%, transparent 60%);
-    pointer-events: none;
+  .workflow-ribbon {
+    display: none !important;
   }
 
   /* --- Station Navigation Dock --- */
@@ -2198,26 +2240,27 @@
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    gap: 6px !important;
-    max-width: 480px !important;
+    gap: 4px !important;
+    max-width: 420px !important;
     width: 100% !important;
     margin: 6px auto 0 !important;
-    padding: 4px 6px !important;
-    background: rgba(18, 12, 8, 0.75) !important;
+    padding: 3px 6px !important;
+    background: rgba(14, 10, 7, 0.75) !important;
     border: 1px solid rgba(232, 179, 60, 0.25) !important;
     border-radius: 99px !important;
     box-sizing: border-box !important;
+    pointer-events: auto !important;
   }
   .st-tab {
     flex: 1 1 0 !important;
     min-width: 0 !important;
-    height: 32px !important;
-    padding: 0 6px !important;
-    font-size: 11px !important;
+    height: 28px !important;
+    padding: 0 4px !important;
+    font-size: 10.5px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 4px !important;
+    gap: 3px !important;
     white-space: nowrap !important;
     border-radius: 99px !important;
   }
@@ -2226,38 +2269,38 @@
   }
   .st-tab .st-num {
     opacity: 0.6 !important;
-    font-size: 10px !important;
+    font-size: 9.5px !important;
   }
   .st-tab[data-st="anvil"]::before {
     content: "";
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     background: url('assets/ui/btn_hammer.jpg') center/cover no-repeat;
-    border-radius: 4px;
+    border-radius: 3px;
     flex-shrink: 0;
   }
   .st-tab[data-st="furnace"]::before {
     content: "";
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     background: url('assets/ui/btn_furnace.jpg') center/cover no-repeat;
-    border-radius: 4px;
+    border-radius: 3px;
     flex-shrink: 0;
   }
   .st-tab[data-st="bell"]::before {
     content: "";
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     background: url('assets/ui/dragon_crest.jpg') center/cover no-repeat;
-    border-radius: 4px;
+    border-radius: 3px;
     flex-shrink: 0;
   }
   .st-tab[data-st="rack"]::before {
     content: "";
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     background: url('assets/ui/btn_vault.jpg') center/cover no-repeat;
-    border-radius: 4px;
+    border-radius: 3px;
     flex-shrink: 0;
   }
   .st-tab[data-st="wide"]::before {
@@ -2265,10 +2308,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 18px;
-    height: 18px;
-    font-size: 11px;
-    border-radius: 4px;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    border-radius: 3px;
     background: rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
   }
@@ -2276,28 +2319,174 @@
     background: linear-gradient(180deg, #c45812 0%, #8a3505 100%) !important;
     border-color: #ffd56a !important;
     color: #fff !important;
-    box-shadow: 0 0 12px rgba(255, 140, 30, 0.45) !important;
+    box-shadow: 0 0 10px rgba(255, 140, 30, 0.45) !important;
   }
 
-  /* --- Tactical Main Action Buttons --- */
-  .actions-main {
+  /* ============================================================
+     STRICT CONTEXT-DRIVEN WORKSTATION CONTROLS
+     ============================================================ */
+
+  /* In Free Walk: ZERO ACTION BUTTONS! The 3D forge is crystal clear! */
+  body:not(.station-engaged) .actions-main,
+  body:not(.station-engaged) .actions-main button,
+  body:not(.station-engaged) #rackBar,
+  body:not(.station-engaged) #btnLeaveStation {
+    display: none !important;
+  }
+
+  /* In Free Walk: Sword plate is a compact floating badge */
+  body:not(.station-engaged) #swordPlate {
+    max-width: 340px !important;
+    padding: 6px 14px !important;
+    margin: 0 auto 6px !important;
+    background: rgba(14, 10, 7, 0.85) !important;
+    border: 1px solid rgba(232, 179, 60, 0.3) !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.6) !important;
+  }
+  body:not(.station-engaged) #swordPlate .sw-shape,
+  body:not(.station-engaged) #swordPlate .sw-meters,
+  body:not(.station-engaged) #swordPlate #frenzyTag,
+  body:not(.station-engaged) #swordPlate #rainbowTag {
+    display: none !important;
+  }
+
+  /* When Engaged at any Station: Hide interaction prompt */
+  body.station-engaged #interactPromptWrap {
+    display: none !important;
+  }
+
+  /* Master Sword Plaque Background in Focus Mode */
+  body.station-engaged #swordPlate {
+    max-width: 440px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    background: linear-gradient(135deg, rgba(14, 10, 7, 0.94) 0%, rgba(24, 17, 11, 0.92) 50%, rgba(12, 8, 5, 0.96) 100%),
+                url('assets/ui/sword_plate_bg.jpg') center/cover no-repeat !important;
+    border: 1.5px solid rgba(232, 179, 60, 0.45) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 230, 160, 0.25), 0 12px 32px rgba(0, 0, 0, 0.8) !important;
+    position: relative;
+    overflow: hidden;
+  }
+  body.station-engaged #swordPlate::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at 85% 20%, rgba(255, 160, 40, 0.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* --- Station Focus: ANVIL (Only Hammer + Bank + Hang + Leave) --- */
+  body.station-engaged.st-anvil .actions-main {
     display: flex !important;
     flex-wrap: wrap !important;
     justify-content: center !important;
-    align-items: stretch !important;
     gap: 8px !important;
-    max-width: 480px !important;
-    width: 100% !important;
+    max-width: 380px !important;
     margin: 8px auto 0 !important;
     pointer-events: auto !important;
   }
-
-  /* Strict station display enforcement */
-  body.station-engaged.st-anvil #btnRepair,
+  body.station-engaged.st-anvil #btnHit {
+    display: inline-flex !important;
+    flex: 1 1 100% !important;
+    height: 52px !important;
+    font-size: 15px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  body.station-engaged.st-anvil #btnHit::before {
+    content: "";
+    width: 30px;
+    height: 30px;
+    background: url('assets/ui/btn_hammer.jpg') center/cover no-repeat;
+    border-radius: 7px;
+    border: 1.5px solid rgba(255, 213, 106, 0.7);
+    margin-right: 9px;
+    flex-shrink: 0;
+  }
+  body.station-engaged.st-anvil #btnBank {
+    display: inline-flex !important;
+    flex: 1 1 100px !important;
+    height: 40px !important;
+    font-size: 12px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  body.station-engaged.st-anvil #btnBank::before {
+    content: "";
+    width: 22px;
+    height: 22px;
+    background: url('assets/ui/btn_vault.jpg') center/cover no-repeat;
+    border-radius: 5px;
+    border: 1px solid rgba(232, 179, 60, 0.6);
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+  body.station-engaged.st-anvil #btnHang {
+    display: inline-flex !important;
+    flex: 1 1 100px !important;
+    height: 40px !important;
+    font-size: 12px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  body.station-engaged.st-anvil #btnLeaveStation {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    height: 40px !important;
+    font-size: 11px !important;
+    padding: 0 12px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
   body.station-engaged.st-anvil #btnHeat,
+  body.station-engaged.st-anvil #btnRepair,
   body.station-engaged.st-anvil #btnTribute,
   body.station-engaged.st-anvil #rackBar {
     display: none !important;
+  }
+
+  /* --- Station Focus: FURNACE (Only Heat + Repair + Leave) --- */
+  body.station-engaged.st-furnace .actions-main {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    max-width: 380px !important;
+    margin: 8px auto 0 !important;
+    pointer-events: auto !important;
+  }
+  body.station-engaged.st-furnace #btnHeat {
+    display: inline-flex !important;
+    flex: 1 1 100% !important;
+    height: 52px !important;
+    font-size: 15px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  body.station-engaged.st-furnace #btnHeat::before {
+    content: "";
+    width: 30px;
+    height: 30px;
+    background: url('assets/ui/btn_furnace.jpg') center/cover no-repeat;
+    border-radius: 7px;
+    border: 1.5px solid rgba(255, 140, 30, 0.7);
+    margin-right: 9px;
+    flex-shrink: 0;
+  }
+  body.station-engaged.st-furnace #btnRepair {
+    flex: 1 1 100% !important;
+    height: 42px !important;
+    font-size: 13px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  body.station-engaged.st-furnace #btnLeaveStation {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    height: 40px !important;
+    font-size: 11px !important;
+    padding: 0 12px !important;
   }
   body.station-engaged.st-furnace #btnHit,
   body.station-engaged.st-furnace #btnBank,
@@ -2305,6 +2494,42 @@
   body.station-engaged.st-furnace #btnHang,
   body.station-engaged.st-furnace #rackBar {
     display: none !important;
+  }
+
+  /* --- Station Focus: BELL (Only Tribute + Leave) --- */
+  body.station-engaged.st-bell .actions-main {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    max-width: 380px !important;
+    margin: 8px auto 0 !important;
+    pointer-events: auto !important;
+  }
+  body.station-engaged.st-bell #btnTribute {
+    display: inline-flex !important;
+    flex: 1 1 100% !important;
+    height: 52px !important;
+    font-size: 15px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  body.station-engaged.st-bell #btnTribute::before {
+    content: "";
+    width: 30px;
+    height: 30px;
+    background: url('assets/ui/dragon_crest.jpg') center/cover no-repeat;
+    border-radius: 7px;
+    border: 1.5px solid rgba(255, 213, 106, 0.7);
+    margin-right: 9px;
+    flex-shrink: 0;
+  }
+  body.station-engaged.st-bell #btnLeaveStation {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    height: 40px !important;
+    font-size: 11px !important;
+    padding: 0 12px !important;
   }
   body.station-engaged.st-bell #btnHit,
   body.station-engaged.st-bell #btnBank,
@@ -2314,6 +2539,31 @@
   body.station-engaged.st-bell #rackBar {
     display: none !important;
   }
+
+  /* --- Station Focus: RACK (Only Rack Slots + Hang + Leave) --- */
+  body.station-engaged.st-rack .actions-main {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    max-width: 380px !important;
+    margin: 8px auto 0 !important;
+    pointer-events: auto !important;
+  }
+  body.station-engaged.st-rack #rackBar {
+    display: flex !important;
+    width: 100% !important;
+  }
+  body.station-engaged.st-rack #btnHang {
+    display: inline-flex !important;
+    flex: 1 1 100% !important;
+    height: 44px !important;
+  }
+  body.station-engaged.st-rack #btnLeaveStation {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    height: 40px !important;
+  }
   body.station-engaged.st-rack #btnHit,
   body.station-engaged.st-rack #btnHeat,
   body.station-engaged.st-rack #btnBank,
@@ -2322,94 +2572,17 @@
     display: none !important;
   }
 
-  /* Hero button: GÕ BÚA */
-  #btnHit {
-    flex: 1 1 100% !important;
-    height: 52px !important;
-    padding: 0 16px !important;
-    font-size: 15px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-  }
-  #btnHit::before {
-    content: "";
-    width: 32px;
-    height: 32px;
-    background: url('assets/ui/btn_hammer.jpg') center/cover no-repeat;
-    border-radius: 8px;
-    border: 1.5px solid rgba(255, 213, 106, 0.7);
-    box-shadow: 0 0 10px rgba(255, 180, 50, 0.4);
-    flex-shrink: 0;
-    margin-right: 10px;
-  }
-
-  /* Secondary action row: CHỐT KIẾM, TREO KIẾM, RỜI TRẠM */
-  #btnBank, #btnHang, #btnHeat, #btnTribute, #btnRepair {
-    flex: 1 1 130px !important;
-    height: 44px !important;
-    padding: 0 10px !important;
-    font-size: 12.5px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  #btnBank::before {
-    content: "";
-    width: 24px;
-    height: 24px;
-    background: url('assets/ui/btn_vault.jpg') center/cover no-repeat;
-    border-radius: 6px;
-    border: 1px solid rgba(232, 179, 60, 0.6);
-    flex-shrink: 0;
-    margin-right: 7px;
-  }
-  #btnHeat::before {
-    content: "";
-    width: 26px;
-    height: 26px;
-    background: url('assets/ui/btn_furnace.jpg') center/cover no-repeat;
-    border-radius: 6px;
-    border: 1px solid rgba(255, 140, 30, 0.6);
-    flex-shrink: 0;
-    margin-right: 7px;
-  }
-  #btnTribute::before {
-    content: "";
-    width: 26px;
-    height: 26px;
-    background: url('assets/ui/dragon_crest.jpg') center/cover no-repeat;
-    border-radius: 6px;
-    border: 1px solid rgba(255, 213, 106, 0.6);
-    flex-shrink: 0;
-    margin-right: 7px;
-  }
-  #btnLeaveStation {
-    flex: 0 0 auto !important;
-    height: 44px !important;
-    padding: 0 14px !important;
-    font-size: 11.5px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    white-space: nowrap !important;
-  }
-
-  /* Button text formatting: Stack title and sub cleanly */
-  .actions-main button {
-    line-height: 1.2 !important;
-  }
+  /* Subtitle text formatting */
   .actions-main button .sub {
     display: block !important;
-    font-size: 10px !important;
+    font-size: 9.5px !important;
     font-weight: 500 !important;
     opacity: 0.8 !important;
     margin-top: 2px !important;
     white-space: nowrap !important;
   }
 
-  /* Royal Armory Hero Pedestal Textured Backdrop */
+  /* Royal Armory Gallery Pedestal & Sheets */
   .gal-hero-pedestal {
     background: radial-gradient(circle at 50% 25%, rgba(255, 160, 50, 0.16) 0%, rgba(12, 8, 5, 0.95) 75%),
                 url('assets/ui/kintsugi_pattern.jpg') center/cover no-repeat !important;
@@ -2426,8 +2599,6 @@
     margin-right: 12px;
     vertical-align: middle;
   }
-
-  /* Modals and Sheets Luxury Styling */
   .sheet-panel {
     background: linear-gradient(180deg, #18110b 0%, #100b07 100%),
                 url('assets/ui/sword_plate_bg.jpg') center/cover no-repeat !important;
@@ -2446,10 +2617,10 @@
       display: none !important;
     }
     #tributePlate {
-      min-width: 200px !important;
+      min-width: 170px !important;
     }
-    #btnHit {
-      height: 48px !important;
+    .actions-main {
+      max-width: 340px !important;
     }
   }
 </style>
@@ -2459,6 +2630,12 @@
 <button type="button" id="btnView" title="Ngắm kiếm (phím V)">🔍 NGẮM</button>
 
 <div id="hud">
+  <div id="swordAttrBoard" class="sab-hidden" aria-live="polite" aria-label="Thuộc tính kiếm trên đe">
+    <div class="sab-head" id="sabTitle">⚔ Thuộc tính kiếm</div>
+    <table class="sab-grid" role="table">
+      <tbody id="swordAttrBody"></tbody>
+    </table>
+  </div>
   <div class="hud-top">
     <div class="hud-expand-only"><button type="button" id="btnHudExpand">▼ Mở HUD (vòng / cống / nhiệm vụ)</button></div>
     <div class="topbar">
@@ -5116,6 +5293,56 @@ function toast(msg, cls){
   var t=$('toast'); t.textContent=msg; t.className='show '+(cls||'info');
   clearTimeout(toastTimer); toastTimer=setTimeout(function(){ t.className=''; }, 1500);
 }
+var _sabCache='';
+function updateSwordAttrBoard(){
+  var board=$('swordAttrBoard'), body=$('swordAttrBody');
+  if(!board||!body||typeof G==='undefined'||!G) return;
+  var isEn=(typeof CURRENT_LANG!=='undefined'&&CURRENT_LANG==='en');
+  var show=G.started&&!G.over&&!document.body.classList.contains('sheet-open');
+  board.classList.toggle('sab-hidden', !show);
+  var title=$('sabTitle'); if(title) title.textContent=isEn?'⚔ Blade stats':'⚔ Thuộc tính kiếm';
+  if(!show) return;
+  var lv=swordLevelNow(), sk=skinForLevel(lv);
+  var rk=(G.rainbow||G.frenzy)?0:riskNow();
+  var rkTxt=G.rainbow?(isEn?'0% 🌈':'0% 🌈'):(G.frenzy?(isEn?'0% ★':'0% ★'):(rk<.095?(rk*100).toFixed(1)+'%':Math.round(rk*100)+'%'));
+  var fi=lv>=11&&typeof fxInfoForLevel==='function'?fxInfoForLevel(lv):null;
+  var st=[];
+  if(G.rainbow) st.push(isEn?'🌈 Rainbow':'🌈 Cầu vồng');
+  else if(G.frenzy) st.push(isEn?'★ Frenzy':'★ Frenzy');
+  if(G.heat>=60) st.push(isEn?'🔥 Hot':'🔥 Nóng đỏ');
+  else if(G.heat<30) st.push(isEn?'❄ Cold':'❄ Lạnh');
+  var stateTxt=st.length?st.join(' · '):(isEn?'Normal':'Bình thường');
+  var bonusPct=Math.round((sk.valueBonus-1)*100);
+  var power=Math.round(G.swordVal*(1+G.hits*0.015+sk.valueBonus*0.08));
+  var maps=typeof mapsSummaryForLevel==='function'?mapsSummaryForLevel(lv):'';
+  var key=[lv,G.swordVal,G.heat,rkTxt,G.hits,G.frenzy,G.rainbow,stateTxt,G.hits].join('|');
+  if(_sabCache===key) return;
+  _sabCache=key;
+  var L=function(vi,en){ return isEn?en:vi; };
+  var rows=[
+    [L('Sức mạnh','Power index'), String(power)+(isEn?' pts':' điểm'), 'sab-power'],
+    [L('Cấp','Level'),'Lv.'+lv+' · '+sk.name,''],
+    [L('Model 3D','3D model'),modelNameForLevel(lv),''],
+    [L('Silhouette','Silhouette'), sk.shapeName||sk.shapeBase||'—',''],
+    [L('Dòng skin','Skin line'), sk.familyName+' · '+SKIN_VARIANTS[sk.sub],''],
+    [L('Nguyên tố','Element'), fi?(fi.elName+(fi.tierName? ' · '+fi.tierName:'')):(lv<11?L('Mở Lv.11+','Unlocks Lv.11+'):'—'),''],
+    [L('Giá kiếm','Blade value'), G.swordVal+(isEn?' gold':' vàng'),''],
+    [L('Bonus skin','Skin bonus'), (bonusPct>=0?'+':'')+bonusPct+(isEn?'% hit value':'% giá mỗi nhát'),''],
+    [L('Nhiệt','Heat'), Math.round(G.heat)+'%',''],
+    [L('Nguy cơ vỡ','Break risk'), rkTxt, rk>=.12?'sab-risk-hot':''],
+    [L('Nhát gõ','Hits'), G.hits+' / 99',''],
+    [L('Trạng thái','Status'), stateTxt,''],
+    [L('Chất liệu','Materials'), maps||'—','']
+  ];
+  var html='';
+  rows.forEach(function(r){
+    html+='<tr class="'+r[2]+'"><th scope="row">'+r[0]+'</th><td>'+r[1]+'</td></tr>';
+  });
+  body.innerHTML=html;
+  board.style.setProperty('--sab-hue', String(Math.round(sk.hue*360)));
+  board.classList.toggle('sab-endgame', lv>=90);
+}
+
 function refreshUI(){
   _setText('uiRound', String(G.round));
   _setText('uiGold', String(G.gold));
@@ -5249,6 +5476,7 @@ function refreshUI(){
   var _mp=$('movePad'); if(_mp) _mp.classList.toggle('show', !!(G&&G.started&&!G.over&&document.body.classList.contains('is-mobile')));
   invalidateStationStatusCache();
   if(typeof updateInteractPrompt==='function') updateInteractPrompt(currentNearStation);
+  if(typeof updateSwordAttrBoard==='function') updateSwordAttrBoard();
   applyHudChrome(); renderWorkflowRibbon();
 }
 function buildShop(){
