@@ -4093,24 +4093,34 @@ mesh(RB(.12, .32, .04, .01), matWoodDk, 0, .16, -.03, displayStand);
 mesh(RB(.84, .50, .022, .012), matSteelDk, 0, .25, 0, displayStand);
 mesh(new THREE.BoxGeometry(.845, .505, .006), matGold, 0, .25, -.002, displayStand);
 
-// Canvas Texture and Display Screen
-var swordTableCanvas, swordTableCtx, swordTableTexture, swordTableMesh;
+// Canvas Texture and Display Screen (hi-DPI for readable text in 3D)
+var SWORD_TABLE_W = 1024, SWORD_TABLE_H = 576;
+var swordTableCanvas, swordTableCtx, swordTableTexture, swordTableMesh, swordTableDpr = 1;
+function applySwordTableCanvasDpr(){
+  if(!swordTableCanvas||!swordTableCtx) return;
+  swordTableDpr = IS_LOW ? 1.35 : (IS_MOBILE ? 1.65 : Math.min(2.5, Math.max(2, window.devicePixelRatio || 2)));
+  swordTableCanvas.width = Math.round(SWORD_TABLE_W * swordTableDpr);
+  swordTableCanvas.height = Math.round(SWORD_TABLE_H * swordTableDpr);
+  swordTableCtx.setTransform(swordTableDpr, 0, 0, swordTableDpr, 0, 0);
+  swordTableCtx.imageSmoothingEnabled = true;
+  if(swordTableCtx.imageSmoothingQuality) swordTableCtx.imageSmoothingQuality = 'high';
+}
 (function(){
   swordTableCanvas = document.createElement("canvas");
-  swordTableCanvas.width = 1024;
-  swordTableCanvas.height = 576;
   swordTableCtx = swordTableCanvas.getContext("2d");
+  applySwordTableCanvasDpr();
   swordTableTexture = new THREE.CanvasTexture(swordTableCanvas);
   swordTableTexture.colorSpace = THREE.SRGBColorSpace;
-  swordTableTexture.anisotropy = (typeof IS_MOBILE !== "undefined" && IS_MOBILE) ? 2 : 4;
-  swordTableTexture.generateMipmaps = true;
-  swordTableTexture.minFilter = THREE.LinearMipmapLinearFilter;
+  swordTableTexture.anisotropy = (typeof MAX_ANISO !== "undefined") ? MAX_ANISO : 8;
+  swordTableTexture.generateMipmaps = false;
+  swordTableTexture.minFilter = THREE.LinearFilter;
+  swordTableTexture.magFilter = THREE.LinearFilter;
 
   var screenMat = new THREE.MeshBasicMaterial({
     map: swordTableTexture,
     toneMapped: false
   });
-  swordTableMesh = new THREE.Mesh(new THREE.PlaneGeometry(.80, .46), screenMat);
+  swordTableMesh = new THREE.Mesh(new THREE.PlaneGeometry(.84, .48), screenMat);
   swordTableMesh.position.set(0, .25, .013);
   displayStand.add(swordTableMesh);
 })();
@@ -4118,7 +4128,7 @@ var swordTableCanvas, swordTableCtx, swordTableTexture, swordTableMesh;
 function updateSwordTableDisplay(){
   if(!swordTableCtx) return;
   var c = swordTableCtx;
-  var w = 1024, h = 576;
+  var w = (typeof SWORD_TABLE_W !== 'undefined') ? SWORD_TABLE_W : 1024, h = (typeof SWORD_TABLE_H !== 'undefined') ? SWORD_TABLE_H : 576;
   var isEn = (typeof CURRENT_LANG !== "undefined" && CURRENT_LANG === "en");
   var sLv = (typeof swordLevelNow === "function") ? swordLevelNow() : (G ? (G.swordLevel || 1) : 1);
   var sSkin = (typeof skinForLevel === "function") ? skinForLevel(sLv) : { name: "Thép Thô", hue: 0.1 };
@@ -4309,11 +4319,11 @@ function updateSwordTableDisplay(){
     c.fillStyle = "#e8b33c";
     c.font = "bold 22px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
     c.fillText(isEn ? "🔥 MASTER SMITH DIRECTIVE" : "📜 BÍ QUYẾT RÈN THẦN KIẾM", w/2, bannerY + 42);
-    c.font = "500 19px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+    c.font = "500 21px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
     c.fillStyle = "#bfae97";
     c.fillText(isEn ? "Heat ≥60% halves shatter risk. Bank gold to meet dragon tribute."
                     : "Nung nhiệt ≥60% giảm 50% nguy cơ vỡ · Đủ cống hãy rung chuông qua vòng", w/2, bannerY + 76);
-    c.font = "italic 16px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+    c.font = "italic 18px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
     c.fillStyle = "#8f806e";
     c.fillText(isEn ? "Hot forge increases value per strike · Press Space / Tap Strike"
                     : "Gõ khi kiếm đỏ rực để tăng giá trị cực đại · Phím Space hoặc bấm Gõ Búa", w/2, bannerY + 102);
@@ -4322,7 +4332,6 @@ function updateSwordTableDisplay(){
   c.shadowBlur = 0;
   if(swordTableTexture) swordTableTexture.needsUpdate = true;
 }
-updateSwordTableDisplay();
 
 /* ================= SWORD SHAPES — a new SILHOUETTE every 3 levels =================
    Colour changes every level (skin families below), but the blade's SHAPE
@@ -5679,7 +5688,7 @@ function applyUpgradeVisuals(){
 /* ---------- SWORD SKINS: blade visibly evolves as its value climbs ---------- */
 /* ================= 100 SWORD LEVELS =================
    Every successful hammer hit = exactly +1 level (1..100). Each level pays
-   more (+2% value per level) and wears its OWN skin: 10 skin families x 10
+   more per hit + a level-up gold surge (×2 family / ×2 apex) and wears its OWN skin: 10 skin families x 10
    variants. Within a family every level brightens the blade, shifts the
    fuller/guard colours and grows the glow + silhouette a step, so level N+1
    never looks identical to level N; crossing into a new family (11/21/.../91)
@@ -5708,6 +5717,15 @@ function calcValueBonus(lv){
   if(lv<=89) return 4.57 + (lv-50)*0.20;
   return 12.37 + (lv-89)*1.5;
 }
+/* Level-up gold surge: nhát gõ = vàng nền; lên level = cộng thêm cục (×2 khi đổi dòng skin / Lv 10·20…) */
+function levelUpGoldBonus(newLv, hitGain, familyChanged){
+  if(!hitGain || hitGain < 1) hitGain = 1;
+  if(familyChanged && newLv > 1) return Math.round(hitGain * 2.45);
+  var sub = (clampLv(newLv) - 1) % 10;
+  if(sub === 9) return Math.round(hitGain * 2);
+  return Math.round(hitGain * (1.08 + sub * 0.07));
+}
+
 function skinForLevel(lv){
   lv=clampLv(lv);
   var famIdx=Math.floor((lv-1)/10), sub=(lv-1)%10, fam=SKIN_FAMILIES[famIdx];
@@ -7184,6 +7202,19 @@ function doHit(){
       if(G.swordLevel>levelBefore){
         metaOnLevel(G.swordLevel);
         var skL=skinForLevel(G.swordLevel), famChanged = skL.family!==famBefore;
+        var lvBonus = levelUpGoldBonus(G.swordLevel, gain, famChanged);
+        if(lvBonus > 0){
+          G.swordVal += lvBonus;
+          var upLv = G.swordLevel, upFam = skinFamilyName(skL);
+          setTimeout(function(){
+            floatNum('⬆ Lv.'+upLv+' +'+lvBonus+' '+L('vàng','gold'), 'big');
+            if(famChanged){
+              toastL('⚔ Lv.'+upLv+' — dòng '+upFam+'! Bonus lên cấp ×2.5 (+'+lvBonus+' vàng)','⚔ Lv.'+upLv+' — '+upFam+' line! Level-up bonus ×2.5 (+'+lvBonus+' gold)','good');
+            } else if((upLv-1)%10===9){
+              toastL('★ Lv.'+upLv+' — tuyệt đỉnh dòng! Bonus lên cấp ×2 (+'+lvBonus+' vàng)','★ Lv.'+upLv+' — family apex! Level bonus ×2 (+'+lvBonus+' gold)','good');
+            }
+          }, famChanged ? 520 : 280);
+        }
         fxOnLevelUp(G.swordLevel, famChanged); /* element shockwave ring + burst in the NEW level's element */
         burstSparks(-.05,1.3,.2, famChanged?55:34, famChanged?1.5:1.2, 1.1);
         if(!famChanged && G.swordLevel<SWORD_LEVEL_MAX && typeof levelUpChime==='function') levelUpChime();
@@ -9629,6 +9660,7 @@ setInterval(function(){
 }, 500);
 
 newGame();
+if(typeof updateSwordTableDisplay==='function') updateSwordTableDisplay();
 applyLanguageUI();
 /* first frame is kicked on the next animation frame, not synchronously:
    animate() renders a full frame in its body, and running that inside the
