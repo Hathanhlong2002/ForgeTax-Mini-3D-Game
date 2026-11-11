@@ -2122,16 +2122,109 @@ var bladeLight = new THREE.PointLight(0xffd9a0, 5, 3.5, 2); bladeLight.position.
 var bladeRim = new THREE.SpotLight(0x86b8ff, 30, 14, .55, .7, 1.3);
 bladeRim.position.set(1.6,3.4,-2.2); scene.add(bladeRim);
 bladeRim.target.position.set(.1,1.15,.1); scene.add(bladeRim.target);
-/* crack decals */
-var crackMat = new THREE.MeshBasicMaterial({color:0x0a0a0a, transparent:true, opacity:.9});
-var cracks=[];
-for(var ki=0; ki<4; ki++){
-  var cg=new THREE.BufferGeometry(); var pts=[];
-  var sx=.3+ki*.22;
-  pts.push(new THREE.Vector3(sx,.034,0));
-  for(var s2=1;s2<=4;s2++) pts.push(new THREE.Vector3(sx+s2*.035, .034, (s2%2? .032:-.03)*(1-s2*.12)));
-  cg.setFromPoints(pts);
-  var cl=new THREE.Line(cg, crackMat); cl.visible=false; sword.add(cl); cracks.push(cl);
+/* ==================== MOLTEN STRESS FRACTURES (VẾT RẠN DUNG NHAM) ==================== */
+function makeMoltenFissureTexture(seed){
+  var p = cnv(384, 128), cv = p[0], ctx = p[1];
+  ctx.clearRect(0, 0, 384, 128);
+
+  function rndL(min, max, s){
+    var x = Math.sin(s * 997.13 + seed * 33.7) * 43758.5453;
+    return min + (x - Math.floor(x)) * (max - min);
+  }
+
+  var mainPts = [];
+  var curX = 35, curY = 64;
+  mainPts.push([curX, curY]);
+  var step = 0;
+  while(curX < 345){
+    step++;
+    curX += rndL(26, 46, step * 1.3);
+    curY += rndL(-22, 22, step * 2.7);
+    curY = Math.max(26, Math.min(102, curY));
+    mainPts.push([curX, curY]);
+  }
+
+  function tracePath(pts){
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for(var pi = 1; pi < pts.length; pi++){
+      ctx.lineTo(pts[pi][0], pts[pi][1]);
+    }
+  }
+
+  var branches = [];
+  for(var bi = 1; bi < mainPts.length - 1; bi += 2){
+    var bp = mainPts[bi];
+    var bx = bp[0] + rndL(15, 30, bi * 3.1);
+    var by = bp[1] + (bi % 2 ? rndL(-25, -15, bi * 4.2) : rndL(15, 25, bi * 4.2));
+    branches.push([bp, [bx, by]]);
+  }
+
+  // Pass 1: Scorched Obsidian Cavity
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'miter';
+  ctx.strokeStyle = 'rgba(20, 6, 4, 0.95)';
+  ctx.lineWidth = 14;
+  tracePath(mainPts);
+  ctx.stroke();
+  branches.forEach(function(br){ tracePath(br); ctx.lineWidth = 8; ctx.stroke(); });
+  ctx.restore();
+
+  // Pass 2: Magma Heat Flare Glow
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = 'rgba(255, 80, 15, 0.92)';
+  ctx.shadowColor = '#ff6000';
+  ctx.shadowBlur = 12;
+  ctx.lineWidth = 6;
+  tracePath(mainPts);
+  ctx.stroke();
+  branches.forEach(function(br){ tracePath(br); ctx.lineWidth = 3.5; ctx.stroke(); });
+  ctx.restore();
+
+  // Pass 3: White-Hot Core Fissure
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = 'rgba(255, 248, 200, 0.98)';
+  ctx.shadowColor = '#ffea9f';
+  ctx.shadowBlur = 4;
+  ctx.lineWidth = 2.2;
+  tracePath(mainPts);
+  ctx.stroke();
+  branches.forEach(function(br){ tracePath(br); ctx.lineWidth = 1.2; ctx.stroke(); });
+  ctx.restore();
+
+  var t = new THREE.CanvasTexture(cv);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+var crackTextures = [
+  makeMoltenFissureTexture(1.4),
+  makeMoltenFissureTexture(3.8),
+  makeMoltenFissureTexture(7.2),
+  makeMoltenFissureTexture(11.6)
+];
+
+var cracks = [];
+for(var ki = 0; ki < 4; ki++){
+  var cMat = new THREE.MeshBasicMaterial({
+    map: crackTextures[ki],
+    transparent: true,
+    opacity: 0,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  });
+  var cPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.30, 0.10), cMat);
+  cPlane.rotation.x = -Math.PI / 2;
+  cPlane.rotation.z = (ki % 2 ? 0.08 : -0.06);
+  cPlane.position.set(0.32 + ki * 0.22, 0.024, 0);
+  cPlane.visible = false;
+  sword.add(cPlane);
+  cracks.push(cPlane);
 }
 var guardMatBase = new THREE.MeshPhysicalMaterial({color:0xb08030, roughness:.32, metalness:1, clearcoat:.7, clearcoatRoughness:.25, envMapIntensity:1.4});
 var guard = mesh(GUARD_DEFS[0].geo, guardMatBase, .04,.008,0, sword); guard.rotation.z=Math.PI/2;
@@ -2459,6 +2552,44 @@ function disengageStation(silent){
   refreshUI();
 }
 
+
+function stationActionReject(st, status){
+  status = status || getStationStatus(st);
+  toast(status.msg, 'bad');
+  if(typeof crackSound === 'function') crackSound();
+  if(st) shakeStationSprite(st);
+}
+
+function runStationAction(st, status){
+  if(!G || !st) return false;
+  status = status || getStationStatus(st);
+  if(!status.ok){
+    stationActionReject(st, status);
+    return false;
+  }
+  if(st === 'anvil'){
+    if(status.action === 'bank' || (G.turns <= 0 && G.hits > 0)) doBank();
+    else doHit();
+  } else if(st === 'furnace'){
+    if(status.action === 'repair' || G.furnaceBroken) doRepair();
+    else doHeat();
+  } else if(st === 'bell') doTribute();
+  else if(st === 'rack') hangSword();
+  return true;
+}
+
+function onStationUseKey(){
+  if(!G || !G.started || G.over) return;
+  if(!isStationEngaged){
+    if(!currentNearStation) return;
+    var stNear = getStationStatus(currentNearStation);
+    if(!stNear.ok){ stationActionReject(currentNearStation, stNear); return; }
+    if(!engageStation(currentNearStation)) return;
+    return;
+  }
+  runStationAction(activeStation);
+}
+
 function setStation(st, silent){
   activeStation = st;
   document.body.classList.remove('st-anvil','st-furnace','st-bell','st-rack','st-wide');
@@ -2541,15 +2672,21 @@ function smithStationNear(){
   return playerStationNear();
 }
 function resetSmith(){
-  playerPos.set(0, 1.85, 2.2);
-  targetPlayerPos.copy(playerPos);
-  camYaw = 0; camPitch = -0.38; targetYaw = 0; targetPitch = -0.38;
-  engageStation('anvil', true);
-  shadowDirty=true;
+  var dest = STATION_DESTINATIONS.anvil;
+  playerPos.copy(dest.pos);
+  targetPlayerPos.copy(dest.pos);
+  camYaw = dest.yaw; camPitch = dest.pitch;
+  targetYaw = dest.yaw; targetPitch = dest.pitch;
+  isStationEngaged = false;
+  activeStation = 'anvil';
+  document.body.classList.remove('station-engaged','st-furnace','st-bell','st-rack','st-wide');
+  document.body.classList.add('st-anvil');
+  document.querySelectorAll('.st-tab').forEach(function(b){ b.classList.toggle('active', false); });
+  currentNearStation = 'anvil';
+  updateInteractPrompt('anvil');
+  shadowDirty = true;
 }
-function updateSmith(dt){
-  updateFPSMovement(dt);
-}
+
 
 /* 3D Station Interaction Floor Beacon (Kintsugi Gold Rune Ring) */
 var beaconMat = new THREE.MeshBasicMaterial({color:0xffb84d, transparent:true, opacity:0, side:THREE.DoubleSide, depthWrite:false});
@@ -3593,6 +3730,7 @@ function crackleSound(){ noiseBurst(.06,.35,900); setTimeout(function(){ noiseBu
 
 /* ============================== UI ============================== */
 function $(id){ return document.getElementById(id); }
+function bindClick(id, fn){ var el=$(id); if(el) el.addEventListener('click', fn); }
 /* PERF: cached DOM refs + write-only-on-change helpers — refreshUI() runs on
    every action and (via heat decay) about once a second; previously it rewrote
    every text node, bar and button state and re-queried the shop/upgrade DOM
@@ -3840,7 +3978,6 @@ var INSPECT_POS = new THREE.Vector3(0,2.0,2.3), INSPECT_LOOK = new THREE.Vector3
 var inspectOn=false, inspectBlend=0;
 var _camPos = new THREE.Vector3(), _camLook = new THREE.Vector3();
 var lookX=0, lookY=0, lookTX=0, lookTY=0;
-var smithFollow=0;
 /* heat animation state: tongs carry the sword anvil -> furnace -> anvil */
 var heatAnim=null, heatCam=0;
 function easeIO(k){ k=Math.max(0,Math.min(1,k)); return k*k*(3-2*k); }
@@ -4186,11 +4323,12 @@ function beginRun(mode){
   G.runMode=mode||'contract';
   G.contractGoal=(mode==='contract')?12:9999;
   G.started=true; introT=0; rollRelicOffers(); metaOnGameStart();
-  $('startOverlay').style.display='none';
+  if(typeof disengageStation==='function') disengageStation(true);
+  var so=$('startOverlay'); if(so) so.style.display='none';
   toast(mode==='endless'?'♾ Vô tận — cống tăng ~20%/vòng, không hạn hợp đồng.':'📜 Hợp đồng 12 vòng — trễ cống 3 lần là thua!', 'info');
   refreshUI();
 }
-$('btnStart').addEventListener('click', function(){ beginRun('contract'); });
+bindClick('btnStart', function(){ beginRun('contract'); });
 var _bse=$('btnStartEndless'); if(_bse) _bse.addEventListener('click', function(){ beginRun('endless'); });
 
 var _bmr = $('btnMenuRules');
@@ -4214,8 +4352,8 @@ if (_bmr) {
   }
 });
 
-$('btnAgain').addEventListener('click', function(){
-  $('endOverlay').style.display='none';
+bindClick('btnAgain', function(){
+  var eo=$('endOverlay'); if(eo) eo.style.display='none';
   closeSheets();
   var _m=G&&G.runMode?G.runMode:'contract';
   newGame(); beginRun(_m);
@@ -4225,41 +4363,12 @@ var _bht=$('btnHudToggle'); if(_bht) _bht.addEventListener('click', function(e){
 var _bhe=$('btnHudExpand'); if(_bhe) _bhe.addEventListener('click', function(){ audio(); META.hudCollapsed=false; metaSave(); applyHudChrome(); refreshUI(); });
 var _bum=$('btnUiMode'); if(_bum) _bum.addEventListener('click', function(e){ e.stopPropagation(); audio(); toggleUiCompact(); });
 var _bcr=$('btnCoachReplay'); if(_bcr) _bcr.addEventListener('click', function(){ audio(); coachReplay(); });
-$('btnHeat').addEventListener('click', function(){
-  var stF = getStationStatus('furnace');
-  if(!stF.ok){
-    toast(stF.msg, 'bad');
-    if(typeof crackSound === 'function') crackSound();
-    shakeStationSprite('furnace');
-    return;
-  }
-  if(stF.action==='repair') doRepair();
-  else doHeat();
-});
-$('btnRepair').addEventListener('click', doRepair);
-$('btnHit').addEventListener('click', function(){
-  var stA = getStationStatus('anvil');
-  if(!stA.ok){
-    toast(stA.msg, 'bad');
-    if(typeof crackSound === 'function') crackSound();
-    shakeStationSprite('anvil');
-    return;
-  }
-  if(stA.action==='bank') doBank();
-  else doHit();
-});
-$('btnBank').addEventListener('click', doBank);
-$('btnTribute').addEventListener('click', function(){
-  var stB = getStationStatus('bell');
-  if(!stB.ok){
-    toast(stB.msg, 'bad');
-    if(typeof crackSound === 'function') crackSound();
-    shakeStationSprite('bell');
-    return;
-  }
-  doTribute();
-});
-$('btnHang').addEventListener('click', function(){ hangSword(); });
+bindClick('btnHeat', function(){ engageStation('furnace', true); runStationAction('furnace'); });
+bindClick('btnRepair', doRepair);
+bindClick('btnHit', function(){ engageStation('anvil', true); runStationAction('anvil'); });
+bindClick('btnBank', function(){ engageStation('anvil', true); doBank(); });
+bindClick('btnTribute', function(){ engageStation('bell', true); runStationAction('bell'); });
+bindClick('btnHang', function(){ engageStation('rack', true); runStationAction('rack'); });
 var _bip = $('interactPrompt'); if(_bip) _bip.addEventListener('click', function(){ engageStation(currentNearStation); });
 var _bls = $('btnLeaveStation'); if(_bls) _bls.addEventListener('click', function(){ disengageStation(); });
 /* ---------- sheets (UX v4): Relic / Upgrades / Help open one at a time
@@ -4303,35 +4412,7 @@ window.addEventListener('keydown', function(e){
   if(e.repeat) return;
   if(e.code==='KeyE'){
     e.preventDefault();
-    if(!isStationEngaged){
-      if(!currentNearStation) return;
-      var stNear = getStationStatus(currentNearStation);
-      if(!stNear.ok){
-        toast(stNear.msg, 'bad');
-        if(typeof crackSound === 'function') crackSound();
-        shakeStationSprite(currentNearStation);
-        return;
-      }
-      engageStation(currentNearStation);
-    } else {
-      var actSt = getStationStatus(activeStation);
-      if(!actSt.ok){
-        toast(actSt.msg, 'bad');
-        if(typeof crackSound === 'function') crackSound();
-        shakeStationSprite(activeStation);
-        return;
-      }
-      if(activeStation==='anvil'){
-        if(G.turns <= 0 && G.hits > 0) doBank();
-        else doHit();
-      }
-      else if(activeStation==='furnace'){
-        if(G.furnaceBroken) doRepair();
-        else doHeat();
-      }
-      else if(activeStation==='bell') doTribute();
-      else if(activeStation==='rack') hangSword();
-    }
+    onStationUseKey();
     return;
   }
   if(e.code==='KeyQ'){
@@ -4341,55 +4422,13 @@ window.addEventListener('keydown', function(e){
   }
   if(e.code==='Space'){
     e.preventDefault();
-    if(!G.started){ $('btnStart').click(); }
-    else {
-      if(!isStationEngaged){
-        if(!currentNearStation) return;
-        var stNear = getStationStatus(currentNearStation);
-        if(!stNear.ok){
-          toast(stNear.msg, 'bad');
-          if(typeof crackSound === 'function') crackSound();
-          shakeStationSprite(currentNearStation);
-          return;
-        }
-        engageStation(currentNearStation);
-      } else {
-        var actSt = getStationStatus(activeStation);
-        if(!actSt.ok){
-          toast(actSt.msg, 'bad');
-          if(typeof crackSound === 'function') crackSound();
-          shakeStationSprite(activeStation);
-          return;
-        }
-        if(activeStation==='furnace'){
-          if(G.furnaceBroken) doRepair();
-          else doHeat();
-        }
-        else if(activeStation==='bell') doTribute();
-        else if(activeStation==='rack') hangSword();
-        else {
-          if(G.turns <= 0 && G.hits > 0) doBank();
-          else doHit();
-        }
-      }
-    }
+    if(!G || !G.started){ var bs=$('btnStart'); if(bs) bs.click(); }
+    else onStationUseKey();
   }
   else if(e.code==='KeyV') setInspect(!inspectOn);
-  else if(e.code==='KeyH'){
-    var _hf=getStationStatus('furnace');
-    if(!_hf.ok){ toast(_hf.msg,'bad'); if(typeof crackSound==='function') crackSound(); shakeStationSprite('furnace'); return; }
-    if(engageStation('furnace', true)){ if(_hf.action==='repair') doRepair(); else doHeat(); }
-  }
-  else if(e.code==='KeyB'){
-    var _hb=getStationStatus('anvil');
-    if(!_hb.ok){ toast(_hb.msg,'bad'); if(typeof crackSound==='function') crackSound(); shakeStationSprite('anvil'); return; }
-  engageStation('anvil', true); doBank();
-  }
-  else if(e.code==='KeyT'){
-    var _ht=getStationStatus('rack');
-    if(!_ht.ok){ toast(_ht.msg,'bad'); if(typeof crackSound==='function') crackSound(); shakeStationSprite('rack'); return; }
-    if(engageStation('rack', true)) hangSword();
-  }
+  else if(e.code==='KeyH'){ if(engageStation('furnace', true)) runStationAction('furnace'); }
+  else if(e.code==='KeyB'){ if(engageStation('anvil', true)) doBank(); }
+  else if(e.code==='KeyT'){ if(engageStation('rack', true)) runStationAction('rack'); }
 });
 window.addEventListener('keyup', function(e){
   if(e.code==='KeyW'||e.code==='KeyA'||e.code==='KeyS'||e.code==='KeyD'||e.code==='ArrowUp'||e.code==='ArrowDown'||e.code==='ArrowLeft'||e.code==='ArrowRight') setMoveKey(e.code,0);
@@ -4475,42 +4514,14 @@ window.addEventListener('pointerup', function(e){
     return;
   }
   if(m===dF){
-    if(activeStation!=='furnace') engageStation('furnace');
-    else {
-      var stF = getStationStatus('furnace');
-      if(stF.ok){
-        if(G && G.furnaceBroken) doRepair();
-        else doHeat();
-      } else {
-        toast(stF.msg, 'bad');
-        if(typeof crackSound === 'function') crackSound();
-        shakeStationSprite('furnace');
-      }
-    }
+    if(activeStation!=='furnace' || !isStationEngaged){ engageStation('furnace'); }
+    else runStationAction('furnace');
   } else if(m===dB){
-    if(activeStation!=='bell') engageStation('bell');
-    else {
-      var stB = getStationStatus('bell');
-      if(stB.ok) doTribute();
-      else {
-        toast(stB.msg, 'bad');
-        if(typeof crackSound === 'function') crackSound();
-        shakeStationSprite('bell');
-      }
-    }
+    if(activeStation!=='bell' || !isStationEngaged){ engageStation('bell'); }
+    else runStationAction('bell');
   } else if(m===dA){
-    if(activeStation!=='anvil') engageStation('anvil');
-    else {
-      var stA = getStationStatus('anvil');
-      if(stA.ok){
-        if(G && G.turns <= 0 && G.hits > 0) doBank();
-        else doHit();
-      } else {
-        toast(stA.msg, 'bad');
-        if(typeof crackSound === 'function') crackSound();
-        shakeStationSprite('anvil');
-      }
-    }
+    if(activeStation!=='anvil' || !isStationEngaged){ engageStation('anvil'); }
+    else runStationAction('anvil');
   }
 });
 window.addEventListener('pointercancel', function(){ isDragging=false; });
@@ -4676,9 +4687,6 @@ function animate(){
         }
       }
     }
-    smithFollow+=(1-smithFollow)*Math.min(1,dt*5);
-    if(!G||!G.started||G.over||inspectOn) smithFollow=Math.max(0,smithFollow-dt*6);
-    var sOffX=smith?(smith.position.x-SMITH_HOME.x)*smithFollow:0, sOffZ=smith?(smith.position.z-SMITH_HOME.z)*smithFollow:0;
     /* camera parallax + shake */
     lookX+=(lookTX-lookX)*Math.min(1,dt*4); lookY+=(lookTY-lookY)*Math.min(1,dt*4);
     shake=Math.max(0, shake-dt*1.4);
@@ -4952,9 +4960,16 @@ function animate(){
     impactLight.intensity=Math.max(0, impactLight.intensity-dt*420);
     if(ringT<1){ ringT=Math.min(1, ringT+dt*2.4); var re=1-Math.pow(1-ringT,3); shockRing.scale.setScalar(1+re*7.5); ringMat.opacity=.85*(1-ringT); }
     else ringMat.opacity=0;
-    /* cracks glow molten when break risk is high */
-    if(G&&G.hits>=3&&rkNow>=.18) crackMat.color.setHSL(.04, 1, .22+.16*Math.sin(t*9));
-    else crackMat.color.setHex(0x0a0a0a);
+    /* micro-ember sparks sputter from stressed cracks when break risk is dangerous */
+    if(G && G.hits>=3 && rkNow>=.10 && Math.random()<0.08 && !G.rainbow && !G.frenzy){
+      var activeC = cracks.filter(function(c){ return c.visible; });
+      if(activeC.length){
+        var pickC = activeC[Math.floor(Math.random()*activeC.length)];
+        var spPos = new THREE.Vector3();
+        pickC.getWorldPosition(spPos);
+        burstSparks(spPos.x, spPos.y, spPos.z, 2, 0.45, 0.35);
+      }
+    }
     /* sword squash on impact */
     swordSquash=Math.max(0, swordSquash-dt*5);
     var sq=reduced?0:swordSquash;
@@ -5697,22 +5712,22 @@ function syncMainModelVisual(){
     if(skinOrbit) skinOrbit.visible = lv>=100; /* orbiting crystals still crown the Lv.100 model */
   }
   modelHolder.scale.setScalar(1+lv*.0018); /* same gentle per-level growth as the procedural blade */
-  /* crack decals ride at the model's top surface and scale to fit the exact blade length */
+  /* Molten stress fissure placement adjusted cleanly to the 3D blade length */
   if(shown && mainModelGroup){
     var bbox = new THREE.Box3().setFromObject(mainModelGroup);
     var bMinX = bbox.min.x - sword.position.x;
     var bMaxX = bbox.max.x - sword.position.x;
-    var bladeSpan = Math.max(0.28, bMaxX - Math.max(0, bMinX));
+    var bladeSpan = Math.max(0.26, bMaxX - Math.max(0, bMinX));
     var startX = Math.max(0.06, bMinX + 0.08);
     cracks.forEach(function(c, i){
-      c.position.y = 0.024;
-      var targetX = startX + (i / 3.4) * (bladeSpan * 0.68);
-      c.position.x = targetX - (0.3 + i * 0.22);
-      c.scale.setScalar(Math.min(1.0, Math.max(0.42, bladeSpan / 1.1)));
+      var targetX = startX + (i / 3.4) * (bladeSpan * 0.72);
+      c.position.set(targetX, 0.025, 0);
+      var scX = Math.min(1.0, Math.max(0.38, bladeSpan / 1.15));
+      c.scale.set(scX, scX * 0.85, 1);
     });
   } else {
-    cracks.forEach(function(c){
-      c.position.set(0, 0, 0);
+    cracks.forEach(function(c, i){
+      c.position.set(0.32 + i * 0.22, 0.025, 0);
       c.scale.set(1, 1, 1);
     });
   }
