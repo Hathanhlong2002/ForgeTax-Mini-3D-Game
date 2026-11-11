@@ -2114,7 +2114,10 @@ var STATIONS={
 
 /* 3D First-Person Walking & Mouse Look Spatial System */
 var activeStation = 'anvil';
-document.body.classList.add('st-anvil');
+var isStationEngaged = true;
+var currentNearStation = 'anvil';
+
+document.body.classList.add('st-anvil', 'station-engaged');
 
 var playerPos = new THREE.Vector3(0, 1.85, 2.05);
 var targetPlayerPos = new THREE.Vector3(0, 1.85, 2.05);
@@ -2131,8 +2134,55 @@ var STATION_DESTINATIONS = {
   wide:    { pos: new THREE.Vector3(0, 2.65, 3.8), yaw: 0, pitch: -0.22 }
 };
 
+function updateInteractPrompt(near){
+  currentNearStation = near || '';
+  var wrap = $('interactPromptWrap');
+  var lbl = $('interactLabel');
+  if(!wrap || !lbl) return;
+  
+  if(!isStationEngaged && near){
+    wrap.style.display = 'flex';
+    var names = {
+      anvil: 'SỬ DỤNG ĐE RÈN 🛠️ (Bấm E)',
+      furnace: 'SỬ DỤNG LÒ NUNG 🔥 (Bấm E)',
+      bell: 'RUNG CHUÔNG CỐNG 🔔 (Bấm E)',
+      rack: 'QUẢN LÝ GIÁ TREO 🗡️ (Bấm E)'
+    };
+    lbl.textContent = names[near] || 'THAO TÁC TRẠM (Bấm E)';
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+function engageStation(st){
+  if(!st) st = currentNearStation || activeStation || 'anvil';
+  isStationEngaged = true;
+  document.body.classList.add('station-engaged');
+  setStation(st, false);
+  updateInteractPrompt(currentNearStation);
+  if(typeof audio === 'function') audio();
+  if(st === 'anvil') toast('🛠 Đe Rèn — [Space/E] Gõ búa, [B] Chốt, [Q/WASD] Rời trạm', 'info');
+  else if(st === 'furnace') toast('🔥 Lò Nung — [Space/E] Nung kiếm, [Q/WASD] Rời trạm', 'info');
+  else if(st === 'bell') toast('🔔 Chuông Cống — [Space/E] Nộp cống, [Q/WASD] Rời trạm', 'info');
+  else if(st === 'rack') toast('🗡 Giá Treo — [T] Treo/Lấy kiếm, [Q/WASD] Rời trạm', 'info');
+  refreshUI();
+}
+
+function disengageStation(silent){
+  if(!isStationEngaged) return;
+  isStationEngaged = false;
+  document.body.classList.remove('station-engaged');
+  document.querySelectorAll('.st-tab').forEach(function(b){
+    b.classList.toggle('active', false);
+  });
+  updateInteractPrompt(currentNearStation);
+  if(!silent){
+    toast('Đã rời trạm — Phím WASD để đi bộ tự do, đến gần trạm bấm [E]', 'info');
+  }
+  refreshUI();
+}
+
 function setStation(st, silent){
-  if(activeStation === st) return;
   activeStation = st;
   document.body.classList.remove('st-anvil','st-furnace','st-bell','st-rack','st-wide');
   document.body.classList.add('st-' + st);
@@ -2145,13 +2195,6 @@ function setStation(st, silent){
     targetYaw = dest.yaw;
     targetPitch = dest.pitch;
   }
-  if(!silent){
-    if(st === 'furnace') toast('🔥 Trạm Lò Nung — [Space] hoặc [H] để Nung kiếm', 'info');
-    else if(st === 'bell') toast('🔔 Trạm Chuông Cống — Rung chuông nộp cống Rồng Khói', 'info');
-    else if(st === 'rack') toast('🗡 Trạm Giá Treo — [T] để treo/lấy kiếm trên giá', 'info');
-    else if(st === 'anvil') toast('🛠 Trạm Đe Rèn — [Space] để gõ búa, [B] để chốt kiếm', 'info');
-    else if(st === 'wide') toast('👁 Toàn cảnh xưởng rèn — Kéo chuột xoay 360°, WASD để đi bộ', 'info');
-  }
   refreshUI();
 }
 
@@ -2161,7 +2204,7 @@ function playerStationNear(){
   for(var k in STATIONS){
     var s = STATIONS[k];
     var d = Math.hypot(p.x - s.x, p.z - s.z);
-    if(d < s.r + 0.35 && d < bd){
+    if(d < s.r + 0.55 && d < bd){
       bd = d;
       best = k;
     }
@@ -2204,13 +2247,22 @@ function updateFPSMovement(dt){
   camYaw += (targetYaw - camYaw) * Math.min(1, dt * 16);
   camPitch += (targetPitch - camPitch) * Math.min(1, dt * 16);
   
+  camera.position.x = playerPos.x;
+  camera.position.y = playerPos.y + Math.sin(walkBob) * 0.045;
+  camera.position.z = playerPos.z;
+  
+  camera.rotation.order = 'YXZ';
+  camera.rotation.y = camYaw;
+  camera.rotation.x = camPitch;
+  
   var near = playerStationNear();
-  if(near && near !== activeStation){
-    setStation(near, true);
-  }
+  updateInteractPrompt(near);
 }
 
 function setMoveKey(code,on){
+  if(on && isStationEngaged){
+    disengageStation(true);
+  }
   if(code==='KeyW'||code==='ArrowUp') moveKeys.w=on?1:0;
   else if(code==='KeyS'||code==='ArrowDown') moveKeys.s=on?1:0;
   else if(code==='KeyA'||code==='ArrowLeft') moveKeys.a=on?1:0;
