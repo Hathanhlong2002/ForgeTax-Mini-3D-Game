@@ -148,8 +148,7 @@
   #gameTeaserOverlay .game-teaser-ui{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:flex-end;padding:max(10px,env(safe-area-inset-top)) 14px max(18px,env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(0,0,0,.35) 0%,transparent 22%,transparent 62%,rgba(0,0,0,.72) 100%);}
   #gameTeaserHook{font-size:clamp(18px,4.5vw,28px);font-weight:900;color:#ffe8c8;text-shadow:0 3px 18px rgba(0,0,0,.9);line-height:1.25;margin-bottom:8px;}
   #gameTeaserSub{font-size:clamp(12px,2.8vw,15px);color:#ffc98a;opacity:.95;margin-bottom:14px;max-width:min(92vw,640px);}
-  #gameTeaserBtnSkip,#gameTeaserBtnEnter{pointer-events:auto;padding:10px 16px;font-size:14px;border-radius:12px;border:1px solid rgba(255,196,120,.45);background:rgba(24,10,4,.88);color:#ffe8c8;cursor:pointer;margin-left:8px;}
-  #gameTeaserBtnEnter{background:linear-gradient(180deg,#9a4b12,#6b2d05);border-color:#ffb84d;}
+  #gameTeaserBtnSkip{pointer-events:auto;padding:10px 16px;font-size:14px;border-radius:12px;border:1px solid rgba(255,196,120,.45);background:rgba(24,10,4,.88);color:#ffe8c8;cursor:pointer;}
   #gameTeaserActions{align-self:flex-end;display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;width:100%;}
   #floatLayer{position:fixed;left:50%;top:42%;transform:translateX(-50%);pointer-events:none;z-index:31;text-align:center;contain:layout style;}
   .floatnum{font-size:clamp(22px,5vw,38px);font-weight:900;color:var(--gold-2);text-shadow:0 2px 10px rgba(0,0,0,.9),0 0 22px rgba(255,160,30,.75);animation:floatUp 1.15s ease-out forwards;white-space:nowrap;}
@@ -4122,7 +4121,7 @@ mesh(new THREE.BoxGeometry(2.17, 1.29, .01), matGold, 0, 0, -.002, displayStand)
 
 // Canvas Texture and Display Screen (native 2K UHD for extreme legibility in 3D)
 var SWORD_TABLE_W = 2048, SWORD_TABLE_H = 1152;
-var SWORD_TABLE_DPR = Math.min(2.5, Math.max(1.5, (typeof window!=='undefined' && window.devicePixelRatio)||1.5));
+var SWORD_TABLE_DPR = (typeof IS_LOW!=='undefined'&&IS_LOW)?1.15:((typeof IS_MOBILE!=='undefined'&&IS_MOBILE)?1.35:Math.min(1.85,(typeof window!=='undefined'&&window.devicePixelRatio)||1.5));
 var swordTableCanvas, swordTableCtx, swordTableTexture, swordTableMesh;
 function applySwordTableCanvasDpr(){
   if(!swordTableCanvas||!swordTableCtx) return;
@@ -4173,7 +4172,6 @@ function updateSwordTableDisplay(){
     if(n >= 1e4) return n.toLocaleString();
     return String(n);
   }
-  var sHits = (G && typeof G.hits === "number") ? G.hits : 0;
   var sShapeName = (typeof modelNameForLevel === "function") ? modelNameForLevel(sLv) : "Kiếm Sắt";
 
   function drawCrispText(text, x, y, font, fillStyle, align, strokeW, strokeStyle){
@@ -4190,170 +4188,225 @@ function updateSwordTableDisplay(){
     c.fillText(text, x, y);
   }
 
+  function drawRoundedPill(x, y, pw, ph, rad, fillStyle, strokeColor, strokeWidth, shadowColor, shadowBlur){
+    c.save();
+    if(shadowColor && shadowBlur){
+      c.shadowColor = shadowColor;
+      c.shadowBlur = shadowBlur;
+      c.shadowOffsetX = 0;
+      c.shadowOffsetY = 4;
+    }
+    c.beginPath();
+    if(c.roundRect) {
+      c.roundRect(x, y, pw, ph, rad);
+    } else {
+      c.moveTo(x + rad, y);
+      c.lineTo(x + pw - rad, y);
+      c.quadraticCurveTo(x + pw, y, x + pw, y + rad);
+      c.lineTo(x + pw - rad, y + ph);
+      c.quadraticCurveTo(x + pw, y + ph, x + pw - rad, y + ph);
+      c.lineTo(x + rad, y + ph);
+      c.quadraticCurveTo(x, y + ph, x, y + ph - rad);
+      c.lineTo(x, y + rad);
+      c.quadraticCurveTo(x, y, x + rad, y);
+    }
+    if(fillStyle){
+      c.fillStyle = fillStyle;
+      c.fill();
+    }
+    if(strokeColor && strokeWidth){
+      c.strokeStyle = strokeColor;
+      c.lineWidth = strokeWidth;
+      c.stroke();
+    }
+    c.restore();
+  }
+
   // 1. Clear & Dark forged slate background
   c.clearRect(0, 0, w, h);
-  var bg = c.createRadialGradient(w/2, h/2, 80, w/2, h/2, w*0.75);
-  bg.addColorStop(0, "#18110b");
-  bg.addColorStop(0.65, "#0e0906");
-  bg.addColorStop(1, "#050302");
+  var bg = c.createRadialGradient(w/2, h/2, 100, w/2, h/2, w * 0.75);
+  bg.addColorStop(0, "#1a110a");
+  bg.addColorStop(0.65, "#0d0805");
+  bg.addColorStop(1, "#040201");
   c.fillStyle = bg;
   c.fillRect(0, 0, w, h);
 
-  // 2. High-contrast Ornate Border
-  c.strokeStyle = "rgba(232, 179, 60, 0.70)";
-  c.lineWidth = 10;
-  c.strokeRect(26, 26, w - 52, h - 52);
+  // Outer ornate frame with glowing gold trim
+  drawRoundedPill(24, 24, w - 48, h - 48, 44, null, "rgba(232, 179, 60, 0.45)", 6, "rgba(232, 179, 60, 0.25)", 18);
+  drawRoundedPill(38, 38, w - 76, h - 76, 36, null, "rgba(232, 179, 60, 0.20)", 2);
 
-  c.strokeStyle = "rgba(232, 179, 60, 0.35)";
-  c.lineWidth = 4;
-  c.strokeRect(44, 44, w - 88, h - 88);
+  // 2. Top Header Pill (styled like .interact-prompt)
+  var headW = 1240, headH = 76, headX = (w - headW) / 2, headY = 48;
+  var headGrd = c.createLinearGradient(headX, headY, headX, headY + headH);
+  headGrd.addColorStop(0, "rgba(36, 22, 14, 0.98)");
+  headGrd.addColorStop(1, "rgba(18, 10, 6, 0.99)");
+  drawRoundedPill(headX, headY, headW, headH, 999, headGrd, "#e8b33c", 3.5, "rgba(232, 179, 60, 0.40)", 16);
 
-  // Corner accents
-  var cs = 72;
-  c.strokeStyle = "#ffd56a";
-  c.lineWidth = 8;
-  c.beginPath(); c.moveTo(26, 26+cs); c.lineTo(26, 26); c.lineTo(26+cs, 26); c.stroke();
-  c.beginPath(); c.moveTo(w-26-cs, 26); c.lineTo(w-26, 26); c.lineTo(w-26, 26+cs); c.stroke();
-  c.beginPath(); c.moveTo(26, h-26-cs); c.lineTo(26, h-26); c.lineTo(26+cs, h-26); c.stroke();
-  c.beginPath(); c.moveTo(w-26-cs, h-26); c.lineTo(w-26, h-26); c.lineTo(w-26, h-26-cs); c.stroke();
+  var headKeyGrd = c.createLinearGradient(headX + 16, headY + 12, headX + 16, headY + headH - 12);
+  headKeyGrd.addColorStop(0, "#d48a20");
+  headKeyGrd.addColorStop(1, "#874906");
+  drawRoundedPill(headX + 16, headY + 12, 60, headH - 24, 12, headKeyGrd, "#ffd56a", 2);
+  drawCrispText("⚔️", headX + 46, headY + 49, "900 28px system-ui, sans-serif", "#ffffff", "center");
+  var headTitle = isEn ? "FORGETAX · MASTER SMITH CONSOLE" : "FORGETAX · BẢNG THÔNG SỐ RÈN KIẾM";
+  drawCrispText(headTitle, headX + 96, headY + 52, "900 36px system-ui, -apple-system, sans-serif", "#ffd56a", "left", 6);
 
-  // 3. Header: Level & Skin Name (Left) + Value (Right)
+  // 3. Grid Coordinates for 4 Main Cards (2 Columns x 2 Rows)
+  var cardW = 926, cardH = 450;
+  var col1_X = 66, col2_X = 1056;
+  var row1_Y = 160, row2_Y = 646;
+
+  var cardGrd = c.createLinearGradient(0, row1_Y, 0, row1_Y + cardH);
+  cardGrd.addColorStop(0, "rgba(34, 22, 14, 0.97)");
+  cardGrd.addColorStop(1, "rgba(14, 8, 4, 0.99)");
+
+  var cardGrd2 = c.createLinearGradient(0, row2_Y, 0, row2_Y + cardH);
+  cardGrd2.addColorStop(0, "rgba(34, 22, 14, 0.97)");
+  cardGrd2.addColorStop(1, "rgba(14, 8, 4, 0.99)");
+
+  var goldKeyGrd = c.createLinearGradient(0, 0, 0, 54);
+  goldKeyGrd.addColorStop(0, "#d48a20");
+  goldKeyGrd.addColorStop(1, "#874906");
+
+  // ==================== CARD 1: CẤP ĐỘ KIẾM (LEVEL) ====================
+  drawRoundedPill(col1_X, row1_Y, cardW, cardH, 42, cardGrd, "#e8b33c", 5, "rgba(232, 179, 60, 0.35)", 20);
+  drawRoundedPill(col1_X + 36, row1_Y + 36, 88, 54, 14, goldKeyGrd, "#ffd56a", 2.5);
+  drawCrispText("LV", col1_X + 80, row1_Y + 74, "900 30px system-ui, sans-serif", "#fff9ea", "center", 4);
+  drawCrispText(isEn ? "BLADE LEVEL" : "CẤP ĐỘ KIẾM", col1_X + 144, row1_Y + 76, "900 40px system-ui, sans-serif", "#d8c29d", "left", 6);
+
   var hue = Math.round((sSkin.hue || 0.1) * 360);
   var skinColor = "hsl(" + hue + ", 94%, 82%)";
-  var modelTitle = sShapeName || (isEn ? "Blade" : "Kiếm");
-  var lvTitle = "Lv." + sLv + " · " + modelTitle + (sLv >= 100 ? (isEn ? " ★ MAX" : " ★ CỰC HẠN") : "");
-  drawCrispText(lvTitle, 72, 128, "900 100px system-ui, -apple-system, BlinkMacSystemFont, sans-serif", skinColor, "left", 16);
+  drawCrispText("Lv." + sLv, col1_X + 36, row1_Y + 235, "900 136px system-ui, sans-serif", skinColor, "left", 18);
+  drawCrispText(sShapeName + " · " + (sSkin.name || ""), col1_X + 36, row1_Y + 322, "900 48px system-ui, sans-serif", "#fff4db", "left", 10);
+  var nextDesc = (sLv >= 100) ? (isEn ? "★ MAX LEVEL (FINAL FORM)" : "★ CỰC HẠN VŨ KHÍ TỐI THƯỢNG")
+                              : (isEn ? ("Next: Lv." + (sLv+1) + " → " + modelNameForLevel(sLv + 1)) : ("Mục tiêu: Lv." + (sLv+1) + " → " + modelNameForLevel(sLv + 1)));
+  drawCrispText(nextDesc, col1_X + 36, row1_Y + 392, "800 36px system-ui, sans-serif", "#d4a359", "left", 8);
 
-  // Gold value (Right)
-  var goldText = "🪙 " + formatBoardGold(sVal) + " " + (isEn ? "GOLD" : "VÀNG");
-  drawCrispText(goldText, w - 72, 128, "900 106px system-ui, -apple-system, BlinkMacSystemFont, sans-serif", "#ffe566", "right", 16);
+  // ==================== CARD 2: GIÁ TRỊ (VÀNG) ====================
+  drawRoundedPill(col2_X, row1_Y, cardW, cardH, 42, cardGrd, "#ffd56a", 5, "rgba(255, 213, 106, 0.40)", 22);
+  drawRoundedPill(col2_X + 36, row1_Y + 36, 88, 54, 14, goldKeyGrd, "#ffd56a", 2.5);
+  drawCrispText("🪙", col2_X + 80, row1_Y + 74, "900 28px system-ui, sans-serif", "#fff9ea", "center");
+  drawCrispText(isEn ? "SWORD VALUE" : "GIÁ TRỊ KIẾM", col2_X + 144, row1_Y + 76, "900 40px system-ui, sans-serif", "#ffd56a", "left", 6);
+  drawCrispText(formatBoardGold(sVal) + " " + (isEn ? "GOLD" : "VÀNG"), col2_X + 36, row1_Y + 235, "900 132px system-ui, sans-serif", "#ffe066", "left", 18);
+  drawCrispText(isEn ? "Press [B] to bank gold into vault" : "Bấm phím [B] để chốt vàng vào kho", col2_X + 36, row1_Y + 322, "900 46px system-ui, sans-serif", "#fff4db", "left", 10);
+  var vaultInfo = (isEn ? "Vault reserve: " : "Vàng kho đang có: ") + formatBoardGold(G ? G.gold : 0) + (isEn ? " gold" : " vàng");
+  drawCrispText(vaultInfo, col2_X + 36, row1_Y + 392, "800 36px system-ui, sans-serif", "#ffd56a", "left", 8);
 
-  // Skin line & next model tier (Sub header)
-  var nextDesc = (sLv >= 100) ? (isEn ? "★ Final blade" : "★ Kiếm tối thượng")
-                              : (isEn ? ("Lv." + (sLv+1) + " → " + modelNameForLevel(sLv + 1)) : ("Lv." + (sLv+1) + " → " + modelNameForLevel(sLv + 1)));
-  var subTitle = "🎨 " + (sSkin.name || "") + "   ·   " + nextDesc;
-  drawCrispText(subTitle, 72, 206, "800 52px system-ui, -apple-system, BlinkMacSystemFont, sans-serif", "#e8dcc8", "left", 10);
+  // ==================== CARD 3: TỈ LỆ THÀNH CÔNG / THẤT BẠI ====================
+  var isSafeMode = (G && (G.rainbow || G.frenzy));
+  var rkBorderColor = isSafeMode ? "#5ae875" : (rk >= 0.15 ? "#ff4030" : "#e8b33c");
+  var rkShadowColor = isSafeMode ? "rgba(90, 232, 117, 0.45)" : (rk >= 0.15 ? "rgba(255, 64, 48, 0.40)" : "rgba(232, 179, 60, 0.35)");
+  drawRoundedPill(col1_X, row2_Y, cardW, cardH, 42, cardGrd2, rkBorderColor, 5, rkShadowColor, 20);
 
-  // Divider line
-  var divGrd = c.createLinearGradient(72, 0, w - 72, 0);
-  divGrd.addColorStop(0, "rgba(232,179,60,0.15)");
-  divGrd.addColorStop(0.5, "rgba(232,179,60,0.95)");
-  divGrd.addColorStop(1, "rgba(232,179,60,0.15)");
-  c.fillStyle = divGrd;
-  c.fillRect(72, 234, w - 144, 6);
-
-  // 4. Meters: HEAT, SHATTER RISK, STRIKES
-  function drawMeter(y, label, valText, pct, fillColor, valColor){
-    // Label
-    drawCrispText(label, 72, y + 42, "900 54px system-ui, -apple-system, BlinkMacSystemFont, sans-serif", "#f2e4d0", "left", 10);
-
-    // Value
-    var vc = valColor || (typeof fillColor === "string" ? fillColor : "#ffd56a");
-    drawCrispText(valText, w - 72, y + 42, "900 58px system-ui, -apple-system, BlinkMacSystemFont, sans-serif", vc, "right", 11);
-
-    // Bar track
-    var bx = 72, by = y + 58, bw = w - 144, bh = 46;
-    c.fillStyle = "rgba(10, 7, 4, 0.95)";
-    c.strokeStyle = "rgba(232, 179, 60, 0.50)";
-    c.lineWidth = 4;
-    c.beginPath();
-    if(c.roundRect) c.roundRect(bx, by, bw, bh, 12); else c.rect(bx, by, bw, bh);
-    c.fill();
-    c.stroke();
-
-    // Bar fill
-    var fw = Math.max(0, Math.min(bw, bw * pct));
-    if(fw > 6){
-      c.fillStyle = fillColor;
-      c.beginPath();
-      if(c.roundRect) c.roundRect(bx + 3, by + 3, fw - 6, bh - 6, 9); else c.rect(bx + 3, by + 3, fw - 6, bh - 6);
-      c.fill();
-    }
-  }
-
-  // Meter 1: Heat
-  var heatGrd = c.createLinearGradient(72, 0, w - 72, 0);
-  heatGrd.addColorStop(0, "#d93814");
-  heatGrd.addColorStop(0.5, "#ff8b14");
-  heatGrd.addColorStop(1, "#ffe566");
-  var heatLbl = isEn ? "🔥 BLADE HEAT" : "🔥 NHIỆT ĐỘ LƯỠI KIẾM";
-  drawMeter(262, heatLbl, sHeat + "%", sHeat / 100, heatGrd, "#ffbe66");
-
-  // Meter 2: Shatter Risk
-  var rkPct = (G && (G.rainbow || G.frenzy)) ? 0 : rk;
-  var rkText = (G && G.rainbow) ? (isEn ? "0% 🌈 (IMMUNE)" : "0% 🌈 (BẤT TỬ)")
-              : ((G && G.frenzy) ? (isEn ? "0% ★ (ARMED)" : "0% ★ (BẢO HỘ)")
-              : (rk < 0.095 ? (rk * 100).toFixed(1) + "%" : Math.round(rk * 100) + "%"));
-  var rkColor = (G && (G.rainbow || G.frenzy)) ? "#5ae875" : (rk >= 0.15 ? "#ff4030" : (rk >= 0.07 ? "#ffaa30" : "#5ae875"));
-  var rkFill = (G && (G.rainbow || G.frenzy)) ? 0 : Math.min(1, rk * 3.5);
-  var rkLbl = isEn ? "⚠ SHATTER RISK" : "⚠ NGUY CƠ VỠ KIẾM";
-  drawMeter(406, rkLbl, rkText, rkFill, rkColor, rkColor);
-
-  // Meter 3: Strikes
-  var strikeGrd = c.createLinearGradient(72, 0, w - 72, 0);
-  strikeGrd.addColorStop(0, "#9e6f22");
-  strikeGrd.addColorStop(1, "#ffd56a");
-  var strikeLbl = isEn ? "🔨 HAMMER STRIKES" : "🔨 SỐ NHÁT GÕ";
-  drawMeter(550, strikeLbl, sHits + " / 99", sHits / 99, strikeGrd, "#ffe08a");
-
-  // 5. Special Status Banner or Forge Lore Advice (Bottom)
-  var bannerY = 712, bannerH = 376;
-  if(G && G.rainbow){
-    var rbGrd = c.createLinearGradient(72, bannerY, w - 72, bannerY);
-    rbGrd.addColorStop(0, "rgba(255, 60, 60, 0.45)");
-    rbGrd.addColorStop(0.25, "rgba(255, 200, 40, 0.45)");
-    rbGrd.addColorStop(0.5, "rgba(60, 255, 120, 0.45)");
-    rbGrd.addColorStop(0.75, "rgba(50, 180, 255, 0.45)");
-    rbGrd.addColorStop(1, "rgba(220, 80, 255, 0.45)");
-    c.fillStyle = rbGrd;
-    c.strokeStyle = "#ffffff";
-    c.lineWidth = 5;
-    c.beginPath();
-    if(c.roundRect) c.roundRect(72, bannerY, w - 144, bannerH, 20); else c.rect(72, bannerY, w - 144, bannerH);
-    c.fill(); c.stroke();
-
-    drawCrispText(isEn ? "🌈 RAINBOW SURGE ACTIVE 🌈" : "🌈 CẦU VỒNG THẦN THÁNH KÍCH HOẠT 🌈", w/2, bannerY + 106, "900 74px system-ui, -apple-system, sans-serif", "#ffffff", "center", 14);
-    drawCrispText(isEn ? "Next strike: ×3.5 Value · 100% Unbreakable (1 Hit)" : "Nhát tới: ×3.5 Giá trị · 100% Bất tử không vỡ (1 Nhát)", w/2, bannerY + 206, "800 52px system-ui, -apple-system, sans-serif", "#ffffed", "center", 10);
-    drawCrispText(isEn ? "Press SPACE / Tap STRIKE HAMMER now!" : "Bấm phím SPACE hoặc nhấn GÕ BÚA ngay!", w/2, bannerY + 296, "700 44px system-ui, -apple-system, sans-serif", "#ffe082", "center", 8);
-  } else if(G && G.frenzy){
-    c.fillStyle = "rgba(255, 120, 20, 0.35)";
-    c.strokeStyle = "#ffa238";
-    c.lineWidth = 5;
-    c.beginPath();
-    if(c.roundRect) c.roundRect(72, bannerY, w - 144, bannerH, 20); else c.rect(72, bannerY, w - 144, bannerH);
-    c.fill(); c.stroke();
-
-    drawCrispText(isEn ? "★ FRENZY STRIKE READY ★" : "★ FRENZY BÙNG NỔ ★", w/2, bannerY + 106, "900 74px system-ui, -apple-system, sans-serif", "#ffe08a", "center", 14);
-    drawCrispText(isEn ? "Next strike: ×2.2 Value Multiplier · Unbreakable" : "Nhát kế tiếp: ×2.2 Giá trị · Không thể vỡ", w/2, bannerY + 206, "800 52px system-ui, -apple-system, sans-serif", "#fff4db", "center", 10);
-    drawCrispText(isEn ? "Hammer rapidly while frenzy is ignited!" : "Rèn nhanh trước khi hiệu ứng cuồng nộ vụt tắt!", w/2, bannerY + 296, "700 44px system-ui, -apple-system, sans-serif", "#ffd56a", "center", 8);
-  } else if(G && G.furnaceBroken){
-    c.fillStyle = "rgba(255, 40, 30, 0.35)";
-    c.strokeStyle = "#ff6050";
-    c.lineWidth = 5;
-    c.beginPath();
-    if(c.roundRect) c.roundRect(72, bannerY, w - 144, bannerH, 20); else c.rect(72, bannerY, w - 144, bannerH);
-    c.fill(); c.stroke();
-
-    drawCrispText(isEn ? "⚠ FURNACE DAMAGED BY DRAGON ⚠" : "⚠ LÒ NUNG BỊ RỒNG PHÁ HỎNG ⚠", w/2, bannerY + 106, "900 70px system-ui, -apple-system, sans-serif", "#ff7b70", "center", 14);
-    drawCrispText(isEn ? "Repair furnace at the hearth before heating blades" : "Hãy tới Lò Nung bấm [SỬA LÒ] để tiếp tục nung kiếm", w/2, bannerY + 206, "800 50px system-ui, -apple-system, sans-serif", "#ffc2be", "center", 10);
-    drawCrispText(isEn ? "Move to Furnace Station (Key 2) to restore heat" : "Di chuyển tới Lò (Phím 2) để dập lửa và sửa chữa lò", w/2, bannerY + 296, "700 44px system-ui, -apple-system, sans-serif", "#ff9b94", "center", 8);
+  var defKeyGrd = c.createLinearGradient(0, 0, 0, 54);
+  if(isSafeMode){
+    defKeyGrd.addColorStop(0, "#2e9f45"); defKeyGrd.addColorStop(1, "#155724");
   } else {
-    c.fillStyle = "rgba(24, 18, 12, 0.90)";
-    c.strokeStyle = "rgba(232, 179, 60, 0.45)";
-    c.lineWidth = 3.5;
-    c.beginPath();
-    if(c.roundRect) c.roundRect(72, bannerY, w - 144, bannerH, 20); else c.rect(72, bannerY, w - 144, bannerH);
-    c.fill(); c.stroke();
-
-    drawCrispText(isEn ? "🔥 MASTER SMITH DIRECTIVE" : "📜 BÍ QUYẾT RÈN THẦN KIẾM", w/2, bannerY + 96, "900 62px system-ui, -apple-system, sans-serif", "#ffd56a", "center", 12);
-    drawCrispText(isEn ? "Heat ≥60% halves shatter risk · Bank gold to satisfy dragon tribute"
-                       : "Nung nhiệt ≥60% giảm 50% nguy cơ vỡ · Đủ cống hãy rung chuông qua vòng", w/2, bannerY + 196, "800 50px system-ui, -apple-system, sans-serif", "#e8dac4", "center", 9);
-    drawCrispText(isEn ? "Hot forge increases value per hit · Press Space or Tap Strike Hammer"
-                       : "Gõ khi kiếm đỏ rực để tăng giá trị cực đại · Phím Space hoặc bấm Gõ Búa", w/2, bannerY + 288, "700 44px system-ui, -apple-system, sans-serif", "#bda98e", "center", 8);
+    defKeyGrd.addColorStop(0, "#d48a20"); defKeyGrd.addColorStop(1, "#874906");
   }
+  drawRoundedPill(col1_X + 36, row2_Y + 36, 88, 54, 14, defKeyGrd, isSafeMode ? "#7df094" : "#ffd56a", 2.5);
+  drawCrispText("🛡️", col1_X + 80, row2_Y + 74, "900 28px system-ui, sans-serif", "#fff9ea", "center");
+  drawCrispText(isEn ? "FORGE SUCCESS & BREAK RATE" : "TỈ LỆ THÀNH CÔNG & NGUY CƠ VỠ", col1_X + 144, row2_Y + 76, "900 40px system-ui, sans-serif", isSafeMode ? "#7df094" : "#d8c29d", "left", 6);
+
+  if(isSafeMode){
+    drawCrispText(isEn ? "100% SUCCESS" : "100% THÀNH CÔNG", col1_X + 36, row2_Y + 205, "900 110px system-ui, sans-serif", "#5ae875", "left", 16);
+    var safeTag = G.rainbow ? (isEn ? "🌈 RAINBOW IMMUNITY · 0% BREAK RISK (×3.5 VALUE)" : "🌈 CẦU VỒNG BẤT TỬ · 0% NGUY CƠ VỠ (×3.5 VÀNG)")
+                            : (isEn ? "★ FRENZY ARMED · 0% BREAK RISK (×2.2 VALUE)" : "★ CUỒNG NỘ BẢO HỘ · 0% NGUY CƠ VỠ (×2.2 VÀNG)");
+    drawCrispText(safeTag, col1_X + 36, row2_Y + 295, "900 42px system-ui, sans-serif", "#d5ffda", "left", 10);
+    var sbX = col1_X + 36, sbY = row2_Y + 330, sbW = cardW - 72, sbH = 34;
+    drawRoundedPill(sbX, sbY, sbW, sbH, 12, "rgba(10, 30, 14, 0.95)", "rgba(90, 232, 117, 0.60)", 2.5);
+    drawRoundedPill(sbX + 2, sbY + 2, sbW - 4, sbH - 4, 10, "#3cb35a");
+    drawCrispText(isEn ? "Next strike is 100% guaranteed safe — Strike hammer now!" : "Nhát gõ tới bảo đảm 100% an toàn không vỡ — Gõ búa ngay!", col1_X + 36, row2_Y + 412, "800 32px system-ui, sans-serif", "#a7f3d0", "left", 7);
+  } else {
+    var succRate = Math.max(0.1, Math.min(99.9, (1 - rk) * 100));
+    var failRate = Math.max(0.1, rk * 100);
+    var succText = (succRate >= 99.85 ? "99.9%" : succRate.toFixed(1) + "%");
+    var failText = (failRate <= 0.15 ? "0.1%" : failRate.toFixed(1) + "%");
+
+    drawCrispText("✔ " + succText + (isEn ? " SUCCESS" : " THÀNH CÔNG"), col1_X + 36, row2_Y + 200, "900 94px system-ui, sans-serif", "#4ade80", "left", 14);
+    var failColor = rk >= 0.15 ? "#ff4030" : (rk >= 0.07 ? "#ff9f1c" : "#fca5a5");
+    drawCrispText("⚠ " + failText + (isEn ? " SHATTER RISK" : " NGUY CƠ VỠ"), col1_X + 36, row2_Y + 290, "900 68px system-ui, sans-serif", failColor, "left", 10);
+
+    var mbX = col1_X + 36, mbY = row2_Y + 328, mbW = cardW - 72, mbH = 34;
+    drawRoundedPill(mbX, mbY, mbW, mbH, 12, "rgba(8, 5, 3, 0.95)", "rgba(232, 179, 60, 0.45)", 2.5);
+    var sRatio = Math.max(0.05, Math.min(0.98, succRate / 100));
+    var swW = Math.round((mbW - 4) * sRatio);
+    var failW = (mbW - 4) - swW;
+    drawRoundedPill(mbX + 2, mbY + 2, swW, mbH - 4, 10, "#3cb35a");
+    if(failW > 4){
+      drawRoundedPill(mbX + 2 + swW, mbY + 2, failW, mbH - 4, 10, failColor);
+    }
+    var hNote = isEn ? ("Heat: " + sHeat + "% (Heat ≥60% halves break risk) · Strikes: " + (G ? G.hits : 0) + "/99")
+                     : ("Nhiệt kiếm: " + sHeat + "% (Nhiệt ≥60% giảm 50% nguy cơ vỡ) · Đã gõ: " + (G ? G.hits : 0) + "/99 nhát");
+    drawCrispText(hNote, col1_X + 36, row2_Y + 412, "800 32px system-ui, sans-serif", "#e2d1bb", "left", 7);
+  }
+
+  // ==================== CARD 4: % ĐẠT CỐNG (QUOTA PROGRESS) ====================
+  var totalGoldAvailable = (G ? (G.gold || 0) : 0) + (G && G.hits > 0 ? (G.swordVal || 0) : 0);
+  var tgt = (G && G.target) ? G.target : 120;
+  var quotaPct = Math.round((totalGoldAvailable / tgt) * 100);
+  var isEnough = totalGoldAvailable >= tgt;
+
+  var qBorderColor = isEnough ? "#4ade80" : "#ffd56a";
+  var qShadowColor = isEnough ? "rgba(74, 222, 128, 0.45)" : "rgba(255, 213, 106, 0.40)";
+  drawRoundedPill(col2_X, row2_Y, cardW, cardH, 42, cardGrd2, qBorderColor, 5, qShadowColor, 20);
+
+  var qKeyGrd = c.createLinearGradient(0, 0, 0, 54);
+  if(isEnough){
+    qKeyGrd.addColorStop(0, "#2e9f45"); qKeyGrd.addColorStop(1, "#155724");
+  } else {
+    qKeyGrd.addColorStop(0, "#d48a20"); qKeyGrd.addColorStop(1, "#874906");
+  }
+  drawRoundedPill(col2_X + 36, row2_Y + 36, 88, 54, 14, qKeyGrd, isEnough ? "#7df094" : "#ffd56a", 2.5);
+  drawCrispText(isEnough ? "🔔" : "🎯", col2_X + 80, row2_Y + 74, "900 28px system-ui, sans-serif", "#fff9ea", "center");
+  drawCrispText(isEn ? "TRIBUTE QUOTA PROGRESS" : "TIẾN ĐỘ NỘP CỐNG QUA VÒNG", col2_X + 144, row2_Y + 76, "900 40px system-ui, sans-serif", isEnough ? "#7df094" : "#ffd56a", "left", 6);
+
+  if(isEnough){
+    drawCrispText(quotaPct + (isEn ? "% TRIBUTE READY 🔔" : "% ĐỦ CỐNG QUA VÒNG 🔔"), col2_X + 36, row2_Y + 205, "900 96px system-ui, sans-serif", "#4ade80", "left", 16);
+    var qSub = (isEn ? "Have " : "Hiện có ") + formatBoardGold(totalGoldAvailable) + " / " + formatBoardGold(tgt) + (isEn ? " gold · Ring bell to advance!" : " Vàng · Rung chuông để qua vòng!");
+    drawCrispText(qSub, col2_X + 36, row2_Y + 295, "900 42px system-ui, sans-serif", "#d1fae5", "left", 10);
+  } else {
+    drawCrispText(quotaPct + (isEn ? "% TRIBUTE REACHED" : "% ĐẠT CHỈ TIÊU CỐNG"), col2_X + 36, row2_Y + 205, "900 96px system-ui, sans-serif", "#ffbe3b", "left", 16);
+    var qSub2 = (isEn ? "Have " : "Hiện có ") + formatBoardGold(totalGoldAvailable) + " / " + formatBoardGold(tgt) + (isEn ? " gold · Need " : " Vàng · Cần thêm ") + formatBoardGold(Math.max(0, tgt - totalGoldAvailable)) + (isEn ? " gold" : " Vàng");
+    drawCrispText(qSub2, col2_X + 36, row2_Y + 295, "900 42px system-ui, sans-serif", "#fff4db", "left", 10);
+  }
+
+  var qbX = col2_X + 36, qbY = row2_Y + 328, qbW = cardW - 72, qbH = 34;
+  drawRoundedPill(qbX, qbY, qbW, qbH, 12, "rgba(8, 5, 3, 0.95)", isEnough ? "rgba(74, 222, 128, 0.60)" : "rgba(232, 179, 60, 0.45)", 2.5);
+  var fillRatio = Math.max(0, Math.min(1, totalGoldAvailable / tgt));
+  var qfW = Math.round((qbW - 4) * fillRatio);
+  if(qfW > 4){
+    var qfGrd = c.createLinearGradient(qbX + 2, 0, qbX + 2 + qfW, 0);
+    if(isEnough){
+      qfGrd.addColorStop(0, "#2e9f45"); qfGrd.addColorStop(1, "#5ae875");
+    } else {
+      qfGrd.addColorStop(0, "#d48a20"); qfGrd.addColorStop(1, "#ffd56a");
+    }
+    drawRoundedPill(qbX + 2, qbY + 2, qfW, qbH - 4, 10, qfGrd);
+  }
+
+  var roundNote = (isEn ? "Round " : "Vòng ") + (G ? G.round : 1) + (isEn ? " · Turns remaining: " : " · Lượt còn lại: ") + (G ? G.turns : 30) + (isEn ? " turns" : " lượt rèn");
+  drawCrispText(roundNote, col2_X + 36, row2_Y + 412, "800 32px system-ui, sans-serif", "#ffd56a", "left", 7);
 
   c.shadowBlur = 0;
   if(swordTableTexture){ swordTableTexture.needsUpdate = true; }
+}
+
+function swordTableStateKey(){
+  if(typeof G==='undefined'||!G) return '';
+  var sLv=(typeof swordLevelNow==='function')?swordLevelNow():(G.swordLevel||1);
+  var rkN=0;
+  if(!(G.rainbow||G.frenzy)&&typeof riskNow==='function'){ try{ rkN=Math.round(riskNow()*200); }catch(e){ rkN=0; } }
+  return [sLv, Math.round(G.swordVal||0), G.gold||0, G.target||120, G.turns||0, G.round||1, Math.round(G.heat/5), G.hits||0, G.frenzy?1:0, G.rainbow?1:0, G.furnaceBroken?1:0, CURRENT_LANG, rkN].join('|');
+}
+function invalidateSwordTable(){ if(typeof _txtCache!=='undefined') _txtCache.swordTableKey=''; }
+function maybeUpdateSwordTableDisplay(force){
+  if(typeof updateSwordTableDisplay!=='function') return;
+  var k=swordTableStateKey();
+  if(!force && typeof _txtCache!=='undefined' && _txtCache.swordTableKey===k) return;
+  try{
+    updateSwordTableDisplay();
+    if(typeof _txtCache!=='undefined') _txtCache.swordTableKey=k;
+  }catch(e){}
 }
 
 /* ================= SWORD SHAPES — a new SILHOUETTE every 3 levels =================
@@ -5711,7 +5764,7 @@ function applyUpgradeVisuals(){
 /* ---------- SWORD SKINS: blade visibly evolves as its value climbs ---------- */
 /* ================= 100 SWORD LEVELS =================
    Every successful hammer hit = exactly +1 level (1..100). Each level pays
-   exponential hit value + level-up surge (Lv.100 ≈ 1000 tỷ gold) and wears its OWN skin: 10 skin families x 10
+   hit value + level-up ×1.25 pricing (cap 1000 tỷ @ Lv.100) and wears its OWN skin: 10 skin families x 10
    variants. Within a family every level brightens the blade, shifts the
    fuller/guard colours and grows the glow + silhouette a step, so level N+1
    never looks identical to level N; crossing into a new family (11/21/.../91)
@@ -6431,6 +6484,7 @@ function metaOnLevel(lv){
   if(lv>=70) achUnlock('a_lv70');
   if(lv>=90) achUnlock('a_lv90');
   if(lv>=100) achUnlock('a_lv100');
+  if(typeof prefetchEndgameMedia==='function') prefetchEndgameMedia(lv);
 }
 function metaOnHitSuccess(isGreat){
   if(!G) return;
@@ -6737,6 +6791,29 @@ function updateSwordAttrBoard(){
   board.classList.toggle('sab-endgame', lv>=90);
 }
 
+function refreshHeatHudQuick(){
+  if(!G||!G.started) return;
+  _setText('uiHeatPct', Math.round(G.heat)+'%');
+  _setBar('heatFill', G.heat/100);
+  var rk=riskNow();
+  if(G.rainbow){
+    _setText('uiRiskPct','0% 🌈');
+    if(_txtCache.riskCol!=='#6bf178'){ _txtCache.riskCol='#6bf178'; _el('uiRiskPct').style.color='#6bf178'; }
+    _setBar('riskFill', 0);
+  } else if(G.frenzy){
+    _setText('uiRiskPct','0% ★');
+    if(_txtCache.riskCol!=='#ffcf5e'){ _txtCache.riskCol='#ffcf5e'; _el('uiRiskPct').style.color='#ffcf5e'; }
+    _setBar('riskFill', 0);
+  } else {
+    _setText('uiRiskPct', rk<.095 ? (rk*100).toFixed(1)+'%' : Math.round(rk*100)+'%');
+    var _rkCol = rk>=.15 ? '#ff5147' : (rk>=.07 ? '#ffb84d' : '');
+    if(_txtCache.riskCol!==_rkCol){ _txtCache.riskCol=_rkCol; _el('uiRiskPct').style.color=_rkCol; }
+    _setBar('riskFill', rk);
+  }
+  _el('riskFill').classList.toggle('hot', rk>=.15);
+  if(typeof maybeUpdateSwordTableDisplay==='function') maybeUpdateSwordTableDisplay(false);
+}
+
 function refreshUI(){
   _setText('uiRound', String(G.round));
   _setText('uiGold', String(G.gold));
@@ -6791,6 +6868,7 @@ function refreshUI(){
      decay calls refreshUI ~1×/s and must not touch this node. */
   if(_txtCache.skinLvRendered!==sLv){
     _txtCache.skinLvRendered=sLv;
+    invalidateSwordTable();
     var broadTier=Math.min(4, Math.floor((sLv-1)/25));
     var _sp=_el('swordPlate');
     if(_sp){ _sp.classList.remove('skin-t0','skin-t1','skin-t2','skin-t3','skin-t4'); _sp.classList.add('skin-t'+broadTier); }
@@ -6871,9 +6949,7 @@ function refreshUI(){
   invalidateStationStatusCache();
   if(typeof updateInteractPrompt==='function') updateInteractPrompt(currentNearStation);
   if(typeof updateSwordAttrBoard==='function') updateSwordAttrBoard();
-  if(typeof updateSwordTableDisplay==='function'){
-    try{ updateSwordTableDisplay(); }catch(e){ if(window.console) console.warn('sword table draw', e); }
-  }
+  if(typeof maybeUpdateSwordTableDisplay==='function') maybeUpdateSwordTableDisplay(false);
   applyHudChrome(); renderWorkflowRibbon();
 }
 function buildShop(){
@@ -7165,6 +7241,31 @@ function revealStartOverlayFromBoot(){
 /* Lv.100 — model Rồng Khói (assets/models) + phim tri ân 60s (assets/cutscenes) */
 var smokeDragonRoot=null, smokeDragonLoading=false, lv100TributeActive=false;
 var LV100_TRIBUTE_MP4='cutscenes/ForgeTax-Cutscene-60s-TrieuHoiLinhThu.mp4';
+var CINEMATIC_PREFETCH = { teaser: false, tribute: false, dragon: false };
+function prefetchUrl(url){
+  if(!url) return;
+  try{
+    var l=document.createElement('link');
+    l.rel='prefetch';
+    l.href=url;
+    document.head.appendChild(l);
+  }catch(e){}
+}
+function prefetchEndgameMedia(lv){
+  lv = (typeof clampLv==='function') ? clampLv(lv) : lv;
+  if(lv >= 82 && !CINEMATIC_PREFETCH.teaser){
+    CINEMATIC_PREFETCH.teaser = true;
+    prefetchUrl(assetsBase() + GAME_TEASER_MP4);
+  }
+  if(lv >= 94 && !CINEMATIC_PREFETCH.tribute){
+    CINEMATIC_PREFETCH.tribute = true;
+    prefetchUrl(assetsBase() + LV100_TRIBUTE_MP4);
+  }
+  if(lv >= 96 && !CINEMATIC_PREFETCH.dragon){
+    CINEMATIC_PREFETCH.dragon = true;
+    setTimeout(function(){ if(typeof showSmokeDragonHead==='function') showSmokeDragonHead(); }, 400);
+  }
+}
 function hideProceduralDragonMesh(){
   if(typeof dragonHead==='undefined' || !dragonHead) return;
   for(var i=0;i<dragonHead.children.length;i++){
@@ -7318,7 +7419,8 @@ function doHit(){
   setTimeout(function(){
     clang(.8, (wasRainbow?1.25:1)*(.88+heatAtStrike/100*.3+levelBefore*.0016)*rnd(.96,1.04)); hitstopEnd=performance.now()+50; if(!wasFrenzy&&!wasRainbow&&hitRisk>=.10) crackleSound(); shake=Math.max(shake, wasRainbow? .3 : .16);
     swordSquash=1; impactFX(wasRainbow?2.2:(wasFrenzy?1.7:1));
-    burstSparks(-.1,1.25,.25, wasRainbow?70:(wasFrenzy?60:34), wasRainbow?1.8:(wasFrenzy?1.5:1.1), 1);
+    var _sparkN=wasRainbow?70:(wasFrenzy?60:34); if(typeof IS_LOW!=='undefined'&&IS_LOW) _sparkN=Math.max(12,Math.round(_sparkN*0.35)); else if(typeof IS_MOBILE!=='undefined'&&IS_MOBILE) _sparkN=Math.max(18,Math.round(_sparkN*0.55));
+    burstSparks(-.1,1.25,.25, _sparkN, wasRainbow?1.8:(wasFrenzy?1.5:1.1), 1);
     fxOnHit(levelBefore); /* element burst / ground-crack flash on the sword's own FX tier */
     if(wasRainbow) burstRainbow(-.05,1.3,.2,80,1.7);
     var broke = !wasFrenzy && !wasRainbow && Math.random()<hitRisk;
@@ -7369,9 +7471,9 @@ function doHit(){
       if(G.swordLevel>levelBefore){
         metaOnLevel(G.swordLevel);
         var skL=skinForLevel(G.swordLevel), famChanged = skL.family!==famBefore;
-        var lvBonus = 0;
-        try{ lvBonus = applyBladeLevelUpPricing(G.swordLevel); }catch(e){ if(window.console) console.warn('level pricing', e); }
+        var lvBonus = applyBladeLevelUpPricing(G.swordLevel);
         _txtCache.skinLvRendered = -1;
+        invalidateSwordTable();
         if(lvBonus > 0){
           var celebratedLv = G.swordLevel, upFam = skinFamilyName(skL);
           setTimeout(function(){
@@ -7402,7 +7504,7 @@ function doHit(){
             if(G && G.swordLevel>=SWORD_LEVEL_MAX && typeof playLv100Tribute==='function') playLv100Tribute();
           }, 1200);
         }
-        if(typeof updateSwordTableDisplay==='function'){ try{ updateSwordTableDisplay(); }catch(e2){} }
+        invalidateSwordTable();
       }
       /* rainbow roll: 4% after a successful hit that didn't just consume rainbow and didn't just arm Frenzy */
       if(!wasRainbow && !G.rainbow && !armedFrenzy && !G.frenzy && Math.random()<RAINBOW_CHANCE){
@@ -7484,13 +7586,27 @@ function syncBladeCarryVisual(){
   if(!G||!G.started||heatAnim) return;
   if(G.carryingBlade){
     var yaw = (typeof camYaw!=='undefined')? camYaw : 0;
-    sword.position.set(
-      playerPos.x + Math.sin(yaw)*0.44,
-      playerPos.y - 0.78,
-      playerPos.z + Math.cos(yaw)*0.44
-    );
-    sword.rotation.y = yaw - 0.12;
+    var pitch = (typeof camPitch!=='undefined')? camPitch : 0;
+    if(typeof camera!=='undefined' && camera && (typeof inspectBlend==='undefined' || inspectBlend<.35)){
+      var _cr = new THREE.Vector3(0.32, -0.38, -0.88);
+      _cr.applyQuaternion(camera.quaternion);
+      sword.position.copy(camera.position).add(_cr);
+      sword.rotation.order = 'YXZ';
+      sword.rotation.y = yaw - 0.14;
+      sword.rotation.x = pitch * 0.22 + 0.18;
+      sword.rotation.z = 0;
+    } else {
+      sword.position.set(
+        playerPos.x + Math.sin(yaw)*0.44,
+        playerPos.y - 0.78,
+        playerPos.z + Math.cos(yaw)*0.44
+      );
+      sword.rotation.y = yaw - 0.12;
+    }
     if(typeof tongs!=='undefined' && tongs) tongs.visible = true;
+    if(typeof hammer!=='undefined' && hammer) hammer.visible = false;
+    if(typeof hammerGhost!=='undefined' && hammerGhost) hammerGhost.visible = false;
+    if(typeof sword!=='undefined' && sword) sword.visible = true;
   } else bladeOnAnvilHome();
 }
 function pickUpBlade(silent){
@@ -7500,6 +7616,9 @@ function pickUpBlade(silent){
   if(!atAnvil && playerStationNear()!=='anvil'){ toastL('Đến đe và bấm [E] rồi bấm [C] để cầm kiếm','Stand at the anvil, press [E], then [C] to pick up the blade','info'); return false; }
   if(!atAnvil && !engageStation('anvil', true)) return false;
   G.carryingBlade = true;
+  if(typeof syncBladeCarryVisual==='function') syncBladeCarryVisual();
+  if(typeof hammer!=='undefined' && hammer) hammer.visible = false;
+  if(typeof hammerGhost!=='undefined' && hammerGhost) hammerGhost.visible = false;
   if(!silent){ audio(); if(typeof whoosh==='function') whoosh(); toastL('🫳 Đã cầm kiếm — mang tới giá treo, chốt kho hoặc giao thương nhân','🫳 Carrying blade — take to rack, bank, or merchant','good'); }
   invalidateStationStatusCache(); refreshUI(); return true;
 }
@@ -7511,6 +7630,7 @@ function putDownBlade(silent){
   }
   G.carryingBlade = false;
   bladeOnAnvilHome();
+  if(typeof syncBladeCarryVisual==='function') syncBladeCarryVisual();
   if(!silent){ audio(); toastL('Đặt kiếm xuống đe — gõ búa hoặc nung tiếp','Blade on anvil — strike or heat again','info'); }
   invalidateStationStatusCache(); refreshUI(); return true;
 }
@@ -8053,8 +8173,10 @@ function animate(){
     camera.position.copy(_camPos);
     camera.lookAt(_camLook);
     camera.rotation.z += -lookX*.015*parEff;
-    hammer.visible = (activeStation==='anvil') && ib<.45;
-    hammerGhost.visible = (activeStation==='anvil') && ib<.45 && !(typeof IS_LOW!=='undefined'&&IS_LOW);
+    var _carryHammerHide = !!(G && G.carryingBlade) || !!(G && G.heating) || !!heatAnim;
+    var _showHammer = (activeStation==='anvil') && ib<.45 && !_carryHammerHide;
+    hammer.visible = _showHammer;
+    hammerGhost.visible = _showHammer && !(typeof IS_LOW!=='undefined'&&IS_LOW);
     if(typeof smith!=='undefined' && smith) smith.visible = false;
     /* furnace fire — dead black when the dragon has broken the furnace */
     var furnaceAlive = !(G&&G.furnaceBroken);
@@ -8171,11 +8293,11 @@ function animate(){
       if(typeof bladeLight!=='undefined' && bladeLight) bladeLight.intensity=4.2+Math.sin(t*7.3)*.7+heatPulse*3;
       cracks.forEach(function(c,i){ var rkT=riskNow(); c.visible = (G.hits>=3+i*2 || rkT>.05+i*.045) && !(G.rainbow); });
       if(!heatAnim) sword.position.y=1.175+Math.sin(t*1.4)*.004;
-      /* heat decay + HUD sync (cheap) */
+      /* heat decay — lightweight HUD (skip full refreshUI + 3D slate) */
       if(G.started&&!G.over){
         var before=Math.round(G.heat);
         G.heat=Math.max(relic('r_heatfloor')?15:0, G.heat - dt*(relic('heat')? .45 : .9)*(1-.13*upLv('furnace')));
-        if(Math.round(G.heat)!==before) refreshUI();
+        if(Math.round(G.heat)!==before && typeof refreshHeatHudQuick==='function') refreshHeatHudQuick();
       }
     }
     /* hammer swing — wall-clock too: the swing (and with it the hammerAnim<1
@@ -9042,7 +9164,7 @@ function onMeshReady(meshId){
   touchMesh(meshId);
   if(typeof dropEmbeddedMeshB64==='function') dropEmbeddedMeshB64(meshId);
   syncMainModelVisual();
-  if(typeof updateSwordTableDisplay==='function'){ try{ updateSwordTableDisplay(); }catch(e){} }
+  if(typeof maybeUpdateSwordTableDisplay==='function') maybeUpdateSwordTableDisplay(true);
   syncRackModels();
   if(typeof bootOnMeshProgress==='function') bootOnMeshProgress(meshId);
   if(typeof bootPreloadActive==='undefined' || !bootPreloadActive){
@@ -9577,7 +9699,7 @@ function startBootPreload(){
     }, 22000);
   }
 }
-function loadLevelModels(){ startBootPreload(); if(typeof initGameTeaserUI==='function') initGameTeaserUI(); if(typeof initLv100TributeUI==='function') initLv100TributeUI(); setTimeout(function(){ if(typeof preloadGameTeaser==='function') preloadGameTeaser(); if(typeof preloadLv100Tribute==='function') preloadLv100Tribute(); }, 1200); }
+function loadLevelModels(){ startBootPreload(); if(typeof initGameTeaserUI==='function') initGameTeaserUI(); if(typeof initLv100TributeUI==='function') initLv100TributeUI(); }
 if(document.readyState==='complete') setTimeout(loadLevelModels, 60);
 else window.addEventListener('load', function(){ setTimeout(loadLevelModels, 60); });
 
@@ -9848,7 +9970,7 @@ setInterval(function(){
 }, 500);
 
 newGame();
-if(typeof updateSwordTableDisplay==='function') updateSwordTableDisplay();
+if(typeof maybeUpdateSwordTableDisplay==='function') maybeUpdateSwordTableDisplay(true);
 applyLanguageUI();
 /* first frame is kicked on the next animation frame, not synchronously:
    animate() renders a full frame in its body, and running that inside the
